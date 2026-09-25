@@ -1,0 +1,131 @@
+{
+  "entities": {
+    "Slide": {
+      "title": "Slide",
+      "description": "Hero carousel slide item",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "image": { "type": "string" },
+        "ctaText": { "type": "string" },
+        "ctaLink": { "type": "string" },
+        "secondaryText": { "type": "string" },
+        "secondaryLink": { "type": "string" },
+        "order": { "type": "number" },
+        "active": { "type": "boolean" }
+      },
+      "required": ["title", "image", "order", "active"]
+    },
+    "News": {
+      "title": "News",
+      "description": "Institutional news or communique",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "content": { "type": "string" },
+        "category": { "type": "string" },
+        "author": { "type": "string" },
+        "date": { "type": "string" },
+        "image": { "type": "string" },
+        "views": { "type": "number" },
+        "featured": { "type": "boolean" },
+        "readTime": { "type": "string" }
+      },
+      "required": ["title", "excerpt", "content", "category", "date", "image"]
+    },
+    "AcademicService": {
+      "title": "AcademicService",
+      "description": "Academic program or course offering",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "duration": { "type": "string" },
+        "modality": { "type": "string" },
+        "targetAudience": { "type": "string" },
+        "image": { "type": "string" },
+        "iconName": { "type": "string" },
+        "requirements": { "type": "array", "items": { "type": "string" } },
+        "modules": { "type": "array", "items": { "type": "string" } },
+        "featured": { "type": "boolean" }
+      },
+      "required": ["code", "title", "category", "description", "duration", "modality"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Contact and admission inquiry message",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "subject": { "type": "string" },
+        "message": { "type": "string" },
+        "date": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["name", "email", "phone", "subject", "message", "date", "status"]
+    },
+    "User": {
+      "title": "User",
+      "description": "CMS system user account",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "status": { "type": "string" },
+        "password": { "type": "string" },
+        "lastLogin": { "type": "string" }
+      },
+      "required": ["username", "name", "email", "role", "status"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Audit trail log transaction",
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string" },
+        "formattedDate": { "type": "string" },
+        "action": { "type": "string" },
+        "module": { "type": "string" },
+        "user": { "type": "string" },
+        "details": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["timestamp", "formattedDate", "action", "module", "user", "details", "status"]
+    }
+  },
+  "firestore": {
+    "/slides/{slideId}": {
+      "schema": "Slide",
+      "description": "Hero carousel slides collection"
+    },
+    "/news/{newsId}": {
+      "schema": "News",
+      "description": "Institutional news collection"
+    },
+    "/services/{serviceId}": {
+      "schema": "AcademicService",
+      "description": "Academic offerings collection"
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Public contact and admissions inquiries"
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "CMS authorized users"
+    },
+    "/audit_logs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Forensic audit trail logs"
+    }
+  }
+}

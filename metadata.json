@@ -1,0 +1,6 @@
+{
+  "name": "PECPFFAA - Portal Universitario Militar & CMS",
+  "description": "Portal web institucional y CMS de gestión para el Programa de Educación y Capacitación Profesional de las FF.AA. (PECPFFAA), con carrusel 16:9, noticias, servicios académicos y control de usuarios.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
