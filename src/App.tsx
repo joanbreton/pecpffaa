@@ -2,7 +2,6 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
 import { HeroCarousel } from './components/HeroCarousel';
-import { QuickAccess } from './components/QuickAccess';
 import { AcademicOffer } from './components/AcademicOffer';
 import { InstitutionalInfo } from './components/InstitutionalInfo';
 import { NewsSection } from './components/NewsSection';
@@ -46,7 +45,6 @@ const MainContent: React.FC = () => {
           <Header />
           <main className="flex-1">
             <HeroCarousel />
-            <QuickAccess />
             <AcademicOffer />
             <InstitutionalInfo />
             <NewsSection />

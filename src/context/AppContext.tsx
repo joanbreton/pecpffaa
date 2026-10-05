@@ -35,7 +35,9 @@ import {
   saveUserToFirestore,
   deleteUserFromFirestore,
   saveAuditLogToFirestore,
-  clearAuditLogsInFirestore
+  clearAuditLogsInFirestore,
+  resetFirestoreToDefaults,
+  importDataToFirestore
 } from '../firebase/firestoreService';
 
 interface AppContextType {
@@ -66,31 +68,31 @@ interface AppContextType {
   messages: ContactMessage[];
   
   // Slide Actions
-  addSlide: (slide: Omit<SlideItem, 'id'>) => boolean;
-  updateSlide: (id: string, slide: Partial<SlideItem>) => boolean;
-  deleteSlide: (id: string) => boolean;
-  toggleSlideStatus: (id: string) => boolean;
+  addSlide: (slide: Omit<SlideItem, 'id'>) => Promise<boolean>;
+  updateSlide: (id: string, slide: Partial<SlideItem>) => Promise<boolean>;
+  deleteSlide: (id: string) => Promise<boolean>;
+  toggleSlideStatus: (id: string) => Promise<boolean>;
   
   // News Actions
-  addNews: (item: Omit<NewsItem, 'id' | 'views'>) => boolean;
-  updateNews: (id: string, item: Partial<NewsItem>) => boolean;
-  deleteNews: (id: string) => boolean;
+  addNews: (item: Omit<NewsItem, 'id' | 'views'>) => Promise<boolean>;
+  updateNews: (id: string, item: Partial<NewsItem>) => Promise<boolean>;
+  deleteNews: (id: string) => Promise<boolean>;
   incrementNewsViews: (id: string) => void;
   
   // Services Actions
-  addService: (item: Omit<ServiceItem, 'id'>) => boolean;
-  updateService: (id: string, item: Partial<ServiceItem>) => boolean;
-  deleteService: (id: string) => boolean;
+  addService: (item: Omit<ServiceItem, 'id'>) => Promise<boolean>;
+  updateService: (id: string, item: Partial<ServiceItem>) => Promise<boolean>;
+  deleteService: (id: string) => Promise<boolean>;
   
   // User Actions
-  addUser: (item: Omit<UserItem, 'id' | 'createdAt'>) => boolean;
-  updateUser: (id: string, item: Partial<UserItem>) => boolean;
-  deleteUser: (id: string) => boolean;
+  addUser: (item: Omit<UserItem, 'id' | 'createdAt'>) => Promise<boolean>;
+  updateUser: (id: string, item: Partial<UserItem>) => Promise<boolean>;
+  deleteUser: (id: string) => Promise<boolean>;
   
   // Contact Message
-  sendContactMessage: (msg: Omit<ContactMessage, 'id' | 'date' | 'status'>) => void;
-  updateMessageStatus: (id: string, status: 'No leído' | 'Leído' | 'Respondido') => boolean;
-  deleteMessage: (id: string) => boolean;
+  sendContactMessage: (msg: Omit<ContactMessage, 'id' | 'date' | 'status'>) => Promise<void>;
+  updateMessageStatus: (id: string, status: 'No leído' | 'Leído' | 'Respondido') => Promise<boolean>;
+  deleteMessage: (id: string) => Promise<boolean>;
   
   // Database & Audit Log
   auditLogs: AuditLogEntry[];
@@ -102,18 +104,23 @@ interface AppContextType {
     details: string, 
     snapshot?: Record<string, unknown>
   ) => void;
-  clearAuditLogs: () => boolean;
+  clearAuditLogs: () => Promise<boolean>;
   exportDatabase: () => string;
-  importDatabase: (jsonContent: string) => { success: boolean; message: string };
+  importDatabase: (jsonContent: string) => Promise<{ success: boolean; message: string }>;
   getDatabaseStats: () => DatabaseStats;
 
   // System
-  resetToDefaults: () => void;
+  resetToDefaults: () => Promise<void>;
   notification: { message: string; type: 'success' | 'error' | 'info' } | null;
   showNotification: (msg: string, type?: 'success' | 'error' | 'info') => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
+
+// Instant cross-tab broadcast for browsers running multiple tabs
+const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in window 
+  ? new BroadcastChannel('pecpffaa_multi_browser_sync') 
+  : null;
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeView, setActiveView] = useState<'portal' | 'dashboard'>('portal');
@@ -122,26 +129,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedServiceModal, setSelectedServiceModal] = useState<ServiceItem | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
-  // Load database state from persistent storage or initial seeds
+  // Load database state from persistent cache or initial seeds
   const [users, setUsers] = useState<UserItem[]>(() => {
     try {
       const saved = localStorage.getItem(DB_KEYS.USERS);
-      if (saved) {
-        const parsed: UserItem[] = JSON.parse(saved);
-        let hasChanges = false;
-        const updated = parsed.map((u) => {
-          if (u.username?.toLowerCase() === 'admin' && u.password !== 'admin') {
-            hasChanges = true;
-            return { ...u, password: 'admin' };
-          }
-          return u;
-        });
-        if (hasChanges) {
-          localStorage.setItem(DB_KEYS.USERS, JSON.stringify(updated));
-        }
-        return updated;
-      }
-      return INITIAL_USERS;
+      return saved ? JSON.parse(saved) : INITIAL_USERS;
     } catch {
       return INITIAL_USERS;
     }
@@ -150,15 +142,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [currentUser, setCurrentUser] = useState<UserItem | null>(() => {
     try {
       const saved = localStorage.getItem(DB_KEYS.CURRENT_USER);
-      if (saved) {
-        const parsed: UserItem = JSON.parse(saved);
-        if (parsed.username?.toLowerCase() === 'admin' && parsed.password !== 'admin') {
-          parsed.password = 'admin';
-          localStorage.setItem(DB_KEYS.CURRENT_USER, JSON.stringify(parsed));
-        }
-        return parsed;
-      }
-      return null;
+      return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
     }
@@ -208,39 +192,96 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Firebase Firestore Real-Time Cloud Synchronization
   const [firebaseSyncStatus, setFirebaseSyncStatus] = useState<'connecting' | 'connected' | 'error'>('connecting');
 
+  // Multi-tab synchronization handler
+  useEffect(() => {
+    if (!syncChannel) return;
+
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'CLOUD_REFRESH') {
+        // Re-read local storage cache if another tab in this browser updated it
+        try {
+          const s = localStorage.getItem(DB_KEYS.SLIDES);
+          if (s) setSlides(JSON.parse(s));
+          const n = localStorage.getItem(DB_KEYS.NEWS);
+          if (n) setNews(JSON.parse(n));
+          const srv = localStorage.getItem(DB_KEYS.SERVICES);
+          if (srv) setServices(JSON.parse(srv));
+          const u = localStorage.getItem(DB_KEYS.USERS);
+          if (u) setUsers(JSON.parse(u));
+          const m = localStorage.getItem(DB_KEYS.MESSAGES);
+          if (m) setMessages(JSON.parse(m));
+        } catch (e) {
+          console.error('Error syncing tab state', e);
+        }
+      }
+    };
+
+    syncChannel.addEventListener('message', handleMessage);
+    return () => {
+      syncChannel.removeEventListener('message', handleMessage);
+    };
+  }, []);
+
+  // Real-time synchronization with Google Cloud Firebase Firestore
   useEffect(() => {
     let isMounted = true;
     let cleanupListeners: (() => void) | undefined;
 
     initAndSyncFirestore({
       onSlidesUpdate: (firestoreSlides) => {
-        if (isMounted && firestoreSlides.length > 0) {
+        if (isMounted) {
           setSlides(firestoreSlides);
+          try {
+            localStorage.setItem(DB_KEYS.SLIDES, JSON.stringify(firestoreSlides));
+          } catch (e) {
+            console.error('Error saving slides cache', e);
+          }
         }
       },
       onNewsUpdate: (firestoreNews) => {
-        if (isMounted && firestoreNews.length > 0) {
+        if (isMounted) {
           setNews(firestoreNews);
+          try {
+            localStorage.setItem(DB_KEYS.NEWS, JSON.stringify(firestoreNews));
+          } catch (e) {
+            console.error('Error saving news cache', e);
+          }
         }
       },
       onServicesUpdate: (firestoreServices) => {
-        if (isMounted && firestoreServices.length > 0) {
+        if (isMounted) {
           setServices(firestoreServices);
+          try {
+            localStorage.setItem(DB_KEYS.SERVICES, JSON.stringify(firestoreServices));
+          } catch (e) {
+            console.error('Error saving services cache', e);
+          }
         }
       },
       onUsersUpdate: (firestoreUsers) => {
-        if (isMounted && firestoreUsers.length > 0) {
+        if (isMounted) {
           setUsers(firestoreUsers);
+          try {
+            localStorage.setItem(DB_KEYS.USERS, JSON.stringify(firestoreUsers));
+          } catch (e) {
+            console.error('Error saving users cache', e);
+          }
         }
       },
       onMessagesUpdate: (firestoreMessages) => {
         if (isMounted) {
           setMessages(firestoreMessages);
+          try {
+            localStorage.setItem(DB_KEYS.MESSAGES, JSON.stringify(firestoreMessages));
+          } catch (e) {
+            console.error('Error saving messages cache', e);
+          }
         }
       },
       onAuditLogsUpdate: (firestoreLogs) => {
         if (isMounted && firestoreLogs.length > 0) {
           setAuditLogs(firestoreLogs);
+          saveStoredAuditLogs(firestoreLogs);
         }
       },
       onSyncStatusChange: (status) => {
@@ -261,64 +302,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, []);
 
-  // Automatically sync table mutations to persistent database storage
-  useEffect(() => {
+  const notifyCrossTab = () => {
     try {
-      localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
-    } catch (e) {
-      console.error('Error saving users to database', e);
+      syncChannel?.postMessage({ type: 'CLOUD_REFRESH', timestamp: Date.now() });
+    } catch {
+      // ignore
     }
-  }, [users]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(DB_KEYS.CURRENT_USER, JSON.stringify(currentUser));
-    } catch (e) {
-      console.error('Error saving current user', e);
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(DB_KEYS.SLIDES, JSON.stringify(slides));
-    } catch (e) {
-      console.error('Error saving slides to database', e);
-    }
-  }, [slides]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(DB_KEYS.NEWS, JSON.stringify(news));
-    } catch (e) {
-      console.error('Error saving news to database', e);
-    }
-  }, [news]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(DB_KEYS.SERVICES, JSON.stringify(services));
-    } catch (e) {
-      console.error('Error saving services to database', e);
-    }
-  }, [services]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(DB_KEYS.MESSAGES, JSON.stringify(messages));
-    } catch (e) {
-      console.error('Error saving messages to database', e);
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    saveStoredAuditLogs(auditLogs);
-  }, [auditLogs]);
+  };
 
   const showNotification = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setNotification({ message: msg, type });
     setTimeout(() => {
       setNotification(null);
-    }, 4000);
+    }, 4500);
   };
 
   // Internal function to log any administrative change to the database
@@ -383,6 +379,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const updatedUser = { ...matched, lastLogin: 'Hace un momento' };
       setCurrentUser(updatedUser);
       setUsers(prev => prev.map(u => u.id === matched.id ? updatedUser : u));
+      try {
+        localStorage.setItem(DB_KEYS.CURRENT_USER, JSON.stringify(updatedUser));
+      } catch (e) {
+        console.error(e);
+      }
       saveUserToFirestore(updatedUser);
       setIsLoginModalOpen(false);
       showNotification(`Bienvenido, ${matched.name} (${matched.role})`, 'success');
@@ -413,20 +414,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       );
     }
     setCurrentUser(null);
+    try {
+      localStorage.removeItem(DB_KEYS.CURRENT_USER);
+    } catch (e) {
+      console.error(e);
+    }
     setActiveView('portal');
     showNotification('Sesión finalizada correctamente', 'info');
   };
 
-  // Slides CRUD with Database Audit Recording & Firebase Persistence
-  const addSlide = (slide: Omit<SlideItem, 'id'>) => {
+  // Slides CRUD with Database Audit Recording & Real-Time Firebase Persistence
+  const addSlide = async (slide: Omit<SlideItem, 'id'>): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const newSlide: SlideItem = {
       ...slide,
       id: 'sld-' + Date.now(),
       order: slides.length + 1
     };
+    
+    // Optimistic UI update
     setSlides(prev => [newSlide, ...prev]);
-    saveSlideToFirestore(newSlide);
+    
+    // Save to Firestore Cloud Database
+    const savedOk = await saveSlideToFirestore(newSlide);
+    if (!savedOk) {
+      showNotification('Aviso: Guardado localmente, sincronizando con Firestore...', 'info');
+    } else {
+      showNotification('Slide guardado y sincronizado con Firebase Firestore en todos los navegadores', 'success');
+    }
+
     recordAuditChange(
       'Creación',
       'Slides (Carrusel)',
@@ -435,16 +451,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Se creó un nuevo slide 16:9 con etiqueta "${newSlide.tag}" y enlace a "${newSlide.ctaText}".`,
       { slide: newSlide }
     );
-    showNotification('Slide del carrusel guardado en Firebase Firestore', 'success');
+    notifyCrossTab();
     return true;
   };
 
-  const updateSlide = (id: string, updated: Partial<SlideItem>) => {
+  const updateSlide = async (id: string, updated: Partial<SlideItem>): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const current = slides.find(s => s.id === id);
-    const updatedSlide = { ...current, ...updated } as SlideItem;
+    const updatedSlide: SlideItem = {
+      ...(current || {}),
+      ...updated,
+      id
+    } as SlideItem;
+
     setSlides(prev => prev.map(s => s.id === id ? updatedSlide : s));
-    saveSlideToFirestore(updatedSlide);
+    
+    const savedOk = await saveSlideToFirestore(updatedSlide);
+    if (!savedOk) {
+      showNotification('Aviso: Guardado localmente, sincronizando con Firestore...', 'info');
+    } else {
+      showNotification('Slide actualizado en Firebase Firestore (visible en todos los navegadores)', 'success');
+    }
+
     recordAuditChange(
       'Modificación',
       'Slides (Carrusel)',
@@ -453,15 +481,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Se actualizaron los campos del slide: ${Object.keys(updated).join(', ')}.`,
       { previous: current, updated }
     );
-    showNotification('Slide actualizado y registrado en Firebase Firestore', 'success');
+    notifyCrossTab();
     return true;
   };
 
-  const deleteSlide = (id: string) => {
+  const deleteSlide = async (id: string): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const current = slides.find(s => s.id === id);
     setSlides(prev => prev.filter(s => s.id !== id));
-    deleteSlideFromFirestore(id);
+    
+    await deleteSlideFromFirestore(id);
+    showNotification('Slide eliminado de la base de datos Firestore', 'info');
+
     recordAuditChange(
       'Eliminación',
       'Slides (Carrusel)',
@@ -470,32 +501,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Se eliminó permanentemente el slide del carrusel institucional de la base de datos.`,
       { deletedItem: current }
     );
-    showNotification('Slide eliminado de la base de datos', 'info');
+    notifyCrossTab();
     return true;
   };
 
-  const toggleSlideStatus = (id: string) => {
+  const toggleSlideStatus = async (id: string): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const current = slides.find(s => s.id === id);
-    const newStatus = !current?.active;
-    setSlides(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s));
-    if (current) {
-      saveSlideToFirestore({ ...current, active: newStatus });
-    }
+    if (!current) return false;
+    const newStatus = !current.active;
+    const updatedSlide: SlideItem = { ...current, active: newStatus, id };
+    
+    setSlides(prev => prev.map(s => s.id === id ? updatedSlide : s));
+    await saveSlideToFirestore(updatedSlide);
+
     recordAuditChange(
       'Cambio de Estado',
       'Slides (Carrusel)',
-      current?.title || id,
+      current.title || id,
       id,
       `Se cambió el estado del slide a ${newStatus ? 'ACTIVO (Visible)' : 'INACTIVO (Oculto)'}.`,
       { newStatus }
     );
-    showNotification(`Estado del slide modificado a ${newStatus ? 'Activo' : 'Inactivo'}`, 'success');
+    showNotification(`Slide marcado como ${newStatus ? 'Activo' : 'Inactivo'} en Firestore`, 'success');
+    notifyCrossTab();
     return true;
   };
 
-  // News CRUD with Database Audit Recording & Firebase Persistence
-  const addNews = (item: Omit<NewsItem, 'id' | 'views'>) => {
+  // News CRUD with Database Audit Recording & Real-Time Firebase Persistence
+  const addNews = async (item: Omit<NewsItem, 'id' | 'views'>): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const newItem: NewsItem = {
       ...item,
@@ -503,7 +537,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       views: 1,
     };
     setNews(prev => [newItem, ...prev]);
-    saveNewsToFirestore(newItem);
+    
+    const savedOk = await saveNewsToFirestore(newItem);
+    if (!savedOk) {
+      showNotification('Aviso: Guardado localmente, sincronizando con Firestore...', 'info');
+    } else {
+      showNotification('Noticia publicada en Firebase Firestore para todos los navegadores', 'success');
+    }
+
     recordAuditChange(
       'Creación',
       'Noticias',
@@ -512,16 +553,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Se redactó y publicó una nueva noticia en la categoría "${newItem.category}".`,
       { news: newItem }
     );
-    showNotification('Noticia guardada en Firebase Firestore', 'success');
+    notifyCrossTab();
     return true;
   };
 
-  const updateNews = (id: string, updated: Partial<NewsItem>) => {
+  const updateNews = async (id: string, updated: Partial<NewsItem>): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const current = news.find(n => n.id === id);
-    const updatedNews = { ...current, ...updated } as NewsItem;
+    const updatedNews: NewsItem = {
+      ...(current || {}),
+      ...updated,
+      id
+    } as NewsItem;
+
     setNews(prev => prev.map(n => n.id === id ? updatedNews : n));
-    saveNewsToFirestore(updatedNews);
+    
+    const savedOk = await saveNewsToFirestore(updatedNews);
+    if (!savedOk) {
+      showNotification('Aviso: Guardado localmente, sincronizando con Firestore...', 'info');
+    } else {
+      showNotification('Noticia actualizada en Firebase Firestore (visible en todos los navegadores)', 'success');
+    }
+
     recordAuditChange(
       'Modificación',
       'Noticias',
@@ -530,15 +583,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Se editaron datos de la noticia: ${Object.keys(updated).join(', ')}.`,
       { previous: current, updated }
     );
-    showNotification('Noticia actualizada y guardada en Firebase Firestore', 'success');
+    notifyCrossTab();
     return true;
   };
 
-  const deleteNews = (id: string) => {
+  const deleteNews = async (id: string): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const current = news.find(n => n.id === id);
     setNews(prev => prev.filter(n => n.id !== id));
-    deleteNewsFromFirestore(id);
+    
+    await deleteNewsFromFirestore(id);
+    showNotification('Noticia eliminada de la base de datos Firestore', 'info');
+
     recordAuditChange(
       'Eliminación',
       'Noticias',
@@ -547,7 +603,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Se eliminó la noticia "${current?.title}" de la base de datos del portal.`,
       { deletedItem: current }
     );
-    showNotification('Noticia eliminada de la base de datos', 'info');
+    notifyCrossTab();
     return true;
   };
 
@@ -558,15 +614,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     incrementNewsViewsInFirestore(id, updatedViews);
   };
 
-  // Services CRUD with Database Audit Recording & Firebase Persistence
-  const addService = (item: Omit<ServiceItem, 'id'>) => {
+  // Services CRUD with Database Audit Recording & Real-Time Firebase Persistence
+  const addService = async (item: Omit<ServiceItem, 'id'>): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const newItem: ServiceItem = {
       ...item,
       id: 'srv-' + Date.now(),
     };
     setServices(prev => [newItem, ...prev]);
-    saveServiceToFirestore(newItem);
+    
+    const savedOk = await saveServiceToFirestore(newItem);
+    if (!savedOk) {
+      showNotification('Aviso: Guardado localmente, sincronizando con Firestore...', 'info');
+    } else {
+      showNotification('Programa académico guardado en Firebase Firestore para todos los navegadores', 'success');
+    }
+
     recordAuditChange(
       'Creación',
       'Oferta Académica',
@@ -575,16 +638,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Se incorporó un nuevo programa de posgrado tipo ${newItem.category} con modalidad ${newItem.modality}.`,
       { service: newItem }
     );
-    showNotification('Programa académico guardado en Firebase Firestore', 'success');
+    notifyCrossTab();
     return true;
   };
 
-  const updateService = (id: string, updated: Partial<ServiceItem>) => {
+  const updateService = async (id: string, updated: Partial<ServiceItem>): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const current = services.find(s => s.id === id);
-    const updatedService = { ...current, ...updated } as ServiceItem;
+    const updatedService: ServiceItem = {
+      ...(current || {}),
+      ...updated,
+      id
+    } as ServiceItem;
+
     setServices(prev => prev.map(s => s.id === id ? updatedService : s));
-    saveServiceToFirestore(updatedService);
+    
+    const savedOk = await saveServiceToFirestore(updatedService);
+    if (!savedOk) {
+      showNotification('Aviso: Guardado localmente, sincronizando con Firestore...', 'info');
+    } else {
+      showNotification('Programa académico actualizado en Firestore (visible en todos los navegadores)', 'success');
+    }
+
     recordAuditChange(
       'Modificación',
       'Oferta Académica',
@@ -593,15 +668,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Se actualizaron los parámetros del programa académico: ${Object.keys(updated).join(', ')}.`,
       { previous: current, updated }
     );
-    showNotification('Programa académico actualizado en Firebase Firestore', 'success');
+    notifyCrossTab();
     return true;
   };
 
-  const deleteService = (id: string) => {
+  const deleteService = async (id: string): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const current = services.find(s => s.id === id);
     setServices(prev => prev.filter(s => s.id !== id));
-    deleteServiceFromFirestore(id);
+    
+    await deleteServiceFromFirestore(id);
+    showNotification('Programa académico eliminado de Firestore', 'info');
+
     recordAuditChange(
       'Eliminación',
       'Oferta Académica',
@@ -610,12 +688,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Se eliminó el programa de posgrado "${current?.title}" de la base de datos.`,
       { deletedItem: current }
     );
-    showNotification('Programa académico eliminado de la base de datos', 'info');
+    notifyCrossTab();
     return true;
   };
 
-  // Users CRUD with Database Audit Recording & Firebase Persistence
-  const addUser = (item: Omit<UserItem, 'id' | 'createdAt'>) => {
+  // Users CRUD with Database Audit Recording & Real-Time Firebase Persistence
+  const addUser = async (item: Omit<UserItem, 'id' | 'createdAt'>): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const newUser: UserItem = {
       ...item,
@@ -624,7 +702,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       lastLogin: 'Pendiente de inicio'
     };
     setUsers(prev => [...prev, newUser]);
-    saveUserToFirestore(newUser);
+    
+    const savedOk = await saveUserToFirestore(newUser);
+    if (!savedOk) {
+      showNotification('Aviso: Guardado localmente, sincronizando con Firestore...', 'info');
+    } else {
+      showNotification(`Usuario ${newUser.username} guardado en Firestore (disponible en todos los navegadores)`, 'success');
+    }
+
     recordAuditChange(
       'Creación',
       'Usuarios',
@@ -633,20 +718,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Se creó la cuenta de usuario con rol ${newUser.role} y estado ${newUser.status}.`,
       { user: { ...newUser, password: '[PROTEGIDO]' } }
     );
-    showNotification(`Usuario ${newUser.username} guardado en Firebase Firestore con rol ${newUser.role}`, 'success');
+    notifyCrossTab();
     return true;
   };
 
-  const updateUser = (id: string, updated: Partial<UserItem>) => {
+  const updateUser = async (id: string, updated: Partial<UserItem>): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const current = users.find(u => u.id === id);
-    const updatedUser = { ...current, ...updated } as UserItem;
+    const updatedUser: UserItem = {
+      ...(current || {}),
+      ...updated,
+      id
+    } as UserItem;
+
     setUsers(prev => prev.map(u => u.id === id ? updatedUser : u));
-    saveUserToFirestore(updatedUser);
     
     // If the updated user is currently logged in, sync currentUser in state and storage
     if (currentUser && currentUser.id === id) {
-      const syncedUser = { ...currentUser, ...updated };
+      const syncedUser = { ...currentUser, ...updated, id };
       setCurrentUser(syncedUser);
       try {
         localStorage.setItem(DB_KEYS.CURRENT_USER, JSON.stringify(syncedUser));
@@ -655,19 +744,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
 
+    const savedOk = await saveUserToFirestore(updatedUser);
+    if (!savedOk) {
+      showNotification('Aviso: Guardado localmente, sincronizando con Firestore...', 'info');
+    } else {
+      showNotification('Usuario modificado en Firebase Firestore', 'success');
+    }
+
     recordAuditChange(
       'Modificación',
       'Usuarios',
       updated.name || current?.name || id,
       id,
-      `Se modificó la configuración de cuenta de @${current?.username || id}: ${Object.keys(updated).join(', ')}.`,
+      `Se modificó la cuenta de @${current?.username || id}: ${Object.keys(updated).join(', ')}.`,
       { updatedFields: Object.keys(updated) }
     );
-    showNotification('Usuario modificado y guardado en Firebase Firestore', 'success');
+    notifyCrossTab();
     return true;
   };
 
-  const deleteUser = (id: string) => {
+  const deleteUser = async (id: string): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     if (id === currentUser?.id) {
       showNotification('No puede eliminar su propia cuenta activa.', 'error');
@@ -675,20 +771,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     const current = users.find(u => u.id === id);
     setUsers(prev => prev.filter(u => u.id !== id));
-    deleteUserFromFirestore(id);
+    
+    await deleteUserFromFirestore(id);
+    showNotification('Usuario eliminado de la base de datos Firestore', 'info');
+
     recordAuditChange(
       'Eliminación',
       'Usuarios',
       current ? `${current.name} (@${current.username})` : id,
       id,
-      `Se revocó y eliminó permanentemente el acceso del usuario de la base de datos institucional.`,
+      `Se revocó el acceso del usuario en la base de datos institucional.`,
       { deletedUser: current?.username }
     );
-    showNotification('Usuario eliminado y registrado en la base de datos', 'info');
+    notifyCrossTab();
     return true;
   };
 
-  const sendContactMessage = (msg: Omit<ContactMessage, 'id' | 'date' | 'status'>) => {
+  const sendContactMessage = async (msg: Omit<ContactMessage, 'id' | 'date' | 'status'>) => {
     const newMsg: ContactMessage = {
       ...msg,
       id: 'msg-' + Date.now(),
@@ -696,7 +795,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       status: 'No leído'
     };
     setMessages(prev => [newMsg, ...prev]);
-    saveMessageToFirestore(newMsg);
+    await saveMessageToFirestore(newMsg);
+    
     recordAuditChange(
       'Creación',
       'Buzón Admisiones',
@@ -705,30 +805,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Ingresó un nuevo mensaje de admisión sobre: "${newMsg.subject}" vía portal público.`
     );
     showNotification('Su solicitud ha sido registrada en la base de datos en la nube (Firestore).', 'success');
+    notifyCrossTab();
   };
 
-  const updateMessageStatus = (id: string, status: 'No leído' | 'Leído' | 'Respondido') => {
+  const updateMessageStatus = async (id: string, status: 'No leído' | 'Leído' | 'Respondido'): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const current = messages.find(m => m.id === id);
+    const updated = current ? { ...current, status, id } : null;
     setMessages(prev => prev.map(m => m.id === id ? { ...m, status } : m));
-    updateMessageStatusInFirestore(id, status);
+    
+    await updateMessageStatusInFirestore(id, status);
+    
     recordAuditChange(
       'Cambio de Estado',
       'Buzón Admisiones',
       current ? `Mensaje de: ${current.name}` : id,
       id,
-      `Se actualizó el estado del mensaje de admisión de "${current?.status || 'No leído'}" a "${status}".`,
+      `Se actualizó el estado del mensaje de admisión a "${status}".`,
       { previousStatus: current?.status, newStatus: status }
     );
-    showNotification(`Mensaje marcado como "${status}" y actualizado en Firebase Firestore`, 'success');
+    showNotification(`Mensaje marcado como "${status}" y actualizado en Firestore`, 'success');
+    notifyCrossTab();
     return true;
   };
 
-  const deleteMessage = (id: string) => {
+  const deleteMessage = async (id: string): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
     const current = messages.find(m => m.id === id);
     setMessages(prev => prev.filter(m => m.id !== id));
-    deleteMessageFromFirestore(id);
+    
+    await deleteMessageFromFirestore(id);
+    
     recordAuditChange(
       'Eliminación',
       'Buzón Admisiones',
@@ -737,16 +844,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Se eliminó la solicitud de admisión de "${current?.name}" de la base de datos.`,
       { deletedItem: current }
     );
-    showNotification('Mensaje eliminado y registrado en la base de datos', 'info');
+    showNotification('Mensaje eliminado de la base de datos Firestore', 'info');
+    notifyCrossTab();
     return true;
   };
 
-  const clearAuditLogs = () => {
+  const clearAuditLogs = async (): Promise<boolean> => {
     if (!checkAdminPermission()) return false;
-    clearAuditLogsInFirestore(auditLogs);
     setAuditLogs([]);
     saveStoredAuditLogs([]);
+    await clearAuditLogsInFirestore();
     showNotification('Historial de auditoría de Firebase Firestore vaciado', 'info');
+    notifyCrossTab();
     return true;
   };
 
@@ -762,7 +871,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return exported;
   };
 
-  const importDatabase = (jsonContent: string): { success: boolean; message: string } => {
+  const importDatabase = async (jsonContent: string): Promise<{ success: boolean; message: string }> => {
     if (!checkAdminPermission()) return { success: false, message: 'Permiso denegado: requiere rol Administrador' };
     try {
       const parsed = JSON.parse(jsonContent);
@@ -783,32 +892,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         'Base de Datos',
         'Restauración desde Archivo JSON',
         `rst-${Date.now()}`,
-        `Se restauró la base de datos completa con ${parsed.tables.slides?.length || 0} slides, ${parsed.tables.news?.length || 0} noticias y ${parsed.tables.services?.length || 0} carreras.`
+        `Se restauró la base de datos completa con ${parsed.tables.slides?.length || 0} slides, ${parsed.tables.news?.length || 0} noticias y ${parsed.tables.services?.length || 0} programas.`
       );
       
       const combinedLogs = [restoreLog, ...newLogs];
       setAuditLogs(combinedLogs);
       saveStoredAuditLogs(combinedLogs);
 
-      // Push restored data to Firebase Firestore
-      if (Array.isArray(parsed.tables.slides)) {
-        for (const s of parsed.tables.slides) saveSlideToFirestore(s);
-      }
-      if (Array.isArray(parsed.tables.news)) {
-        for (const n of parsed.tables.news) saveNewsToFirestore(n);
-      }
-      if (Array.isArray(parsed.tables.services)) {
-        for (const s of parsed.tables.services) saveServiceToFirestore(s);
-      }
-      if (Array.isArray(parsed.tables.users)) {
-        for (const u of parsed.tables.users) saveUserToFirestore(u);
-      }
-      if (Array.isArray(parsed.tables.messages)) {
-        for (const m of parsed.tables.messages) saveMessageToFirestore(m);
-      }
+      // Persist restored collections to Firebase Firestore
+      await importDataToFirestore({
+        slides: parsed.tables.slides,
+        news: parsed.tables.news,
+        services: parsed.tables.services,
+        users: parsed.tables.users,
+        messages: parsed.tables.messages,
+        auditLogs: combinedLogs
+      });
 
-      showNotification('Base de datos restaurada y sincronizada con Firebase Firestore', 'success');
-      return { success: true, message: 'Base de datos restaurada con éxito.' };
+      showNotification('Base de datos restaurada y sincronizada con Firebase Firestore para todos los navegadores', 'success');
+      notifyCrossTab();
+      return { success: true, message: 'Base de datos restaurada con éxito en Firestore.' };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Error desconocido de parseo';
       return { success: false, message: `Error al procesar el archivo: ${msg}` };
@@ -825,7 +928,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   };
 
-  const resetToDefaults = () => {
+  const resetToDefaults = async () => {
     if (!checkAdminPermission()) return;
     setUsers(INITIAL_USERS);
     setSlides(INITIAL_SLIDES);
@@ -833,11 +936,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setServices(INITIAL_SERVICES);
     setMessages([]);
 
-    // Reseed Firebase Firestore with initial records
-    for (const s of INITIAL_SLIDES) saveSlideToFirestore(s);
-    for (const n of INITIAL_NEWS) saveNewsToFirestore(n);
-    for (const s of INITIAL_SERVICES) saveServiceToFirestore(s);
-    for (const u of INITIAL_USERS) saveUserToFirestore(u);
+    await resetFirestoreToDefaults();
 
     recordAuditChange(
       'Restauración BD',
@@ -846,7 +945,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `rst-def-${Date.now()}`,
       'Se restablecieron los datos predeterminados en todas las tablas institucionales y Firebase Firestore.'
     );
-    showNotification('Datos de fábrica restaurados y guardados en Firebase Firestore', 'success');
+    showNotification('Datos de fábrica restaurados y guardados en Firebase Firestore para todos los navegadores', 'success');
+    notifyCrossTab();
   };
 
   return (

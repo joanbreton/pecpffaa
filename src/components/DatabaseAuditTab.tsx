@@ -118,12 +118,14 @@ export const DatabaseAuditTab: React.FC<DatabaseAuditTabProps> = ({ onNavigateTo
     reader.readAsText(file);
   };
 
-  const handleExecuteRestore = () => {
+  const [isConfirmingClearLogs, setIsConfirmingClearLogs] = useState(false);
+
+  const handleExecuteRestore = async () => {
     if (!restoreJsonText.trim()) {
       showNotification('Pegue o cargue un archivo JSON válido para restaurar', 'error');
       return;
     }
-    const result = importDatabase(restoreJsonText);
+    const result = await importDatabase(restoreJsonText);
     if (result.success) {
       setIsRestoreModalOpen(false);
       setRestoreJsonText('');
@@ -241,18 +243,35 @@ export const DatabaseAuditTab: React.FC<DatabaseAuditTabProps> = ({ onNavigateTo
           )}
 
           {isAdmin && auditLogs.length > 0 && (
-            <button
-              onClick={() => {
-                if (window.confirm('¿Desea vaciar el historial de auditoría? Los datos de las tablas no se eliminarán, solo los registros de la bitácora.')) {
-                  clearAuditLogs();
-                }
-              }}
-              className="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-red-200 transition-colors"
-              title="Vaciar historial de logs"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Limpiar Logs</span>
-            </button>
+            isConfirmingClearLogs ? (
+              <div className="flex items-center gap-1.5 bg-red-50 p-1 rounded-lg border border-red-200">
+                <span className="text-[11px] font-semibold text-red-700 px-1">¿Vaciar bitácora?</span>
+                <button
+                  onClick={() => {
+                    clearAuditLogs();
+                    setIsConfirmingClearLogs(false);
+                  }}
+                  className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px] font-bold"
+                >
+                  Sí, vaciar
+                </button>
+                <button
+                  onClick={() => setIsConfirmingClearLogs(false)}
+                  className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-[10px] font-semibold"
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsConfirmingClearLogs(true)}
+                className="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-red-200 transition-colors"
+                title="Vaciar historial de logs"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Limpiar Logs</span>
+              </button>
+            )
           )}
         </div>
       </div>

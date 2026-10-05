@@ -58,6 +58,8 @@ export const CMSDashboard: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'overview' | 'slides' | 'news' | 'services' | 'users' | 'messages' | 'database'>('overview');
   const [messageFilter, setMessageFilter] = useState<'Todos' | 'No leído' | 'Leído' | 'Respondido'>('Todos');
+  const [confirmDeleteMessageId, setConfirmDeleteMessageId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   
   const isAdmin = currentUser?.role === 'Administrador';
 
@@ -158,18 +160,23 @@ export const CMSDashboard: React.FC = () => {
     setIsSlideModalOpen(true);
   };
 
-  const handleSaveSlide = (e: React.FormEvent) => {
+  const handleSaveSlide = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAdmin) {
       showNotification('Modo Lectura: No tiene permisos para guardar cambios.', 'info');
       return;
     }
-    if (editingSlideId) {
-      updateSlide(editingSlideId, slideFormData);
-    } else {
-      addSlide(slideFormData);
+    setIsSaving(true);
+    try {
+      if (editingSlideId) {
+        await updateSlide(editingSlideId, slideFormData);
+      } else {
+        await addSlide(slideFormData);
+      }
+      setIsSlideModalOpen(false);
+    } finally {
+      setIsSaving(false);
     }
-    setIsSlideModalOpen(false);
   };
 
   // News Handlers
@@ -206,18 +213,23 @@ export const CMSDashboard: React.FC = () => {
     setIsNewsModalOpen(true);
   };
 
-  const handleSaveNews = (e: React.FormEvent) => {
+  const handleSaveNews = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAdmin) {
       showNotification('Modo Lectura: No tiene permisos para guardar noticias.', 'info');
       return;
     }
-    if (editingNewsId) {
-      updateNews(editingNewsId, newsFormData);
-    } else {
-      addNews(newsFormData);
+    setIsSaving(true);
+    try {
+      if (editingNewsId) {
+        await updateNews(editingNewsId, newsFormData);
+      } else {
+        await addNews(newsFormData);
+      }
+      setIsNewsModalOpen(false);
+    } finally {
+      setIsSaving(false);
     }
-    setIsNewsModalOpen(false);
   };
 
   // Service Handlers
@@ -258,18 +270,23 @@ export const CMSDashboard: React.FC = () => {
     setIsServiceModalOpen(true);
   };
 
-  const handleSaveService = (e: React.FormEvent) => {
+  const handleSaveService = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAdmin) {
       showNotification('Modo Lectura: No tiene permisos para editar servicios.', 'info');
       return;
     }
-    if (editingServiceId) {
-      updateService(editingServiceId, serviceFormData);
-    } else {
-      addService(serviceFormData);
+    setIsSaving(true);
+    try {
+      if (editingServiceId) {
+        await updateService(editingServiceId, serviceFormData);
+      } else {
+        await addService(serviceFormData);
+      }
+      setIsServiceModalOpen(false);
+    } finally {
+      setIsSaving(false);
     }
-    setIsServiceModalOpen(false);
   };
 
   // User Handlers
@@ -298,18 +315,23 @@ export const CMSDashboard: React.FC = () => {
     setIsUserModalOpen(true);
   };
 
-  const handleSaveUser = (e: React.FormEvent) => {
+  const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAdmin) {
       showNotification('Modo Lectura: Solo el Administrador puede gestionar usuarios.', 'info');
       return;
     }
-    if (editingUserId) {
-      updateUser(editingUserId, userFormData);
-    } else {
-      addUser(userFormData);
+    setIsSaving(true);
+    try {
+      if (editingUserId) {
+        await updateUser(editingUserId, userFormData);
+      } else {
+        await addUser(userFormData);
+      }
+      setIsUserModalOpen(false);
+    } finally {
+      setIsSaving(false);
     }
-    setIsUserModalOpen(false);
   };
 
   return (
@@ -1236,18 +1258,35 @@ export const CMSDashboard: React.FC = () => {
                             )}
                           </div>
 
-                          <button
-                            onClick={() => {
-                              if (confirm(`¿Eliminar de la base de datos el mensaje de "${m.name}"?`)) {
-                                deleteMessage(m.id);
-                              }
-                            }}
-                            disabled={!isAdmin}
-                            className="text-red-600 hover:text-red-800 p-1.5 rounded hover:bg-red-50 transition-colors"
-                            title="Eliminar mensaje permanentemente"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          {confirmDeleteMessageId === m.id ? (
+                            <div className="flex items-center gap-1.5 bg-red-50 p-1 rounded-lg border border-red-200">
+                              <span className="text-[10px] text-red-700 font-bold">¿Eliminar?</span>
+                              <button
+                                onClick={() => {
+                                  deleteMessage(m.id);
+                                  setConfirmDeleteMessageId(null);
+                                }}
+                                className="px-2 py-0.5 bg-red-600 hover:bg-red-700 text-white rounded text-[10px] font-bold"
+                              >
+                                Sí
+                              </button>
+                              <button
+                                onClick={() => setConfirmDeleteMessageId(null)}
+                                className="px-2 py-0.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-[10px]"
+                              >
+                                No
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setConfirmDeleteMessageId(m.id)}
+                              disabled={!isAdmin}
+                              className="text-red-600 hover:text-red-800 p-1.5 rounded hover:bg-red-50 transition-colors"
+                              title="Eliminar mensaje permanentemente"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -1345,20 +1384,27 @@ export const CMSDashboard: React.FC = () => {
                 <label htmlFor="slideActive" className="font-semibold text-slate-700">Mostrar activamente en el carrusel de inicio</label>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsSlideModalOpen(false)}
-                  className="px-4 py-2 border rounded-lg text-slate-600 hover:bg-slate-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-[#0D3671] text-white rounded-lg font-bold hover:bg-[#092652]"
-                >
-                  Guardar Slide
-                </button>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                <span className="text-[10px] text-emerald-700 flex items-center gap-1 font-medium">
+                  <Database className="w-3 h-3 text-emerald-600 shrink-0" />
+                  <span>Sincronización directa con Firebase Firestore</span>
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsSlideModalOpen(false)}
+                    className="px-4 py-2 border rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="px-5 py-2 bg-[#0D3671] text-white rounded-lg font-bold hover:bg-[#092652] cursor-pointer disabled:opacity-50"
+                  >
+                    {isSaving ? 'Guardando...' : 'Guardar en Firestore'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -1452,20 +1498,27 @@ export const CMSDashboard: React.FC = () => {
                 />
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsNewsModalOpen(false)}
-                  className="px-4 py-2 border rounded-lg text-slate-600 hover:bg-slate-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-[#B91C1C] text-white rounded-lg font-bold hover:bg-red-700"
-                >
-                  Publicar
-                </button>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                <span className="text-[10px] text-emerald-700 flex items-center gap-1 font-medium">
+                  <Database className="w-3 h-3 text-emerald-600 shrink-0" />
+                  <span>Sincronización directa con Firebase Firestore</span>
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsNewsModalOpen(false)}
+                    className="px-4 py-2 border rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="px-5 py-2 bg-[#B91C1C] text-white rounded-lg font-bold hover:bg-red-700 cursor-pointer disabled:opacity-50"
+                  >
+                    {isSaving ? 'Publicando...' : 'Publicar en Firestore'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -1572,20 +1625,27 @@ export const CMSDashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsServiceModalOpen(false)}
-                  className="px-4 py-2 border rounded-lg text-slate-600 hover:bg-slate-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-[#0D3671] text-white rounded-lg font-bold hover:bg-[#092652]"
-                >
-                  Guardar Programa
-                </button>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                <span className="text-[10px] text-emerald-700 flex items-center gap-1 font-medium">
+                  <Database className="w-3 h-3 text-emerald-600 shrink-0" />
+                  <span>Sincronización directa con Firebase Firestore</span>
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsServiceModalOpen(false)}
+                    className="px-4 py-2 border rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="px-5 py-2 bg-[#0D3671] text-white rounded-lg font-bold hover:bg-[#092652] cursor-pointer disabled:opacity-50"
+                  >
+                    {isSaving ? 'Guardando...' : 'Guardar en Firestore'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -1691,20 +1751,27 @@ export const CMSDashboard: React.FC = () => {
                 />
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsUserModalOpen(false)}
-                  className="px-4 py-2 border rounded-lg text-slate-600 hover:bg-slate-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-[#0D3671] text-white rounded-lg font-bold hover:bg-[#092652]"
-                >
-                  Guardar Usuario
-                </button>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                <span className="text-[10px] text-emerald-700 flex items-center gap-1 font-medium">
+                  <Database className="w-3 h-3 text-emerald-600 shrink-0" />
+                  <span>Sincronización directa con Firebase Firestore</span>
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsUserModalOpen(false)}
+                    className="px-4 py-2 border rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="px-5 py-2 bg-[#0D3671] text-white rounded-lg font-bold hover:bg-[#092652] cursor-pointer disabled:opacity-50"
+                  >
+                    {isSaving ? 'Guardando...' : 'Guardar en Firestore'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
