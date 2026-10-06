@@ -941,9 +941,6 @@ export const DirectorModal: React.FC = () => {
                       <p className="text-[10px] uppercase font-extrabold tracking-wider text-[#CE1126]">
                         {directorData.title}
                       </p>
-                      <p className="text-xs font-bold text-slate-800 leading-tight">
-                        {directorInfo.name}
-                      </p>
                     </div>
                   </div>
 

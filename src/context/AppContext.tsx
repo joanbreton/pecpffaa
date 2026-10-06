@@ -85,6 +85,7 @@ interface AppContextType {
   updateSlide: (id: string, slide: Partial<SlideItem>) => Promise<boolean>;
   deleteSlide: (id: string) => Promise<boolean>;
   toggleSlideStatus: (id: string) => Promise<boolean>;
+  toggleSlideTextContainer: (id: string) => Promise<boolean>;
   
   // News Actions
   addNews: (item: Omit<NewsItem, 'id' | 'views'>) => Promise<boolean>;
@@ -559,6 +560,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       { newStatus }
     );
     showNotification(`Slide marcado como ${newStatus ? 'Activo' : 'Inactivo'} en Firestore`, 'success');
+    notifyCrossTab();
+    return true;
+  };
+
+  const toggleSlideTextContainer = async (id: string): Promise<boolean> => {
+    if (!checkAdminPermission()) return false;
+    const current = slides.find(s => s.id === id);
+    if (!current) return false;
+    const newStatus = current.showTextContainer === false;
+    const updatedSlide: SlideItem = { ...current, showTextContainer: newStatus, id };
+    
+    setSlides(prev => prev.map(s => s.id === id ? updatedSlide : s));
+    await saveSlideToFirestore(updatedSlide);
+
+    recordAuditChange(
+      'Modificación',
+      'Slides (Carrusel)',
+      current.title || id,
+      id,
+      `Se ${newStatus ? 'activó' : 'desactivó'} el contenedor de textos del slide en el HeroCarousel.`,
+      { showTextContainer: newStatus }
+    );
+    showNotification(`Contenedor de textos ${newStatus ? 'activado' : 'desactivado'} en Firestore`, 'info');
     notifyCrossTab();
     return true;
   };
@@ -1072,6 +1096,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateSlide,
         deleteSlide,
         toggleSlideStatus,
+        toggleSlideTextContainer,
         addNews,
         updateNews,
         deleteNews,

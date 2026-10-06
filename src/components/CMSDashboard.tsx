@@ -22,7 +22,9 @@ import {
   Mail,
   Database,
   Building2,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { DatabaseAuditTab } from './DatabaseAuditTab';
 import { CMSDirectorTab } from './CMSDirectorTab';
@@ -37,6 +39,7 @@ export const CMSDashboard: React.FC = () => {
     updateSlide, 
     deleteSlide, 
     toggleSlideStatus,
+    toggleSlideTextContainer,
     news,
     addNews,
     updateNews,
@@ -81,6 +84,7 @@ export const CMSDashboard: React.FC = () => {
     secondaryLink: '#admisiones',
     order: 1,
     active: true,
+    showTextContainer: true,
   });
 
   // News Form
@@ -144,6 +148,7 @@ export const CMSDashboard: React.FC = () => {
         secondaryLink: slide.secondaryLink || '',
         order: slide.order,
         active: slide.active,
+        showTextContainer: slide.showTextContainer !== false,
       });
     } else {
       setEditingSlideId(null);
@@ -158,6 +163,7 @@ export const CMSDashboard: React.FC = () => {
         secondaryLink: '#contacto',
         order: slides.length + 1,
         active: true,
+        showTextContainer: true,
       });
     }
     setIsSlideModalOpen(true);
@@ -842,6 +848,11 @@ export const CMSDashboard: React.FC = () => {
                         </div>
                         <div className="absolute top-3 right-3 flex items-center gap-1.5">
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded shadow ${
+                            slide.showTextContainer !== false ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-amber-300 border border-amber-400/30'
+                          }`}>
+                            {slide.showTextContainer !== false ? 'Textos: ON' : 'Textos: OFF'}
+                          </span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded shadow ${
                             slide.active ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-300'
                           }`}>
                             {slide.active ? 'Activo' : 'Oculto'}
@@ -866,16 +877,41 @@ export const CMSDashboard: React.FC = () => {
                     </div>
 
                     {/* Actions */}
-                    <div className="p-4 bg-white border-t border-slate-200 flex items-center justify-between gap-2">
-                      <button
-                        onClick={() => toggleSlideStatus(slide.id)}
-                        disabled={!isAdmin}
-                        className={`text-xs px-2.5 py-1.5 rounded font-semibold border ${
-                          isAdmin ? 'hover:bg-slate-50 text-slate-700 border-slate-300' : 'text-slate-400 border-slate-200 cursor-not-allowed'
-                        }`}
-                      >
-                        {slide.active ? 'Ocultar' : 'Activar'}
-                      </button>
+                    <div className="p-4 bg-white border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => toggleSlideStatus(slide.id)}
+                          disabled={!isAdmin}
+                          className={`text-xs px-2.5 py-1.5 rounded font-semibold border ${
+                            isAdmin ? 'hover:bg-slate-50 text-slate-700 border-slate-300 cursor-pointer' : 'text-slate-400 border-slate-200 cursor-not-allowed'
+                          }`}
+                        >
+                          {slide.active ? 'Ocultar' : 'Activar'}
+                        </button>
+
+                        <button
+                          onClick={() => toggleSlideTextContainer(slide.id)}
+                          disabled={!isAdmin}
+                          className={`text-xs px-2.5 py-1.5 rounded font-semibold border flex items-center gap-1 transition-colors ${
+                            slide.showTextContainer !== false
+                              ? 'bg-cyan-50 hover:bg-cyan-100 text-cyan-800 border-cyan-200'
+                              : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200'
+                          } ${!isAdmin ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                          title={slide.showTextContainer !== false ? 'Desactivar contenedor de textos del Slider' : 'Activar contenedor de textos del Slider'}
+                        >
+                          {slide.showTextContainer !== false ? (
+                            <>
+                              <EyeOff className="w-3.5 h-3.5" />
+                              <span>Textos: ON</span>
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>Textos: OFF</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
 
                       <div className="flex items-center gap-2">
                         <button
@@ -1406,15 +1442,32 @@ export const CMSDashboard: React.FC = () => {
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="slideActive"
-                  checked={slideFormData.active}
-                  onChange={(e) => setSlideFormData({ ...slideFormData, active: e.target.checked })}
-                  className="w-4 h-4 text-[#0D3671] rounded"
-                />
-                <label htmlFor="slideActive" className="font-semibold text-slate-700">Mostrar activamente en el carrusel de inicio</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                  <input
+                    type="checkbox"
+                    id="slideActive"
+                    checked={slideFormData.active}
+                    onChange={(e) => setSlideFormData({ ...slideFormData, active: e.target.checked })}
+                    className="w-4 h-4 text-[#0D3671] rounded cursor-pointer"
+                  />
+                  <label htmlFor="slideActive" className="font-semibold text-slate-700 text-xs cursor-pointer">
+                    Mostrar en carrusel de inicio
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                  <input
+                    type="checkbox"
+                    id="slideShowTextContainer"
+                    checked={slideFormData.showTextContainer}
+                    onChange={(e) => setSlideFormData({ ...slideFormData, showTextContainer: e.target.checked })}
+                    className="w-4 h-4 text-[#0D3671] rounded cursor-pointer"
+                  />
+                  <label htmlFor="slideShowTextContainer" className="font-semibold text-slate-700 text-xs cursor-pointer">
+                    Activar contenedor de textos (Liquid Glass)
+                  </label>
+                </div>
               </div>
 
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">

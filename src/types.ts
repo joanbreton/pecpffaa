@@ -25,6 +25,7 @@ export interface SlideItem {
   secondaryLink?: string;
   order: number;
   active: boolean;
+  showTextContainer?: boolean;
 }
 
 export interface NewsItem {

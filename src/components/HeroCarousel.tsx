@@ -7,15 +7,20 @@ import {
   Sparkles,
   Pause,
   Play,
-  Edit3
+  Edit3,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 export const HeroCarousel: React.FC = () => {
-  const { slides, currentUser, setActiveView } = useApp();
+  const { slides, currentUser, setActiveView, toggleSlideTextContainer } = useApp();
   const activeSlides = slides.filter(s => s.active);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Control local e interactivo para activar/desactivar el contenedor de textos
+  const [overrideTextVisibility, setOverrideTextVisibility] = useState<Record<string, boolean>>({});
 
   // Auto-advance
   useEffect(() => {
@@ -46,6 +51,22 @@ export const HeroCarousel: React.FC = () => {
   }
 
   const currentSlide = activeSlides[currentIdx] || activeSlides[0];
+
+  const isTextVisible = overrideTextVisibility[currentSlide.id] !== undefined
+    ? overrideTextVisibility[currentSlide.id]
+    : currentSlide.showTextContainer !== false;
+
+  const handleToggleTextContainer = async () => {
+    const nextVisibility = !isTextVisible;
+    setOverrideTextVisibility((prev) => ({
+      ...prev,
+      [currentSlide.id]: nextVisibility,
+    }));
+    // Si el usuario es administrador, guarda el cambio directamente en Firestore
+    if (currentUser) {
+      await toggleSlideTextContainer(currentSlide.id);
+    }
+  };
 
   const handlePrev = () => {
     setCurrentIdx((prev) => (prev === 0 ? activeSlides.length - 1 : prev - 1));
@@ -97,69 +118,98 @@ export const HeroCarousel: React.FC = () => {
           </div>
         ))}
 
-        {/* Foreground Content: docked at bottom-left in a highly transparent Liquid Glass container */}
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 w-full pb-14 sm:pb-16 pt-6">
-          <div className="relative max-w-lg lg:max-w-xl p-5 sm:p-6 lg:p-7 rounded-3xl overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/[0.14] via-white/[0.03] to-black/[0.12] border border-white/40 border-t-white/75 border-l-white/55 border-b-white/20 shadow-[0_16px_45px_rgba(0,0,0,0.35),inset_0_1px_2px_rgba(255,255,255,0.75),inset_0_-1px_1px_rgba(255,255,255,0.15)] space-y-3.5 animate-fadeIn">
-            
-            {/* Liquid Glass Specular Shimmer Highlights */}
-            <div className="pointer-events-none absolute -top-24 -left-24 w-60 h-60 rounded-full bg-white/25 blur-2xl opacity-50" />
-            <div className="pointer-events-none absolute -bottom-24 -right-24 w-60 h-60 rounded-full bg-cyan-400/10 blur-3xl opacity-40" />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-transparent rounded-3xl" />
+        {/* Foreground Content: docked at bottom-left in a highly transparent Liquid Glass container (activable/desactivable) */}
+        {isTextVisible && (
+          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 w-full pb-14 sm:pb-16 pt-6">
+            <div className="relative max-w-lg lg:max-w-xl p-5 sm:p-6 lg:p-7 rounded-3xl overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/[0.14] via-white/[0.03] to-black/[0.12] border border-white/40 border-t-white/75 border-l-white/55 border-b-white/20 shadow-[0_16px_45px_rgba(0,0,0,0.35),inset_0_1px_2px_rgba(255,255,255,0.75),inset_0_-1px_1px_rgba(255,255,255,0.15)] space-y-3.5 animate-fadeIn">
+              
+              {/* Liquid Glass Specular Shimmer Highlights */}
+              <div className="pointer-events-none absolute -top-24 -left-24 w-60 h-60 rounded-full bg-white/25 blur-2xl opacity-50" />
+              <div className="pointer-events-none absolute -bottom-24 -right-24 w-60 h-60 rounded-full bg-cyan-400/10 blur-3xl opacity-40" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-transparent rounded-3xl" />
 
-            {/* Tag / Badge en Cápsula Liquid Glass */}
-            <div className="relative z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#B91C1C]/90 backdrop-blur-md text-white text-xs font-bold tracking-wider uppercase shadow-[0_2px_10px_rgba(185,28,28,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)] border border-white/40">
-              <Sparkles className="w-3 h-3 text-amber-300 shrink-0" />
-              <span>{currentSlide.tag || 'Formación de Excelencia'}</span>
-            </div>
+              {/* Tag / Badge y Botón para Desactivar Textos */}
+              <div className="relative z-10 flex items-center justify-between gap-2">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#B91C1C]/90 backdrop-blur-md text-white text-xs font-bold tracking-wider uppercase shadow-[0_2px_10px_rgba(185,28,28,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)] border border-white/40">
+                  <Sparkles className="w-3 h-3 text-amber-300 shrink-0" />
+                  <span>{currentSlide.tag || 'Formación de Excelencia'}</span>
+                </div>
 
-            {/* Title with Sleek Typography & Strong Contrast Shadow */}
-            <h1 className="relative z-10 text-lg sm:text-xl md:text-2xl lg:text-3xl font-black text-white uppercase leading-snug tracking-tight line-clamp-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] font-sans">
-              {currentSlide.title}
-            </h1>
-
-            {/* Subtitle */}
-            <p className="relative z-10 text-xs sm:text-sm text-slate-100 font-medium leading-relaxed line-clamp-2 sm:line-clamp-3 drop-shadow-[0_1px_5px_rgba(0,0,0,0.9)]">
-              {currentSlide.subtitle}
-            </p>
-
-            {/* Accent Line con Brillo Líquido */}
-            <div className="relative z-10 w-14 sm:w-16 h-1 bg-gradient-to-r from-[#B91C1C] via-red-500 to-amber-400 rounded-full shadow-[0_0_12px_rgba(220,38,38,0.8)]"></div>
-
-            {/* CTA Buttons */}
-            <div className="relative z-10 pt-1 flex flex-wrap items-center gap-2 sm:gap-3">
-              {/* Primary CTA (#B91C1C) */}
-              <button
-                id="btn-hero-primary-cta"
-                onClick={() => handleScrollTo(currentSlide.ctaLink || '#servicios')}
-                className="bg-[#B91C1C] hover:bg-red-700 active:scale-95 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-bold uppercase tracking-wider text-xs transition shadow-lg flex items-center gap-1.5 group cursor-pointer border border-red-400/50"
-              >
-                <span>{currentSlide.ctaText || 'Explorar Carreras'}</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </button>
-
-              {/* Secondary CTA Liquid Glass Button */}
-              <button
-                id="btn-hero-secondary-cta"
-                onClick={() => handleScrollTo(currentSlide.secondaryLink || '#admisiones')}
-                className="bg-white/20 hover:bg-white/30 active:scale-95 backdrop-blur-xl text-white border border-white/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-bold uppercase tracking-wider text-xs transition flex items-center gap-1.5 cursor-pointer"
-              >
-                <span>{currentSlide.secondaryText || 'Admisiones 2026'}</span>
-              </button>
-
-              {/* Quick CMS slide edit helper for admins */}
-              {currentUser && (
                 <button
-                  onClick={() => setActiveView('dashboard')}
-                  className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[11px] border border-amber-400/40 backdrop-blur-md shadow-xs"
-                  title="Editar este carrusel en el CMS"
+                  id="btn-hide-hero-text"
+                  onClick={handleToggleTextContainer}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/40 hover:bg-black/60 text-white/90 hover:text-white text-[11px] font-semibold backdrop-blur-md border border-white/30 transition shadow-sm hover:scale-105 cursor-pointer"
+                  title="Desactivar contenedor de textos del Slider (ver foto completa)"
                 >
-                  <Edit3 className="w-3 h-3" />
-                  Editar Slider
+                  <EyeOff className="w-3 h-3 text-red-300" />
+                  <span className="hidden sm:inline">Desactivar</span>
                 </button>
-              )}
+              </div>
+
+              {/* Title with Sleek Typography & Strong Contrast Shadow */}
+              <h1 className="relative z-10 text-lg sm:text-xl md:text-2xl lg:text-3xl font-black text-white uppercase leading-snug tracking-tight line-clamp-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] font-sans">
+                {currentSlide.title}
+              </h1>
+
+              {/* Subtitle */}
+              <p className="relative z-10 text-xs sm:text-sm text-slate-100 font-medium leading-relaxed line-clamp-2 sm:line-clamp-3 drop-shadow-[0_1px_5px_rgba(0,0,0,0.9)]">
+                {currentSlide.subtitle}
+              </p>
+
+              {/* Accent Line con Brillo Líquido */}
+              <div className="relative z-10 w-14 sm:w-16 h-1 bg-gradient-to-r from-[#B91C1C] via-red-500 to-amber-400 rounded-full shadow-[0_0_12px_rgba(220,38,38,0.8)]"></div>
+
+              {/* CTA Buttons */}
+              <div className="relative z-10 pt-1 flex flex-wrap items-center gap-2 sm:gap-3">
+                {/* Primary CTA (#B91C1C) */}
+                <button
+                  id="btn-hero-primary-cta"
+                  onClick={() => handleScrollTo(currentSlide.ctaLink || '#servicios')}
+                  className="bg-[#B91C1C] hover:bg-red-700 active:scale-95 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-bold uppercase tracking-wider text-xs transition shadow-lg flex items-center gap-1.5 group cursor-pointer border border-red-400/50"
+                >
+                  <span>{currentSlide.ctaText || 'Explorar Carreras'}</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </button>
+
+                {/* Secondary CTA Liquid Glass Button */}
+                <button
+                  id="btn-hero-secondary-cta"
+                  onClick={() => handleScrollTo(currentSlide.secondaryLink || '#admisiones')}
+                  className="bg-white/20 hover:bg-white/30 active:scale-95 backdrop-blur-xl text-white border border-white/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-bold uppercase tracking-wider text-xs transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>{currentSlide.secondaryText || 'Admisiones 2026'}</span>
+                </button>
+
+                {/* Quick CMS slide edit helper for admins */}
+                {currentUser && (
+                  <button
+                    onClick={() => setActiveView('dashboard')}
+                    className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[11px] border border-amber-400/40 backdrop-blur-md shadow-xs cursor-pointer"
+                    title="Editar este carrusel en el CMS"
+                  >
+                    <Edit3 className="w-3 h-3" />
+                    Editar Slider
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Botón flotante para reactivar el contenedor si está desactivado */}
+        {!isTextVisible && (
+          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 w-full pb-14 sm:pb-16 pt-6">
+            <button
+              id="btn-show-hero-text"
+              onClick={handleToggleTextContainer}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl backdrop-blur-md bg-slate-950/75 hover:bg-[#003876] text-white text-xs font-bold border border-white/35 shadow-2xl transition-all hover:scale-105 cursor-pointer animate-fadeIn group"
+              title="Activar contenedor de textos del Slider"
+            >
+              <Eye className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+              <span>Activar Contenedor de Textos</span>
+            </button>
+          </div>
+        )}
 
         {/* Carousel Navigation Arrows */}
         {activeSlides.length > 1 && (
@@ -183,8 +233,33 @@ export const HeroCarousel: React.FC = () => {
           </>
         )}
 
-        {/* Slide Indicators and Play/Pause control cleanly positioned at bottom-right */}
-        <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-8 z-30 flex items-center gap-2.5 sm:gap-3 pointer-events-auto">
+        {/* Slide Indicators, Text Toggle and Play/Pause control cleanly positioned at bottom-right */}
+        <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-8 z-30 flex items-center gap-2 sm:gap-3 pointer-events-auto">
+          {/* Botón para activar y desactivar el contenedor de textos */}
+          <button
+            id="btn-toggle-slider-text"
+            onClick={handleToggleTextContainer}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md border shadow-lg transition-all cursor-pointer ${
+              isTextVisible
+                ? 'bg-slate-950/75 hover:bg-slate-900 text-slate-200 hover:text-white border-white/20 hover:border-white/40'
+                : 'bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold border-amber-300 shadow-amber-500/40 ring-2 ring-amber-400/50'
+            }`}
+            title={isTextVisible ? 'Desactivar contenedor de textos del Slider' : 'Activar contenedor de textos del Slider'}
+            aria-label={isTextVisible ? 'Desactivar contenedor de textos del Slider' : 'Activar contenedor de textos del Slider'}
+          >
+            {isTextVisible ? (
+              <>
+                <EyeOff className="w-3.5 h-3.5 text-slate-300" />
+                <span className="hidden sm:inline">Desactivar Textos</span>
+              </>
+            ) : (
+              <>
+                <Eye className="w-3.5 h-3.5 text-slate-950" />
+                <span>Activar Textos</span>
+              </>
+            )}
+          </button>
+
           {/* Indicators */}
           <div className="flex items-center space-x-2 bg-slate-950/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
             {activeSlides.map((_, idx) => (

@@ -559,11 +559,10 @@ export const CMSDirectorTab: React.FC = () => {
                   </div>
 
                   <div className="pt-1 text-center">
-                    <p className="font-bold text-xs text-slate-800 truncate">{formData.name}</p>
+                    <p className="text-[10px] uppercase font-extrabold tracking-wider text-[#CE1126] truncate">{formData.title}</p>
                     {formData.rank && (
-                      <p className="text-[10px] text-slate-500 font-semibold truncate">{formData.rank}</p>
+                      <p className="text-[10px] text-slate-600 font-semibold truncate">{formData.rank}</p>
                     )}
-                    <p className="text-[10px] text-[#CE1126] font-semibold truncate">{formData.title}</p>
                   </div>
 
                   <p className="text-[10px] text-slate-500 font-medium">
