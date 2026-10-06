@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import officialLogo from '../assets/images/programalogo.jpg';
 import { 
@@ -10,16 +10,41 @@ import {
   Phone, 
   Mail, 
   ChevronRight, 
+  ChevronDown,
+  Building2,
+  Sparkles,
   LogOut 
 } from 'lucide-react';
 
 export const Header: React.FC = () => {
-  const { activeView, setActiveView, currentUser, setIsLoginModalOpen, logout } = useApp();
+  const { 
+    activeView, 
+    setActiveView, 
+    currentUser, 
+    setIsLoginModalOpen, 
+    setIsDirectorModalOpen,
+    logout 
+  } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [nosotrosDropdownOpen, setNosotrosDropdownOpen] = useState(false);
+  const [mobileNosotrosOpen, setMobileNosotrosOpen] = useState(true);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setNosotrosDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const navLinks = [
     { label: 'Inicio', href: '#inicio' },
-    { label: 'Institución', href: '#institucion' },
     { label: 'Oferta Académica', href: '#servicios' },
     { label: 'Noticias & Eventos', href: '#noticias' },
     { label: 'Admisiones', href: '#admisiones' },
@@ -156,7 +181,112 @@ export const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden xl:flex items-center space-x-6 text-sm font-medium">
-            {navLinks.map((link) => (
+            <a
+              href="#inicio"
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick('#inicio');
+              }}
+              className="text-slate-700 hover:text-[#B91C1C] font-semibold transition-colors duration-150 relative py-1"
+            >
+              Inicio
+            </a>
+
+            {/* NOSOTROS Dropdown */}
+            <div 
+              ref={dropdownRef}
+              className="relative"
+              onMouseEnter={() => setNosotrosDropdownOpen(true)}
+              onMouseLeave={() => setNosotrosDropdownOpen(false)}
+            >
+              <button
+                id="nav-dropdown-nosotros"
+                onClick={() => setNosotrosDropdownOpen(!nosotrosDropdownOpen)}
+                className={`flex items-center gap-1.5 font-semibold text-sm transition-colors py-1 cursor-pointer ${
+                  nosotrosDropdownOpen ? 'text-[#B91C1C]' : 'text-slate-700 hover:text-[#B91C1C]'
+                }`}
+                aria-expanded={nosotrosDropdownOpen}
+                aria-haspopup="true"
+              >
+                <span className="tracking-wide">Nosotros</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${nosotrosDropdownOpen ? 'rotate-180 text-[#B91C1C]' : 'text-slate-400'}`} />
+              </button>
+
+              {/* Dropdown Menu Card */}
+              {nosotrosDropdownOpen && (
+                <div className="absolute top-full left-0 pt-2 w-80 z-50 animate-fadeIn">
+                  <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#0D3671]/20 py-2.5 overflow-hidden">
+                    
+                    {/* Header inside dropdown */}
+                    <div className="px-4 py-2 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-[#0D3671]">
+                        Institucional • MIDE
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-semibold">
+                        PECPFFAA
+                      </span>
+                    </div>
+
+                    {/* Primary Highlighted Option: DESPACHO DEL DIRECTOR */}
+                    <div className="p-2">
+                      <button
+                        id="btn-nav-despacho-director"
+                        onClick={() => {
+                          setIsDirectorModalOpen(true);
+                          setNosotrosDropdownOpen(false);
+                        }}
+                        className="w-full text-left p-3 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50/40 hover:from-blue-100 hover:to-indigo-100/60 border border-blue-200/80 transition-all flex items-start gap-3 group cursor-pointer shadow-xs hover:shadow-sm"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-[#0D3671] text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-105 group-hover:bg-[#B91C1C] transition-all">
+                          <Building2 className="w-5 h-5 text-amber-300" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-xs font-black uppercase tracking-wider text-[#0D3671] group-hover:text-[#B91C1C] transition-colors">
+                              DESPACHO DEL DIRECTOR
+                            </span>
+                            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#B91C1C] text-white shadow-xs">
+                              POPUP
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-600 line-clamp-1 mt-0.5 font-medium">
+                            Alocución oficial y perfil del Director General
+                          </p>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Secondary Institutional Options */}
+                    <div className="px-2 pt-1 pb-1 space-y-1">
+                      <button
+                        onClick={() => {
+                          handleNavClick('#institucion');
+                          setNosotrosDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-xs font-semibold text-slate-700 hover:text-[#0D3671] flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span>Nuestra Institución & Misión</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleNavClick('#institucion');
+                          setNosotrosDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-xs font-semibold text-slate-700 hover:text-[#0D3671] flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span>Ideario del Gran General Luperón</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Remaining Nav Links */}
+            {navLinks.filter(l => l.label !== 'Inicio').map((link) => (
               <a
                 key={link.label}
                 href={link.href}
@@ -196,12 +326,68 @@ export const Header: React.FC = () => {
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
           <div className="xl:hidden bg-white border-t border-slate-200 px-4 py-4 space-y-3 animate-fadeIn shadow-lg">
-            <div className="space-y-1 pb-3 border-b border-slate-200">
-              {navLinks.map((link) => (
+            <div className="space-y-2 pb-3 border-b border-slate-200">
+              <button
+                onClick={() => handleNavClick('#inicio')}
+                className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
+              >
+                <span>Inicio</span>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+
+              {/* Mobile NOSOTROS collapsible */}
+              <div className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/70">
+                <button
+                  onClick={() => setMobileNosotrosOpen(!mobileNosotrosOpen)}
+                  className="w-full text-left px-3.5 py-2.5 bg-slate-100/90 font-bold text-xs uppercase tracking-wider text-[#0D3671] flex items-center justify-between"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-[#B91C1C]" />
+                    NOSOTROS
+                  </span>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileNosotrosOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {mobileNosotrosOpen && (
+                  <div className="p-2 space-y-1.5 bg-white border-t border-slate-200">
+                    <button
+                      id="btn-mobile-despacho-director"
+                      onClick={() => {
+                        setIsDirectorModalOpen(true);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left p-2.5 rounded-lg bg-blue-50/70 hover:bg-blue-100 border border-blue-200 text-xs font-bold text-[#0D3671] flex items-center justify-between shadow-xs transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-[#0D3671] text-amber-300 flex items-center justify-center shrink-0 shadow-xs">
+                          <Building2 className="w-4 h-4 text-amber-300" />
+                        </div>
+                        <div>
+                          <span className="block font-black text-[#0D3671]">DESPACHO DEL DIRECTOR</span>
+                          <span className="text-[10px] text-slate-500 font-normal">Alocución oficial y perfil</span>
+                        </div>
+                      </div>
+                      <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-[#B91C1C] text-white">
+                        Popup
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => handleNavClick('#institucion')}
+                      className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
+                    >
+                      <span>Nuestra Institución & Misión</span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {navLinks.filter(l => l.label !== 'Inicio').map((link) => (
                 <button
                   key={link.label}
                   onClick={() => handleNavClick(link.href)}
-                  className="w-full text-left px-3 py-2.5 rounded text-sm font-semibold text-slate-700 hover:bg-slate-100 hover:text-[#0D3671] flex items-center justify-between"
+                  className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 hover:text-[#0D3671] flex items-center justify-between"
                 >
                   <span>{link.label}</span>
                   <ChevronRight className="w-4 h-4 text-slate-400" />

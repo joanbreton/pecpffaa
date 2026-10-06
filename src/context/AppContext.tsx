@@ -50,6 +50,8 @@ interface AppContextType {
   setActiveView: (view: 'portal' | 'dashboard') => void;
   isLoginModalOpen: boolean;
   setIsLoginModalOpen: (open: boolean) => void;
+  isDirectorModalOpen: boolean;
+  setIsDirectorModalOpen: (open: boolean) => void;
   selectedNewsModal: NewsItem | null;
   setSelectedNewsModal: (news: NewsItem | null) => void;
   selectedServiceModal: ServiceItem | null;
@@ -125,6 +127,7 @@ const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in windo
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeView, setActiveView] = useState<'portal' | 'dashboard'>('portal');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isDirectorModalOpen, setIsDirectorModalOpen] = useState(false);
   const [selectedNewsModal, setSelectedNewsModal] = useState<NewsItem | null>(null);
   const [selectedServiceModal, setSelectedServiceModal] = useState<ServiceItem | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -958,6 +961,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setActiveView,
         isLoginModalOpen,
         setIsLoginModalOpen,
+        isDirectorModalOpen,
+        setIsDirectorModalOpen,
         selectedNewsModal,
         setSelectedNewsModal,
         selectedServiceModal,

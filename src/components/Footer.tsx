@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { setActiveView, setIsLoginModalOpen, currentUser } = useApp();
+  const { setActiveView, setIsLoginModalOpen, setIsDirectorModalOpen, currentUser } = useApp();
 
   const currentYear = new Date().getFullYear();
 
@@ -83,6 +83,18 @@ export const Footer: React.FC = () => {
               <Award className="w-4 h-4 text-amber-400" />
             </h4>
             <ul className="space-y-2 text-slate-300">
+              <li>
+                <button
+                  onClick={() => setIsDirectorModalOpen(true)}
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1 text-left text-slate-200 cursor-pointer group"
+                >
+                  <ChevronRight className="w-3 h-3 text-[#B91C1C] group-hover:translate-x-0.5 transition-transform" />
+                  <span className="font-semibold text-white">Despacho del Director General</span>
+                  <span className="text-[9px] bg-[#B91C1C] text-white px-1.5 py-0.2 rounded font-bold uppercase ml-1">
+                    Popup
+                  </span>
+                </button>
+              </li>
               <li>
                 <a href="#institucion" onClick={(e) => { e.preventDefault(); handleNavClick('#institucion'); }} className="hover:text-amber-300 transition-colors flex items-center gap-1">
                   <ChevronRight className="w-3 h-3 text-[#B91C1C]" />

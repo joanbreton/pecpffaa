@@ -10,6 +10,7 @@ import { Footer } from './components/Footer';
 import { CMSDashboard } from './components/CMSDashboard';
 import { LoginModal } from './components/LoginModal';
 import { ItemModals } from './components/ItemModals';
+import { DirectorModal } from './components/DirectorModal';
 import { CheckCircle2, AlertCircle, Info } from 'lucide-react';
 
 const MainContent: React.FC = () => {
@@ -57,6 +58,7 @@ const MainContent: React.FC = () => {
       {/* Global Interactive Modals */}
       <LoginModal />
       <ItemModals />
+      <DirectorModal />
     </div>
   );
 };
