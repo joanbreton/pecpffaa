@@ -69,66 +69,74 @@ export const HeroCarousel: React.FC = () => {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Responsive Aspect Ratio Container with ample tablet clearance */}
-      <div className="relative w-full aspect-auto lg:aspect-[21/9] xl:aspect-[16/7] min-h-[560px] sm:min-h-[640px] md:min-h-[660px] lg:min-h-[600px] xl:min-h-[620px] flex items-center">
+      {/* Responsive Container: adapts naturally to widescreen proportions without stretching or over-cropping images */}
+      <div className="relative w-full h-[440px] sm:h-[500px] md:h-[550px] lg:h-[600px] xl:h-[640px] flex items-end overflow-hidden">
         
-        {/* Background Slide Image - 100% clean, crisp and without dark overlay layers */}
+        {/* Background Slide Image - crisp, properly scaled and adapted to container */}
         {activeSlides.map((slide, idx) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+            className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
               idx === currentIdx ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
             }`}
           >
+            {/* Ambient soft background to prevent harsh borders on any non-standard image proportions */}
+            <img
+              src={slide.image}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-25 scale-110 pointer-events-none"
+            />
+            {/* Main high-resolution image adapting to container with sharp focus */}
             <img
               src={slide.image}
               alt={slide.title}
-              className="w-full h-full object-cover object-center"
+              className="relative w-full h-full object-cover object-center transform transition-transform duration-1000 ease-out"
               loading="eager"
             />
           </div>
         ))}
 
-        {/* Foreground Content in a Sleek, Elegant Card leaving the image clean and prominent */}
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 w-full pt-8 pb-20 sm:pt-10 sm:pb-24">
-          <div className="max-w-xl lg:max-w-2xl bg-slate-950/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-white/15 shadow-2xl space-y-4">
+        {/* Foreground Content: docked at bottom-left in a sleek, compact card so the entire photo can be appreciated */}
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 w-full pb-14 sm:pb-16 pt-6">
+          <div className="max-w-lg lg:max-w-xl bg-slate-950/80 backdrop-blur-md p-5 sm:p-6 lg:p-7 rounded-2xl border border-white/15 shadow-2xl space-y-3 animate-fadeIn">
             
             {/* Tag / Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#B91C1C] text-white text-xs sm:text-sm font-bold tracking-wider uppercase shadow-lg border border-red-400/40">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#B91C1C] text-white text-xs font-bold tracking-wider uppercase shadow-md border border-red-400/40">
+              <Sparkles className="w-3 h-3 text-amber-300 shrink-0" />
               <span>{currentSlide.tag || 'Formación de Excelencia'}</span>
             </div>
 
             {/* Title with Sleek Typography */}
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-white uppercase leading-tight tracking-tight">
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black text-white uppercase leading-snug tracking-tight line-clamp-2">
               {currentSlide.title}
             </h1>
 
             {/* Subtitle */}
-            <p className="text-xs sm:text-sm md:text-base text-slate-200 font-normal leading-relaxed line-clamp-3 sm:line-clamp-none">
+            <p className="text-xs sm:text-sm text-slate-200 font-normal leading-relaxed line-clamp-2 sm:line-clamp-3">
               {currentSlide.subtitle}
             </p>
 
             {/* Accent Line (#B91C1C) */}
-            <div className="w-16 sm:w-20 h-1 bg-[#B91C1C] rounded-full shadow"></div>
+            <div className="w-14 sm:w-16 h-1 bg-[#B91C1C] rounded-full shadow"></div>
 
             {/* CTA Buttons */}
-            <div className="pt-2 flex flex-wrap items-center gap-2.5 sm:gap-3.5">
+            <div className="pt-1.5 flex flex-wrap items-center gap-2 sm:gap-3">
               {/* Primary CTA (#B91C1C) */}
               <button
                 id="btn-hero-primary-cta"
                 onClick={() => handleScrollTo(currentSlide.ctaLink || '#servicios')}
-                className="bg-[#B91C1C] hover:bg-red-700 active:scale-95 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold uppercase tracking-wider text-xs sm:text-sm transition shadow-lg flex items-center gap-2 group cursor-pointer border border-red-500/40"
+                className="bg-[#B91C1C] hover:bg-red-700 active:scale-95 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-bold uppercase tracking-wider text-xs transition shadow-md flex items-center gap-1.5 group cursor-pointer border border-red-500/40"
               >
                 <span>{currentSlide.ctaText || 'Explorar Carreras'}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </button>
 
               {/* Secondary CTA */}
               <button
                 id="btn-hero-secondary-cta"
                 onClick={() => handleScrollTo(currentSlide.secondaryLink || '#admisiones')}
-                className="bg-white/10 hover:bg-white/20 active:scale-95 backdrop-blur-md text-white border border-white/30 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold uppercase tracking-wider text-xs sm:text-sm transition flex items-center gap-2 cursor-pointer"
+                className="bg-white/10 hover:bg-white/20 active:scale-95 backdrop-blur-md text-white border border-white/30 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-bold uppercase tracking-wider text-xs transition flex items-center gap-1.5 cursor-pointer"
               >
                 <span>{currentSlide.secondaryText || 'Admisiones 2026'}</span>
               </button>
@@ -137,11 +145,11 @@ export const HeroCarousel: React.FC = () => {
               {currentUser && (
                 <button
                   onClick={() => setActiveView('dashboard')}
-                  className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-xs border border-amber-400/30 backdrop-blur-sm"
+                  className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[11px] border border-amber-400/30 backdrop-blur-sm"
                   title="Editar este carrusel en el CMS"
                 >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  Editar Slider en CMS
+                  <Edit3 className="w-3 h-3" />
+                  Editar Slider
                 </button>
               )}
             </div>
@@ -170,16 +178,16 @@ export const HeroCarousel: React.FC = () => {
           </>
         )}
 
-        {/* Slide Indicators and Play/Pause control */}
-        <div className="absolute bottom-4 sm:bottom-6 left-0 right-0 z-30 flex items-center justify-between max-w-7xl mx-auto px-4 sm:px-8 pointer-events-none">
+        {/* Slide Indicators and Play/Pause control cleanly positioned at bottom-right */}
+        <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-8 z-30 flex items-center gap-2.5 sm:gap-3 pointer-events-auto">
           {/* Indicators */}
-          <div className="flex items-center space-x-2 pointer-events-auto bg-slate-950/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+          <div className="flex items-center space-x-2 bg-slate-950/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
             {activeSlides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentIdx(idx)}
                 aria-label={`Ir al slide ${idx + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 ${
+                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
                   idx === currentIdx ? 'w-8 bg-[#B91C1C]' : 'w-2 bg-white/40 hover:bg-white/70'
                 }`}
               />
@@ -187,16 +195,16 @@ export const HeroCarousel: React.FC = () => {
           </div>
 
           {/* Slide Number & Pause Button */}
-          <div className="hidden sm:flex items-center space-x-3 pointer-events-auto bg-slate-950/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 text-xs text-slate-300">
+          <div className="hidden sm:flex items-center space-x-2.5 bg-slate-950/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 text-xs text-slate-300 shadow-lg">
             <span className="font-mono font-bold text-amber-400">
               0{currentIdx + 1} <span className="text-slate-500">/ 0{activeSlides.length}</span>
             </span>
             <button
               onClick={() => setIsPaused(!isPaused)}
-              className="text-slate-400 hover:text-white transition-colors"
+              className="text-slate-400 hover:text-white transition-colors cursor-pointer"
               title={isPaused ? 'Reanudar carrusel' : 'Pausar carrusel'}
             >
-              {isPaused ? <Play className="w-3.5 h-3.5 text-amber-400" /> : <Pause className="w-3.5 h-3.5" />}
+              {isPaused ? <Play className="w-3.5 h-3.5 text-amber-300" /> : <Pause className="w-3.5 h-3.5" />}
             </button>
           </div>
         </div>
