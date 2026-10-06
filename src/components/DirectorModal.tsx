@@ -19,9 +19,12 @@ import {
   UserCheck,
   Edit3,
   FileText,
-  ArrowLeft
+  ArrowLeft,
+  Loader2,
+  Download
 } from 'lucide-react';
 import officialLogo from '../assets/images/programalogo.jpg';
+import { generateDirectorPdf } from '../utils/generateDirectorPdf';
 
 export const DirectorModal: React.FC = () => {
   const { 
@@ -35,6 +38,7 @@ export const DirectorModal: React.FC = () => {
   
   const [activeTab, setActiveTab] = useState<'biografia' | 'mensaje' | 'funciones' | 'marco-legal' | 'contacto'>('biografia');
   const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const isAdmin = currentUser?.role === 'Administrador';
 
@@ -104,6 +108,41 @@ export const DirectorModal: React.FC = () => {
     setTimeout(() => {
       window.print();
     }, 250);
+  };
+
+  const handleGeneratePdf = async () => {
+    if (isGeneratingPdf) return;
+    setIsGeneratingPdf(true);
+    showNotification('Generando expediente oficial en PDF...', 'info');
+
+    try {
+      const sanitizedName = directorInfo.name.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]/g, '_');
+      const fileName = `Expediente_Biografico_${sanitizedName || 'Director_General'}_PECPFFAA.pdf`;
+
+      const success = await generateDirectorPdf('director-printable-document', {
+        fileName,
+        onProgress: (status) => {
+          showNotification(status, 'info');
+        }
+      });
+
+      if (success) {
+        showNotification('¡Expediente PDF oficial generado y descargado exitosamente!', 'success');
+      } else {
+        showNotification('Abriendo diálogo del sistema para imprimir o guardar PDF...', 'info');
+        setTimeout(() => {
+          window.print();
+        }, 300);
+      }
+    } catch (err) {
+      console.error('Error generating PDF:', err);
+      showNotification('Abriendo diálogo del sistema para imprimir o guardar PDF...', 'info');
+      setTimeout(() => {
+        window.print();
+      }, 300);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   const handleGoToContact = () => {
@@ -199,11 +238,30 @@ export const DirectorModal: React.FC = () => {
 
             <div className="flex items-center gap-2">
               <button
-                onClick={handleExecutePrint}
-                className="px-4 py-2 rounded-xl bg-[#CE1126] hover:bg-red-700 text-white text-xs font-extrabold flex items-center gap-2 shadow-md transition-all cursor-pointer active:scale-95"
+                onClick={handleGeneratePdf}
+                disabled={isGeneratingPdf}
+                className="px-4 py-2 rounded-xl bg-[#CE1126] hover:bg-red-700 disabled:bg-red-400 text-white text-xs font-extrabold flex items-center gap-2 shadow-md transition-all cursor-pointer active:scale-95 disabled:cursor-wait"
+                title="Generar y descargar documento PDF oficial con toda la información biográfica y fotografía"
               >
-                <Printer className="w-4 h-4" />
-                <span>Imprimir / Guardar PDF</span>
+                {isGeneratingPdf ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <span>Generando PDF...</span>
+                  </>
+                ) : (
+                  <>
+                    <Printer className="w-4 h-4 text-white" />
+                    <span>Imprimir / Guardar PDF</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={handleExecutePrint}
+                className="hidden sm:inline-flex p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer items-center justify-center"
+                title="Diálogo de impresión del sistema (Ctrl+P)"
+              >
+                <Printer className="w-4 h-4 text-white/80" />
               </button>
 
               <button
