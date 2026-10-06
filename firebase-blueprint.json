@@ -100,6 +100,34 @@
         "status": { "type": "string" }
       },
       "required": ["timestamp", "formattedDate", "action", "module", "user", "details", "status"]
+    },
+    "DirectorInfo": {
+      "title": "DirectorInfo",
+      "description": "Despacho del Director General information, 9:16 portrait and content",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "title": { "type": "string" },
+        "institution": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "phone": { "type": "string" },
+        "extension": { "type": "string" },
+        "email": { "type": "string" },
+        "address": { "type": "string" },
+        "schedule": { "type": "string" },
+        "bioSubtitle": { "type": "string" },
+        "bioSummary": { "type": "string" },
+        "bioParagraphs": { "type": "array", "items": { "type": "string" } },
+        "academicDegrees": { "type": "array" },
+        "distinctions": { "type": "array", "items": { "type": "string" } },
+        "messageQuote": { "type": "string" },
+        "messageSubtitle": { "type": "string" },
+        "messageParagraphs": { "type": "array", "items": { "type": "string" } },
+        "functions": { "type": "array" },
+        "legalFramework": { "type": "array" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["name", "title", "institution", "photoUrl", "email"]
     }
   },
   "firestore": {
@@ -122,6 +150,10 @@
     "/users/{userId}": {
       "schema": "User",
       "description": "CMS authorized users"
+    },
+    "/director_info/{directorId}": {
+      "schema": "DirectorInfo",
+      "description": "Despacho del Director General official data and popup profile"
     },
     "/audit_logs/{logId}": {
       "schema": "AuditLog",

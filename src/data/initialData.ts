@@ -1,4 +1,4 @@
-import { SlideItem, NewsItem, ServiceItem, UserItem } from '../types';
+import { SlideItem, NewsItem, ServiceItem, UserItem, DirectorData } from '../types';
 
 export const INITIAL_USERS: UserItem[] = [
   {
@@ -234,3 +234,92 @@ export const INITIAL_SERVICES: ServiceItem[] = [
     featured: false,
   }
 ];
+
+export const INITIAL_DIRECTOR_DATA: DirectorData = {
+  id: 'director_general',
+  name: 'Mayor General, ERD',
+  title: 'Director General del PECPFFAA',
+  institution: 'PECPFFAA / MIDE',
+  photoUrl: 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg',
+  phone: '(809) 530-5149',
+  extension: 'Ext. 3899 / 3900',
+  email: 'despacho@pecpffaa.edu.do',
+  address: 'Edificio Principal MIDE, Ave. 27 de Febrero esq. Ave. Gregorio Luperón, Santo Domingo, D.N.',
+  schedule: 'Lunes a Viernes: 8:00 AM – 4:00 PM',
+  bioSubtitle: 'Semblanza Oficial',
+  bioSummary: 'Director General del PECPFFAA • Fuerzas Armadas de la República Dominicana',
+  bioParagraphs: [
+    'El Director General del Programa de Educación y Capacitación Profesional de las Fuerzas Armadas (PECPFFAA) cuenta con una dilatada y distinguida trayectoria militar, académica e institucional de más de 28 años al servicio de la República Dominicana, caracterizada por su consagración a la defensa nacional, la docencia superior y la excelencia operativa.',
+    'Egresado con honores de la Academia Militar Batalla de las Carreras, ha desempeñado funciones neurálgicas en el Estado Mayor Conjunto del Ministerio de Defensa (MIDE), en el Comando de Operaciones Especiales y en la dirección de planes tácticos y formativos de las escuelas de graduados de las Fuerzas Armadas.',
+    'Bajo su liderazgo directivo en el PECPFFAA, ha impulsado la modernización curricular hacia estándares de acreditación internacional, incorporando metodologías de aprendizaje por competencias, simuladores avanzados y laboratorios de ciberseguridad, inteligencia estratégica y gestión del riesgo ante desastres naturales.'
+  ],
+  academicDegrees: [
+    { title: 'Maestría en Seguridad y Defensa', institution: 'Instituto Superior para la Defensa (INSUDE)' },
+    { title: 'Comando y Estado Mayor Conjunto', institution: 'Escuela de Graduados de Doctrina Conjunta' },
+    { title: 'Licenciatura en Ciencias Militares', institution: 'Academia Militar Batalla de las Carreras' },
+    { title: 'Diplomado en Gestión Estratégica', institution: 'Centro de Altos Estudios Estratégicos' }
+  ],
+  distinctions: [
+    'Orden al Mérito Militar',
+    'Gran Cruz Placa de Plata',
+    'Encomio Especial del MIDE'
+  ],
+  messageQuote: 'Formar con disciplina, liderar con honor y servir a la Patria con excelencia técnica y moral.',
+  messageSubtitle: 'Alocución del Director General • Ciclo 2026',
+  messageParagraphs: [
+    'Distinguidos miembros de las Fuerzas Armadas, respetada comunidad docente, cadetes y conciudadanos:',
+    'Desde el Despacho de la Dirección General del PECPFFAA, renovamos nuestro compromiso sagrado con la formación integral de los hombres y mujeres que conforman el brazo protector y productivo de la nación dominicana. Guiados por el ejemplo inmortal del Gran General Restaurador Gregorio Luperón, consolidamos un sistema educativo castrense y civil basado en el mérito, la innovación y la rectitud.',
+    'En este nuevo ciclo académico, reforzamos nuestra oferta formativa con programas de vanguardia en ciberdefensa, logística militar, idiomas, gestión ambiental y tecnología aplicada. La educación es la base fundamental sobre la que se edifica la soberanía y la paz social de nuestro pueblo.',
+    'Exhorto a cada cursante y oficial a asumir con pasión este desafío formativo. Las puertas de este Despacho están siempre abiertas al diálogo constructivo, al servicio honesto y al engrandecimiento de la patria dominicana.'
+  ],
+  functions: [
+    {
+      num: '01',
+      title: 'Dirección Estratégica',
+      desc: 'Planificar, coordinar y dirigir la ejecución del plan estratégico institucional y el modelo curricular de educación militar y técnica.'
+    },
+    {
+      num: '02',
+      title: 'Rectoría Académica',
+      desc: 'Velar por la pertinencia, calidad docente y actualización constante de los programas de grado, posgrado y formación técnica continua.'
+    },
+    {
+      num: '03',
+      title: 'Representación Oficial',
+      desc: 'Ejercer la representación legal e institucional del PECPFFAA ante el Ministerio de Defensa y organismos nacionales e internacionales.'
+    },
+    {
+      num: '04',
+      title: 'Gestión de Recursos',
+      desc: 'Administrar con estricta transparencia los recursos humanos, tecnológicos y de infraestructura asignados a la labor docente.'
+    },
+    {
+      num: '05',
+      title: 'Innovación y Ciberdefensa',
+      desc: 'Fomentar la adopción de nuevas tecnologías, simuladores avanzados y doctrinas de ciberseguridad en el ámbito de la defensa nacional.'
+    },
+    {
+      num: '06',
+      title: 'Vinculación Social',
+      desc: 'Estrechar la colaboración con las instituciones del Estado, academias aliadas y la sociedad civil para el desarrollo técnico de la nación.'
+    }
+  ],
+  legalFramework: [
+    {
+      title: 'Constitución de la República Dominicana',
+      desc: 'Artículos 252 al 254 sobre el régimen, misión y formación de las Fuerzas Armadas de la Nación.'
+    },
+    {
+      title: 'Ley Orgánica de las Fuerzas Armadas (Ley No. 139-13)',
+      desc: 'Normativa general que rige el sistema educativo militar, jerarquías, deberes y atribuciones castrenses.'
+    },
+    {
+      title: 'Decretos de Creación y Estructura Docente',
+      desc: 'Disposiciones del Poder Ejecutivo que consolidan el PECPFFAA como órgano formativo de excelencia.'
+    },
+    {
+      title: 'Reglamento Interno de Régimen y Docencia PECPFFAA',
+      desc: 'Normas disciplinarias, planes de estudio y deberes académicos de cadetes y estudiantes.'
+    }
+  ]
+};

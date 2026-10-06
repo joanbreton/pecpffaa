@@ -21,9 +21,11 @@ import {
   ExternalLink,
   Mail,
   Database,
+  Building2,
   CheckCircle2
 } from 'lucide-react';
 import { DatabaseAuditTab } from './DatabaseAuditTab';
+import { CMSDirectorTab } from './CMSDirectorTab';
 
 export const CMSDashboard: React.FC = () => {
   const { 
@@ -50,13 +52,14 @@ export const CMSDashboard: React.FC = () => {
     messages,
     updateMessageStatus,
     deleteMessage,
+    directorData,
     auditLogs,
     resetToDefaults,
     showNotification,
     firebaseSyncStatus
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'slides' | 'news' | 'services' | 'users' | 'messages' | 'database'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'slides' | 'news' | 'services' | 'users' | 'messages' | 'director' | 'database'>('overview');
   const [messageFilter, setMessageFilter] = useState<'Todos' | 'No leído' | 'Leído' | 'Respondido'>('Todos');
   const [confirmDeleteMessageId, setConfirmDeleteMessageId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -531,6 +534,23 @@ export const CMSDashboard: React.FC = () => {
               </button>
 
               <button
+                onClick={() => setActiveTab('director')}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                  activeTab === 'director' 
+                    ? 'bg-white/10 text-white border-l-4 border-[#B91C1C] shadow-sm' 
+                    : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Building2 className="w-4 h-4 text-amber-300" />
+                  <span>Despacho del Director</span>
+                </div>
+                <span className="text-[10px] bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded-full font-mono font-bold">
+                  Popup
+                </span>
+              </button>
+
+              <button
                 onClick={() => setActiveTab('database')}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === 'database' 
@@ -666,7 +686,7 @@ export const CMSDashboard: React.FC = () => {
               {/* Quick Action Shortcuts */}
               <div className="bg-[#0D3671] text-white p-6 rounded-2xl space-y-4">
                 <h3 className="font-bold text-base">Acciones Rápidas de Administración</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                   <button
                     onClick={() => { setActiveTab('slides'); handleOpenSlideModal(); }}
                     className="py-3 px-4 bg-white/10 hover:bg-white/20 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-white/20 transition-colors"
@@ -692,11 +712,19 @@ export const CMSDashboard: React.FC = () => {
                   </button>
 
                   <button
+                    onClick={() => setActiveTab('director')}
+                    className="py-3 px-4 bg-amber-500/20 hover:bg-amber-500/30 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-amber-400/40 transition-colors text-amber-200"
+                  >
+                    <Building2 className="w-4 h-4 text-amber-300" />
+                    <span>Despacho Director</span>
+                  </button>
+
+                  <button
                     onClick={() => setActiveTab('database')}
                     className="py-3 px-4 bg-emerald-600/60 hover:bg-emerald-600 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-emerald-400/40 transition-colors text-white"
                   >
                     <Database className="w-4 h-4 text-emerald-200" />
-                    <span>Base de Datos & Respaldo</span>
+                    <span>Base de Datos</span>
                   </button>
                 </div>
               </div>
@@ -1293,6 +1321,11 @@ export const CMSDashboard: React.FC = () => {
                 </div>
               )}
             </div>
+          )}
+
+          {/* TAB: DIRECTOR GENERAL CMS */}
+          {activeTab === 'director' && (
+            <CMSDirectorTab />
           )}
 
           {/* TAB 7: DATABASE & AUDIT LOGS */}

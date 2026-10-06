@@ -6,6 +6,7 @@ export const DB_KEYS = {
   SERVICES: 'pecpffaa_services',
   USERS: 'pecpffaa_users',
   MESSAGES: 'pecpffaa_messages',
+  DIRECTOR: 'pecpffaa_director_info',
   AUDIT_LOGS: 'pecpffaa_db_audit_logs',
   CURRENT_USER: 'pecpffaa_current_user',
   DB_META: 'pecpffaa_db_metadata'
@@ -158,6 +159,11 @@ export function computeDatabaseStats(
         name: 'tbl_buzon_admisiones',
         description: 'Solicitudes y mensajes recibidos vía portal público',
         count: messages.length
+      },
+      {
+        name: 'tbl_despacho_director',
+        description: 'Ficha oficial, fotografía 9:16 y alocución del Director General',
+        count: 1
       },
       {
         name: 'tbl_auditoria_transacciones',

@@ -8,9 +8,16 @@ import {
   AuditLogEntry,
   AuditAction,
   CMSModule,
-  DatabaseStats
+  DatabaseStats,
+  DirectorData
 } from '../types';
-import { INITIAL_SLIDES, INITIAL_NEWS, INITIAL_SERVICES, INITIAL_USERS } from '../data/initialData';
+import { 
+  INITIAL_SLIDES, 
+  INITIAL_NEWS, 
+  INITIAL_SERVICES, 
+  INITIAL_USERS,
+  INITIAL_DIRECTOR_DATA 
+} from '../data/initialData';
 import { 
   DB_KEYS, 
   createAuditLog, 
@@ -34,6 +41,7 @@ import {
   deleteMessageFromFirestore,
   saveUserToFirestore,
   deleteUserFromFirestore,
+  saveDirectorToFirestore,
   saveAuditLogToFirestore,
   clearAuditLogsInFirestore,
   resetFirestoreToDefaults,
@@ -68,6 +76,9 @@ interface AppContextType {
   services: ServiceItem[];
   users: UserItem[];
   messages: ContactMessage[];
+  directorData: DirectorData;
+  updateDirectorData: (data: Partial<DirectorData>) => Promise<boolean>;
+  resetDirectorData: () => Promise<boolean>;
   
   // Slide Actions
   addSlide: (slide: Omit<SlideItem, 'id'>) => Promise<boolean>;
@@ -187,6 +198,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
+  const [directorData, setDirectorData] = useState<DirectorData>(() => {
+    try {
+      const saved = localStorage.getItem(DB_KEYS.DIRECTOR);
+      return saved ? JSON.parse(saved) : INITIAL_DIRECTOR_DATA;
+    } catch {
+      return INITIAL_DIRECTOR_DATA;
+    }
+  });
+
   // Audit Logs table for database activity recording
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>(() => {
     return getStoredAuditLogs();
@@ -213,6 +233,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           if (u) setUsers(JSON.parse(u));
           const m = localStorage.getItem(DB_KEYS.MESSAGES);
           if (m) setMessages(JSON.parse(m));
+          const d = localStorage.getItem(DB_KEYS.DIRECTOR);
+          if (d) setDirectorData(JSON.parse(d));
         } catch (e) {
           console.error('Error syncing tab state', e);
         }
@@ -278,6 +300,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             localStorage.setItem(DB_KEYS.MESSAGES, JSON.stringify(firestoreMessages));
           } catch (e) {
             console.error('Error saving messages cache', e);
+          }
+        }
+      },
+      onDirectorUpdate: (firestoreDirector) => {
+        if (isMounted && firestoreDirector) {
+          setDirectorData(firestoreDirector);
+          try {
+            localStorage.setItem(DB_KEYS.DIRECTOR, JSON.stringify(firestoreDirector));
+          } catch (e) {
+            console.error('Error saving director cache', e);
           }
         }
       },
@@ -952,6 +984,64 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     notifyCrossTab();
   };
 
+  // Director Office CMS Actions
+  const updateDirectorData = async (data: Partial<DirectorData>): Promise<boolean> => {
+    const updated: DirectorData = {
+      ...directorData,
+      ...data,
+      id: 'general',
+      updatedAt: new Date().toISOString()
+    };
+
+    setDirectorData(updated);
+    try {
+      localStorage.setItem(DB_KEYS.DIRECTOR, JSON.stringify(updated));
+    } catch (e) {
+      console.error('Error caching director info', e);
+    }
+    notifyCrossTab();
+
+    const success = await saveDirectorToFirestore(updated);
+
+    recordAuditChange(
+      'Modificación',
+      'Despacho del Director',
+      'Información y Perfil del Director General',
+      'general',
+      `Actualización integral del Despacho del Director (${updated.name}) en el CMS.`
+    );
+
+    if (success) {
+      showNotification('Información del Despacho guardada en Firebase Firestore', 'success');
+    } else {
+      showNotification('Cambios guardados localmente (sin conexión)', 'info');
+    }
+
+    return true;
+  };
+
+  const resetDirectorData = async (): Promise<boolean> => {
+    setDirectorData(INITIAL_DIRECTOR_DATA);
+    try {
+      localStorage.setItem(DB_KEYS.DIRECTOR, JSON.stringify(INITIAL_DIRECTOR_DATA));
+    } catch (e) {
+      console.error('Error resetting director info', e);
+    }
+    notifyCrossTab();
+
+    const success = await saveDirectorToFirestore(INITIAL_DIRECTOR_DATA);
+    recordAuditChange(
+      'Modificación',
+      'Despacho del Director',
+      'Restablecimiento de Ficha del Despacho',
+      'general',
+      'Restablecimiento de los datos del Despacho del Director a los valores oficiales por defecto.'
+    );
+
+    showNotification('Despacho del Director restablecido a valores iniciales', 'success');
+    return success;
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -975,6 +1065,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         services,
         users,
         messages,
+        directorData,
+        updateDirectorData,
+        resetDirectorData,
         addSlide,
         updateSlide,
         deleteSlide,

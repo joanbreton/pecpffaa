@@ -8,30 +8,32 @@ import {
   Mail, 
   Phone, 
   Download, 
-  FileText, 
   Send, 
   CheckCircle2, 
   Star,
   Quote,
-  ChevronRight,
   GraduationCap,
-  Calendar,
-  MapPin,
   Clock,
   Printer,
   Scale,
   Briefcase,
   UserCheck,
-  ExternalLink
+  Edit3
 } from 'lucide-react';
 import officialLogo from '../assets/images/programalogo.jpg';
 
 export const DirectorModal: React.FC = () => {
-  const { isDirectorModalOpen, setIsDirectorModalOpen, showNotification } = useApp();
+  const { 
+    isDirectorModalOpen, 
+    setIsDirectorModalOpen, 
+    directorData, 
+    currentUser, 
+    setActiveView, 
+    showNotification 
+  } = useApp();
   const [activeTab, setActiveTab] = useState<'biografia' | 'mensaje' | 'funciones' | 'marco-legal' | 'contacto'>('biografia');
 
-  // URL oficial provista por el usuario para la foto en proporción 9:16
-  const DIRECTOR_PHOTO_URL = 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg';
+  const isAdmin = currentUser?.role === 'Administrador';
 
   // Manejo de tecla ESC y bloqueo del scroll de fondo
   useEffect(() => {
@@ -67,6 +69,11 @@ export const DirectorModal: React.FC = () => {
         contactElem.scrollIntoView({ behavior: 'smooth' });
       }
     }, 150);
+  };
+
+  const handleGoToCMS = () => {
+    setIsDirectorModalOpen(false);
+    setActiveView('dashboard');
   };
 
   return (
@@ -105,19 +112,32 @@ export const DirectorModal: React.FC = () => {
                 <span className="text-amber-300 font-bold">Despacho del Director</span>
               </div>
               <h2 id="ogtic-director-modal-title" className="text-base sm:text-xl font-extrabold tracking-tight text-white mt-0.5 font-sans">
-                Despacho del Director General
+                {directorData.title || 'Despacho del Director General'}
               </h2>
             </div>
           </div>
 
-          {/* Botón de Cierre */}
-          <button
-            onClick={() => setIsDirectorModalOpen(false)}
-            aria-label="Cerrar ventana"
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:rotate-90 duration-200 cursor-pointer border border-white/20 shrink-0 ml-2"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {isAdmin && (
+              <button
+                onClick={handleGoToCMS}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold text-xs shadow-sm transition-all cursor-pointer"
+                title="Editar este contenido desde el Panel Administrativo CMS"
+              >
+                <Edit3 className="w-3.5 h-3.5 text-slate-900" />
+                <span>Editar en CMS</span>
+              </button>
+            )}
+
+            {/* Botón de Cierre */}
+            <button
+              onClick={() => setIsDirectorModalOpen(false)}
+              aria-label="Cerrar ventana"
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:rotate-90 duration-200 cursor-pointer border border-white/20 shrink-0 ml-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* =========================================================================
@@ -131,7 +151,7 @@ export const DirectorModal: React.FC = () => {
                 Órgano de Máxima Dirección Institucional
               </span>
               <p className="text-xs text-slate-500 mt-1">
-                Ministerio de Defensa de la República Dominicana • Programa de Educación y Capacitación Profesional de las FF.AA.
+                Ministerio de Defensa de la República Dominicana • {directorData.institution || 'PECPFFAA'}
               </p>
             </div>
 
@@ -202,88 +222,64 @@ export const DirectorModal: React.FC = () => {
                   {/* Encabezado Semblanza */}
                   <div className="border-b border-slate-200 pb-3">
                     <span className="text-xs font-bold uppercase tracking-wider text-[#CE1126]">
-                      Semblanza Oficial
+                      {directorData.bioSubtitle || 'Semblanza Oficial'}
                     </span>
                     <h3 className="text-xl sm:text-2xl font-black text-[#003876] font-sans mt-0.5">
-                      Mayor General, ERD
+                      {directorData.name}
                     </h3>
                     <p className="text-xs sm:text-sm font-semibold text-slate-600">
-                      Director General del PECPFFAA • Fuerzas Armadas de la República Dominicana
+                      {directorData.bioSummary || `${directorData.title} • Fuerzas Armadas de la República Dominicana`}
                     </p>
                   </div>
 
-                  {/* Columna de Párrafos Biográficos */}
+                  {/* Columna de Párrafos Biográficos Dinámicos */}
                   <div className="space-y-3.5 text-sm sm:text-[15px] leading-relaxed text-slate-700 text-justify">
-                    <p>
-                      El <strong>Director General del Programa de Educación y Capacitación Profesional de las Fuerzas Armadas (PECPFFAA)</strong> cuenta con una dilatada y distinguida trayectoria militar, académica e institucional de más de 28 años al servicio de la República Dominicana, caracterizada por su consagración a la defensa nacional, la docencia superior y la excelencia operativa.
-                    </p>
-
-                    <p>
-                      Egresado con honores de la Academia Militar Batalla de las Carreras, ha desempeñado funciones neurálgicas en el Estado Mayor Conjunto del Ministerio de Defensa (MIDE), en el Comando de Operaciones Especiales y en la dirección de planes tácticos y formativos de las escuelas de graduados de las Fuerzas Armadas.
-                    </p>
-
-                    <p>
-                      Bajo su liderazgo directivo en el PECPFFAA, ha impulsado la modernización curricular hacia estándares de acreditación internacional, incorporando metodologías de aprendizaje por competencias, simuladores avanzados y laboratorios de ciberseguridad, inteligencia estratégica y gestión del riesgo ante desastres naturales.
-                    </p>
+                    {directorData.bioParagraphs && directorData.bioParagraphs.length > 0 ? (
+                      directorData.bioParagraphs.map((parr, idx) => (
+                        <p key={idx}>{parr}</p>
+                      ))
+                    ) : (
+                      <p>Información biográfica del Director General en proceso de actualización.</p>
+                    )}
                   </div>
 
                   {/* Formación Académica & Credenciales (Estilo Fichas OGTIC) */}
-                  <div className="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-3">
-                    <h4 className="text-xs font-extrabold uppercase tracking-wider text-[#003876] flex items-center gap-1.5">
-                      <GraduationCap className="w-4 h-4 text-[#CE1126]" />
-                      Formación Académica y Especializaciones
-                    </h4>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200 flex items-start gap-2 shadow-2xs">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-bold text-slate-800 block">Maestría en Seguridad y Defensa</span>
-                          <span className="text-slate-500">Instituto Superior para la Defensa (INSUDE)</span>
-                        </div>
-                      </div>
-
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200 flex items-start gap-2 shadow-2xs">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-bold text-slate-800 block">Comando y Estado Mayor Conjunto</span>
-                          <span className="text-slate-500">Escuela de Graduados de Doctrina Conjunta</span>
-                        </div>
-                      </div>
-
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200 flex items-start gap-2 shadow-2xs">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-bold text-slate-800 block">Licenciatura en Ciencias Militares</span>
-                          <span className="text-slate-500">Academia Militar Batalla de las Carreras</span>
-                        </div>
-                      </div>
-
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200 flex items-start gap-2 shadow-2xs">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-bold text-slate-800 block">Diplomado en Gestión Estratégica</span>
-                          <span className="text-slate-500">Centro de Altos Estudios Estratégicos</span>
-                        </div>
+                  {directorData.academicDegrees && directorData.academicDegrees.length > 0 && (
+                    <div className="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-3">
+                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-[#003876] flex items-center gap-1.5">
+                        <GraduationCap className="w-4 h-4 text-[#CE1126]" />
+                        Formación Académica y Especializaciones
+                      </h4>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                        {directorData.academicDegrees.map((deg, idx) => (
+                          <div key={idx} className="bg-white p-2.5 rounded-lg border border-slate-200 flex items-start gap-2 shadow-2xs">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                            <div>
+                              <span className="font-bold text-slate-800 block">{deg.title}</span>
+                              <span className="text-slate-500">{deg.institution}</span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Distinciones & Condecoraciones */}
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    <span className="text-xs font-bold text-slate-700">Distinciones Oficiales:</span>
-                    <span className="px-2.5 py-1 rounded-md bg-amber-50 text-amber-900 border border-amber-200 text-[11px] font-semibold flex items-center gap-1">
-                      <Award className="w-3 h-3 text-amber-600" />
-                      Orden al Mérito Militar
-                    </span>
-                    <span className="px-2.5 py-1 rounded-md bg-blue-50 text-blue-900 border border-blue-200 text-[11px] font-semibold flex items-center gap-1">
-                      <Star className="w-3 h-3 text-[#003876]" />
-                      Gran Cruz Placa de Plata
-                    </span>
-                    <span className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-semibold">
-                      Encomio Especial del MIDE
-                    </span>
-                  </div>
+                  {directorData.distinctions && directorData.distinctions.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <span className="text-xs font-bold text-slate-700">Distinciones Oficiales:</span>
+                      {directorData.distinctions.map((dist, idx) => (
+                        <span 
+                          key={idx} 
+                          className="px-2.5 py-1 rounded-md bg-amber-50 text-amber-900 border border-amber-200 text-[11px] font-semibold flex items-center gap-1"
+                        >
+                          <Award className="w-3 h-3 text-amber-600" />
+                          {dist}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                 </div>
               )}
@@ -299,36 +295,31 @@ export const DirectorModal: React.FC = () => {
                       <Quote className="w-8 h-8 text-[#003876]/30 shrink-0" />
                       <div>
                         <span className="text-xs font-bold uppercase tracking-wider text-[#003876]">
-                          Alocución del Director General • Ciclo 2026
+                          {directorData.messageSubtitle || 'Alocución del Director General • Ciclo 2026'}
                         </span>
                         <h4 className="text-base sm:text-lg font-bold text-slate-900 font-sans leading-snug mt-0.5">
-                          "Formar con disciplina, liderar con honor y servir a la Patria con excelencia técnica y moral."
+                          "{directorData.messageQuote || 'Formar con disciplina, liderar con honor y servir a la Patria con excelencia técnica y moral.'}"
                         </h4>
                       </div>
                     </div>
                   </div>
 
-                  {/* Párrafos del Mensaje */}
+                  {/* Párrafos del Mensaje Dinámicos */}
                   <div className="space-y-3.5 text-sm sm:text-[15px] leading-relaxed text-slate-700 text-justify">
-                    <p>
-                      Distinguidos miembros de las Fuerzas Armadas, respetada comunidad docente, cadetes y conciudadanos:
-                    </p>
-                    <p>
-                      Desde el Despacho de la Dirección General del PECPFFAA, renovamos nuestro compromiso sagrado con la formación integral de los hombres y mujeres que conforman el brazo protector y productivo de la nación dominicana. Guiados por el ejemplo inmortal del <em>Gran General Restaurador Gregorio Luperón</em>, consolidamos un sistema educativo castrense y civil basado en el mérito, la innovación y la rectitud.
-                    </p>
-                    <p>
-                      En este nuevo ciclo académico, reforzamos nuestra oferta formativa con programas de vanguardia en ciberdefensa, logística militar, idiomas, gestión ambiental y tecnología aplicada. La educación es la base fundamental sobre la que se edifica la soberanía y la paz social de nuestro pueblo.
-                    </p>
-                    <p className="font-semibold text-slate-800">
-                      Exhorto a cada cursante y oficial a asumir con pasión este desafío formativo. Las puertas de este Despacho están siempre abiertas al diálogo constructivo, al servicio honesto y al engrandecimiento de la patria dominicana.
-                    </p>
+                    {directorData.messageParagraphs && directorData.messageParagraphs.length > 0 ? (
+                      directorData.messageParagraphs.map((parr, idx) => (
+                        <p key={idx}>{parr}</p>
+                      ))
+                    ) : (
+                      <p>Mensaje oficial del Despacho del Director General en proceso de actualización.</p>
+                    )}
                   </div>
 
                   {/* Bloque de Firma Oficial */}
                   <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>
-                      <p className="text-xs font-extrabold uppercase tracking-wider text-[#003876]">Mayor General, ERD</p>
-                      <p className="text-sm font-bold text-slate-900">Director General del PECPFFAA</p>
+                      <p className="text-xs font-extrabold uppercase tracking-wider text-[#003876]">{directorData.name}</p>
+                      <p className="text-sm font-bold text-slate-900">{directorData.title}</p>
                       <p className="text-xs text-slate-500">Ministerio de Defensa • República Dominicana</p>
                     </div>
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold">
@@ -351,55 +342,28 @@ export const DirectorModal: React.FC = () => {
                       Funciones del Despacho del Director General
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Conforme al Reglamento Orgánico del Ministerio de Defensa y la normativa académica del PECPFFAA.
+                      Conforme al Reglamento Orgánico del Ministerio de Defensa y la normativa académica del {directorData.institution || 'PECPFFAA'}.
                     </p>
                   </div>
 
-                  {/* Tarjetas de Funciones (Diseño Clon OGTIC) */}
+                  {/* Tarjetas de Funciones Dinámicas */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    {[
-                      {
-                        num: '01',
-                        title: 'Dirección Estratégica',
-                        desc: 'Planificar, coordinar y dirigir la ejecución del plan estratégico institucional y el modelo curricular de educación militar y técnica.'
-                      },
-                      {
-                        num: '02',
-                        title: 'Rectoría Académica',
-                        desc: 'Velar por la pertinencia, calidad docente y actualización constante de los programas de grado, posgrado y formación técnica continua.'
-                      },
-                      {
-                        num: '03',
-                        title: 'Representación Oficial',
-                        desc: 'Ejercer la representación legal e institucional del PECPFFAA ante el Ministerio de Defensa y organismos nacionales e internacionales.'
-                      },
-                      {
-                        num: '04',
-                        title: 'Gestión de Recursos',
-                        desc: 'Administrar con estricta transparencia los recursos humanos, tecnológicos y de infraestructura asignados a la labor docente.'
-                      },
-                      {
-                        num: '05',
-                        title: 'Innovación y Ciberdefensa',
-                        desc: 'Fomentar la adopción de nuevas tecnologías, simuladores avanzados y doctrinas de ciberseguridad en el ámbito de la defensa nacional.'
-                      },
-                      {
-                        num: '06',
-                        title: 'Vinculación Social',
-                        desc: 'Estrechar la colaboración con las instituciones del Estado, academias aliadas y la sociedad civil para el desarrollo técnico de la nación.'
-                      }
-                    ].map((f) => (
-                      <div key={f.num} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-blue-300 hover:shadow-xs transition-all space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-mono text-xs font-extrabold text-[#CE1126] bg-red-50 px-2 py-0.5 rounded border border-red-200">
-                            {f.num}
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-bold uppercase">Atribución</span>
+                    {directorData.functions && directorData.functions.length > 0 ? (
+                      directorData.functions.map((f, idx) => (
+                        <div key={idx} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-blue-300 hover:shadow-xs transition-all space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono text-xs font-extrabold text-[#CE1126] bg-red-50 px-2 py-0.5 rounded border border-red-200">
+                              {f.num || `0${idx + 1}`}
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase">Atribución</span>
+                          </div>
+                          <h4 className="text-xs font-bold text-slate-900 pt-1">{f.title}</h4>
+                          <p className="text-[11px] text-slate-600 leading-relaxed">{f.desc}</p>
                         </div>
-                        <h4 className="text-xs font-bold text-slate-900 pt-1">{f.title}</h4>
-                        <p className="text-[11px] text-slate-600 leading-relaxed">{f.desc}</p>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-xs text-slate-500 col-span-2">No hay funciones registradas.</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -417,37 +381,19 @@ export const DirectorModal: React.FC = () => {
                   </div>
 
                   <div className="space-y-2.5 text-xs text-slate-700">
-                    <div className="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-3">
-                      <Scale className="w-4 h-4 text-[#003876] shrink-0 mt-0.5" />
-                      <div>
-                        <span className="font-bold text-slate-900 block">Constitución de la República Dominicana</span>
-                        <span className="text-slate-600">Artículos 252 al 254 sobre el régimen, misión y formación de las Fuerzas Armadas de la Nación.</span>
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-3">
-                      <Scale className="w-4 h-4 text-[#003876] shrink-0 mt-0.5" />
-                      <div>
-                        <span className="font-bold text-slate-900 block">Ley Orgánica de las Fuerzas Armadas (Ley No. 139-13)</span>
-                        <span className="text-slate-600">Normativa general que rige el sistema educativo militar, jerarquías, deberes y atribuciones castrenses.</span>
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-3">
-                      <Scale className="w-4 h-4 text-[#003876] shrink-0 mt-0.5" />
-                      <div>
-                        <span className="font-bold text-slate-900 block">Decretos de Creación y Estructura Docente</span>
-                        <span className="text-slate-600">Disposiciones del Poder Ejecutivo que consolidan el PECPFFAA como órgano formativo de excelencia.</span>
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-3">
-                      <Scale className="w-4 h-4 text-[#003876] shrink-0 mt-0.5" />
-                      <div>
-                        <span className="font-bold text-slate-900 block">Reglamento Interno de Régimen y Docencia PECPFFAA</span>
-                        <span className="text-slate-600">Normas disciplinarias, planes de estudio y deberes académicos de cadetes y estudiantes.</span>
-                      </div>
-                    </div>
+                    {directorData.legalFramework && directorData.legalFramework.length > 0 ? (
+                      directorData.legalFramework.map((leg, idx) => (
+                        <div key={idx} className="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-3">
+                          <Scale className="w-4 h-4 text-[#003876] shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold text-slate-900 block">{leg.title}</span>
+                            <span className="text-slate-600">{leg.desc}</span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-xs text-slate-500">Marco legal en proceso de actualización.</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -471,7 +417,7 @@ export const DirectorModal: React.FC = () => {
                         Sede y Ubicación
                       </span>
                       <p className="text-slate-600 text-[11px] leading-relaxed">
-                        Edificio Principal MIDE, Ave. 27 de Febrero esq. Ave. Gregorio Luperón, Santo Domingo, D.N.
+                        {directorData.address}
                       </p>
                     </div>
 
@@ -481,7 +427,7 @@ export const DirectorModal: React.FC = () => {
                         Horario de Atención
                       </span>
                       <p className="text-slate-600 text-[11px] leading-relaxed">
-                        Lunes a Viernes: 8:00 AM – 4:00 PM (Previa Cita o Audiencia Oficial)
+                        {directorData.schedule}
                       </p>
                     </div>
 
@@ -491,7 +437,7 @@ export const DirectorModal: React.FC = () => {
                         Línea Telefónica Directa
                       </span>
                       <p className="text-slate-600 text-[11px] leading-relaxed">
-                        (809) 530-5149 • Extensiones: 3899 / 3900 (Secretaría del Despacho)
+                        {directorData.phone} • {directorData.extension} (Secretaría del Despacho)
                       </p>
                     </div>
 
@@ -501,7 +447,7 @@ export const DirectorModal: React.FC = () => {
                         Correspondencia Electrónica
                       </span>
                       <p className="text-slate-600 text-[11px] leading-relaxed">
-                        despacho@pecpffaa.edu.do • direccion@pecpffaa.edu.do
+                        {directorData.email}
                       </p>
                     </div>
                   </div>
@@ -522,7 +468,7 @@ export const DirectorModal: React.FC = () => {
 
             {/* ---------------------------------------------------------------------
                 COLUMNA DERECHA: FOTO OFICIAL EN PROPORCIÓN 9:16 (CLON ESTRUCTURA OGTIC)
-                Utiliza exactamente: https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg
+                Utiliza reactivamente: directorData.photoUrl
                --------------------------------------------------------------------- */}
             <div className="lg:col-span-5 xl:col-span-4 order-1 lg:order-2 flex flex-col items-center">
               
@@ -534,23 +480,22 @@ export const DirectorModal: React.FC = () => {
                     República Dominicana
                   </span>
                   <span className="text-xs font-bold block text-white">
-                    Dirección General • PECPFFAA
+                    {directorData.title}
                   </span>
                 </div>
 
-                {/* Marco de Imagen 9:16 con la Foto Solicitada */}
+                {/* Marco de Imagen 9:16 con la Foto Dinámica del CMS */}
                 <div className="p-3 bg-slate-50/70">
                   <div className="relative w-full aspect-[9/16] rounded-xl overflow-hidden bg-slate-950 shadow-md group border border-slate-300">
                     
-                    {/* Fotografía Oficial con la URL provista por el usuario */}
+                    {/* Fotografía Oficial */}
                     <img
-                      src={DIRECTOR_PHOTO_URL}
-                      alt="Director General del PECPFFAA"
+                      src={directorData.photoUrl || 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg'}
+                      alt={directorData.name}
                       className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-102"
                       referrerPolicy="no-referrer"
                       loading="eager"
                       onError={(e) => {
-                        // En caso de corte momentáneo de red, respaldo de alta calidad
                         const img = e.currentTarget as HTMLImageElement;
                         img.src = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=85';
                       }}
@@ -570,10 +515,10 @@ export const DirectorModal: React.FC = () => {
                         <span className="w-3 h-1.5 bg-[#CE1126] rounded-2xs inline-block"></span>
                       </div>
                       <p className="text-[10px] uppercase font-extrabold tracking-wider text-amber-300">
-                        Director General
+                        {directorData.title}
                       </p>
                       <p className="text-xs font-bold text-white leading-tight">
-                        Mayor General, ERD
+                        {directorData.name}
                       </p>
                     </div>
 
@@ -585,22 +530,24 @@ export const DirectorModal: React.FC = () => {
                   
                   <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                     <span className="text-slate-500 text-[11px] font-medium">Institución:</span>
-                    <span className="font-bold text-[#003876] text-[11px]">PECPFFAA / MIDE</span>
+                    <span className="font-bold text-[#003876] text-[11px]">{directorData.institution}</span>
                   </div>
 
                   <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                     <span className="text-slate-500 text-[11px] font-medium">Rango:</span>
-                    <span className="font-bold text-slate-800 text-[11px]">Mayor General, ERD</span>
+                    <span className="font-bold text-slate-800 text-[11px]">{directorData.name}</span>
                   </div>
 
                   <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                     <span className="text-slate-500 text-[11px] font-medium">Extensión:</span>
-                    <span className="font-mono font-bold text-[#CE1126] text-[11px]">Ext. 3899</span>
+                    <span className="font-mono font-bold text-[#CE1126] text-[11px]">{directorData.extension}</span>
                   </div>
 
                   <div className="flex items-center justify-between pb-1">
                     <span className="text-slate-500 text-[11px] font-medium">Correo:</span>
-                    <span className="text-slate-700 text-[10px] font-mono font-semibold">despacho@pecpffaa.edu.do</span>
+                    <span className="text-slate-700 text-[10px] font-mono font-semibold truncate max-w-[170px]" title={directorData.email}>
+                      {directorData.email}
+                    </span>
                   </div>
 
                   {/* Botones de Descarga en Barra Lateral */}
@@ -630,12 +577,12 @@ export const DirectorModal: React.FC = () => {
           <div className="flex items-center gap-3 text-xs text-slate-600">
             <span className="flex items-center gap-1 text-[11px]">
               <Phone className="w-3.5 h-3.5 text-[#003876]" />
-              (809) 530-5149 ext. 3899
+              {directorData.phone} {directorData.extension}
             </span>
             <span>•</span>
             <span className="flex items-center gap-1 text-[11px]">
               <Mail className="w-3.5 h-3.5 text-[#CE1126]" />
-              despacho@pecpffaa.edu.do
+              {directorData.email}
             </span>
           </div>
 

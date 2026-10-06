@@ -14,13 +14,15 @@ import {
   ServiceItem, 
   UserItem, 
   ContactMessage, 
-  AuditLogEntry 
+  AuditLogEntry,
+  DirectorData 
 } from '../types';
 import { 
   INITIAL_SLIDES, 
   INITIAL_NEWS, 
   INITIAL_SERVICES, 
-  INITIAL_USERS 
+  INITIAL_USERS,
+  INITIAL_DIRECTOR_DATA 
 } from '../data/initialData';
 
 export interface FirestoreSyncCallbacks {
@@ -29,6 +31,7 @@ export interface FirestoreSyncCallbacks {
   onServicesUpdate?: (services: ServiceItem[]) => void;
   onUsersUpdate?: (users: UserItem[]) => void;
   onMessagesUpdate?: (messages: ContactMessage[]) => void;
+  onDirectorUpdate?: (director: DirectorData) => void;
   onAuditLogsUpdate?: (logs: AuditLogEntry[]) => void;
   onSyncStatusChange?: (status: 'connecting' | 'connected' | 'error', error?: string) => void;
 }
@@ -182,6 +185,29 @@ export const initAndSyncFirestore = async (callbacks: FirestoreSyncCallbacks): P
     });
     unsubscribers.push(unsubAudit);
 
+    // 7. Parallel Director Info Listener
+    const directorDocRef = doc(db, COLLECTIONS.DIRECTOR, 'general');
+    const unsubDirector = onSnapshot(directorDocRef, async (docSnap) => {
+      markConnected();
+      if (docSnap.exists()) {
+        callbacks.onDirectorUpdate?.({ ...(docSnap.data() as DirectorData), id: docSnap.id });
+      } else {
+        // Seed default initial director data if empty
+        try {
+          const clean = sanitizeForFirestore({ ...INITIAL_DIRECTOR_DATA, id: 'general' });
+          await setDoc(directorDocRef, clean);
+          callbacks.onDirectorUpdate?.(INITIAL_DIRECTOR_DATA);
+        } catch (e) {
+          console.warn('Initial director seed note:', e);
+          callbacks.onDirectorUpdate?.(INITIAL_DIRECTOR_DATA);
+        }
+      }
+    }, (err) => {
+      console.warn('Firestore director listener warning:', err);
+      callbacks.onSyncStatusChange?.('error', err.message);
+    });
+    unsubscribers.push(unsubDirector);
+
   } catch (error) {
     console.error('Firebase Firestore connection error:', error);
     callbacks.onSyncStatusChange?.('error', String(error));
@@ -323,6 +349,22 @@ export const deleteUserFromFirestore = async (id: string): Promise<boolean> => {
   }
 };
 
+/* --- DIRECTOR INFO CRUD --- */
+export const saveDirectorToFirestore = async (item: DirectorData): Promise<boolean> => {
+  try {
+    const clean = sanitizeForFirestore({
+      ...item,
+      id: 'general',
+      updatedAt: new Date().toISOString()
+    });
+    await setDoc(doc(db, COLLECTIONS.DIRECTOR, 'general'), clean);
+    return true;
+  } catch (err) {
+    console.error('Error saving director info to Firestore:', err);
+    return false;
+  }
+};
+
 /* --- AUDIT LOGS --- */
 export const saveAuditLogToFirestore = async (item: AuditLogEntry): Promise<boolean> => {
   try {
@@ -381,6 +423,13 @@ export const resetFirestoreToDefaults = async (): Promise<boolean> => {
     }
 
     await clearCol(COLLECTIONS.MESSAGES);
+
+    // Reset Director Info
+    await setDoc(doc(db, COLLECTIONS.DIRECTOR, 'general'), sanitizeForFirestore({
+      ...INITIAL_DIRECTOR_DATA,
+      id: 'general',
+      updatedAt: new Date().toISOString()
+    }));
     return true;
   } catch (err) {
     console.error('Error resetting Firestore to defaults:', err);

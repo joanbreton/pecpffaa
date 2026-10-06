@@ -70,7 +70,7 @@ export interface ContactMessage {
 }
 
 export type AuditAction = 'Creación' | 'Modificación' | 'Eliminación' | 'Cambio de Estado' | 'Restauración BD' | 'Inicialización BD';
-export type CMSModule = 'Slides (Carrusel)' | 'Noticias' | 'Oferta Académica' | 'Usuarios' | 'Buzón Admisiones' | 'Base de Datos';
+export type CMSModule = 'Slides (Carrusel)' | 'Noticias' | 'Oferta Académica' | 'Usuarios' | 'Buzón Admisiones' | 'Base de Datos' | 'Despacho del Director';
 
 export interface AuditLogEntry {
   id: string;
@@ -101,4 +101,44 @@ export interface DatabaseStats {
     description: string;
     count: number;
   }[];
+}
+
+export interface DirectorDegree {
+  title: string;
+  institution: string;
+}
+
+export interface DirectorFunction {
+  num: string;
+  title: string;
+  desc: string;
+}
+
+export interface DirectorLegalItem {
+  title: string;
+  desc: string;
+}
+
+export interface DirectorData {
+  id?: string;
+  name: string;
+  title: string;
+  institution: string;
+  photoUrl: string;
+  phone: string;
+  extension: string;
+  email: string;
+  address: string;
+  schedule: string;
+  bioSubtitle: string;
+  bioSummary: string;
+  bioParagraphs: string[];
+  academicDegrees: DirectorDegree[];
+  distinctions: string[];
+  messageQuote: string;
+  messageSubtitle: string;
+  messageParagraphs: string[];
+  functions: DirectorFunction[];
+  legalFramework: DirectorLegalItem[];
+  updatedAt?: string;
 }
