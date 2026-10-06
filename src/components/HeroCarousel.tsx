@@ -69,8 +69,8 @@ export const HeroCarousel: React.FC = () => {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Responsive Container: adapts naturally to widescreen proportions without stretching or over-cropping images */}
-      <div className="relative w-full h-[440px] sm:h-[500px] md:h-[550px] lg:h-[600px] xl:h-[640px] flex items-end overflow-hidden">
+      {/* Container: 768px de altura */}
+      <div className="relative w-full h-[768px] flex items-end overflow-hidden">
         
         {/* Background Slide Image - crisp, properly scaled and adapted to container */}
         {activeSlides.map((slide, idx) => (
