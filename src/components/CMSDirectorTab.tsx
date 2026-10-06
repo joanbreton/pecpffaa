@@ -235,7 +235,7 @@ export const CMSDirectorTab: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-slate-500">
-                Administre la ficha técnica, fotografía en proporción 9:16, semblanza, alocución y funciones institucionales.
+                Administre la ficha técnica, fotografía en proporción 1:1 completa, semblanza, alocución y funciones institucionales.
               </p>
             </div>
           </div>
@@ -302,7 +302,7 @@ export const CMSDirectorTab: React.FC = () => {
       {/* Module Navigation Tabs */}
       <div className="flex items-center gap-1.5 bg-slate-200/70 p-1.5 rounded-xl overflow-x-auto scrollbar-none">
         {[
-          { id: 'ficha', label: '1. Ficha & Foto 9:16', icon: ImageIcon },
+          { id: 'ficha', label: '1. Ficha & Foto 1:1', icon: ImageIcon },
           { id: 'biografia', label: '2. Biografía & Formación', icon: UserCheck },
           { id: 'mensaje', label: '3. Alocución & Cita', icon: Quote },
           { id: 'funciones', label: '4. Funciones del Despacho', icon: Briefcase },
@@ -339,10 +339,10 @@ export const CMSDirectorTab: React.FC = () => {
             <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
               <div>
                 <h3 className="text-base font-bold text-slate-900">
-                  Ficha Identificativa y Fotografía Oficial 9:16
+                  Ficha Identificativa y Fotografía Oficial 1:1
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Configure los datos del Director y la fotografía en proporción vertical 9:16.
+                  Configure los datos del Director y la fotografía oficial en proporción cuadrada 1:1 (completa sin cortes).
                 </p>
               </div>
               <span className="text-[11px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
@@ -358,7 +358,7 @@ export const CMSDirectorTab: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Nombre y Rango Militar *
+                       Nombre y Rango Militar *
                     </label>
                     <input
                       type="text"
@@ -402,7 +402,7 @@ export const CMSDirectorTab: React.FC = () => {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      URL de la Fotografía Oficial (Proporción 9:16) *
+                      URL de la Fotografía Oficial (Proporción 1:1) *
                     </label>
                     <input
                       type="url"
@@ -495,32 +495,39 @@ export const CMSDirectorTab: React.FC = () => {
 
               </div>
 
-              {/* Columna Derecha: Previsualizador de Fotografía 9:16 en Vivo */}
+              {/* Columna Derecha: Previsualizador de Fotografía 1:1 en Vivo */}
               <div className="lg:col-span-4 flex flex-col items-center">
-                <div className="w-full max-w-[220px] bg-slate-50 p-3 rounded-2xl border-2 border-slate-300 shadow-sm text-center space-y-2">
+                <div className="w-full max-w-[240px] bg-slate-50 p-3.5 rounded-2xl border-2 border-slate-300 shadow-sm text-center space-y-2.5">
                   <div className="flex items-center justify-between text-[11px] font-bold text-[#003876]">
-                    <span>Vista Previa</span>
-                    <span className="bg-red-100 text-[#CE1126] px-1.5 py-0.2 rounded text-[9px] font-mono font-extrabold">9:16</span>
+                    <span>Vista Previa 1:1</span>
+                    <span className="bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded text-[9px] font-mono font-extrabold">1:1 Completa</span>
                   </div>
 
-                  <div className="relative w-full aspect-[9/16] rounded-xl overflow-hidden bg-slate-900 shadow-inner border border-slate-300">
+                  <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-900 shadow-inner border border-slate-300 flex items-center justify-center">
                     <img
                       src={formData.photoUrl || 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg'}
-                      alt="Previsualización 9:16"
-                      className="w-full h-full object-cover object-top"
+                      alt=""
+                      aria-hidden="true"
+                      className="absolute inset-0 w-full h-full object-cover blur-sm opacity-20 scale-110 pointer-events-none"
+                    />
+                    <img
+                      src={formData.photoUrl || 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg'}
+                      alt="Previsualización 1:1"
+                      className="relative z-10 w-full h-full object-contain object-center"
                       referrerPolicy="no-referrer"
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80';
                       }}
                     />
-                    <div className="absolute bottom-0 inset-x-0 bg-slate-950/80 p-2 text-white text-[10px]">
-                      <p className="font-bold truncate">{formData.name || 'Mayor General, ERD'}</p>
-                      <p className="text-[9px] text-amber-300 truncate">{formData.title}</p>
-                    </div>
+                  </div>
+
+                  <div className="pt-1 text-center">
+                    <p className="font-bold text-xs text-slate-800 truncate">{formData.name || 'Mayor General, ERD'}</p>
+                    <p className="text-[10px] text-[#CE1126] font-semibold truncate">{formData.title}</p>
                   </div>
 
                   <p className="text-[10px] text-slate-500 font-medium">
-                    Proporción vertical óptima para retrato oficial de alta fidelidad.
+                    Proporción 1:1 que muestra la fotografía completa sin cortes.
                   </p>
                 </div>
               </div>

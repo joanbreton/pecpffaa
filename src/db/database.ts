@@ -162,7 +162,7 @@ export function computeDatabaseStats(
       },
       {
         name: 'tbl_despacho_director',
-        description: 'Ficha oficial, fotografía 9:16 y alocución del Director General',
+        description: 'Ficha oficial, fotografía 1:1 y alocución del Director General',
         count: 1
       },
       {
