@@ -122,6 +122,7 @@ export interface DirectorLegalItem {
 export interface DirectorData {
   id?: string;
   name: string;
+  rank?: string;
   title: string;
   institution: string;
   photoUrl: string;

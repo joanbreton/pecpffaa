@@ -44,12 +44,41 @@ export const CMSDirectorTab: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
+  // Helper to parse name and rank
+  const parseNameAndRank = (data: DirectorData) => {
+    let cleanName = (data.name || '').trim();
+    let rank = (data.rank || '').trim();
+
+    if (!rank && cleanName.includes(',')) {
+      const idx = cleanName.indexOf(',');
+      rank = cleanName.substring(idx + 1).trim();
+      cleanName = cleanName.substring(0, idx).trim();
+    }
+
+    return {
+      name: cleanName,
+      rank: rank || 'General de Brigada, ERD.'
+    };
+  };
+
   // Form local state cloned from directorData
-  const [formData, setFormData] = useState<DirectorData>(directorData);
+  const [formData, setFormData] = useState<DirectorData>(() => {
+    const { name, rank } = parseNameAndRank(directorData);
+    return {
+      ...directorData,
+      name,
+      rank
+    };
+  });
 
   // Sync form data if remote database updates directorData
   useEffect(() => {
-    setFormData(directorData);
+    const { name, rank } = parseNameAndRank(directorData);
+    setFormData({
+      ...directorData,
+      name,
+      rank
+    });
   }, [directorData]);
 
   // Handlers for dynamic lists
@@ -358,18 +387,34 @@ export const CMSDirectorTab: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                       Nombre y Rango Militar *
+                      Nombre Completo del Titular *
                     </label>
                     <input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Ej: Mayor General, ERD"
+                      placeholder="Ej: Ambiorix de Jesús Cepeda Hernández"
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-[#003876] focus:bg-white transition-all outline-none"
                       required
                     />
                   </div>
 
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Rango Militar *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.rank || ''}
+                      onChange={(e) => setFormData({ ...formData, rank: e.target.value })}
+                      placeholder="Ej: General de Brigada, ERD."
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-[#003876] focus:bg-white transition-all outline-none"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
                       Cargo Oficial *
@@ -383,9 +428,7 @@ export const CMSDirectorTab: React.FC = () => {
                       required
                     />
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
                       Institución / Adscripción *
@@ -399,6 +442,7 @@ export const CMSDirectorTab: React.FC = () => {
                       required
                     />
                   </div>
+                </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -422,7 +466,6 @@ export const CMSDirectorTab: React.FC = () => {
                       </button>
                     </div>
                   </div>
-                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
                   <div>
@@ -506,14 +549,8 @@ export const CMSDirectorTab: React.FC = () => {
                   <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-900 shadow-inner border border-slate-300 flex items-center justify-center">
                     <img
                       src={formData.photoUrl || 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg'}
-                      alt=""
-                      aria-hidden="true"
-                      className="absolute inset-0 w-full h-full object-cover blur-sm opacity-20 scale-110 pointer-events-none"
-                    />
-                    <img
-                      src={formData.photoUrl || 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg'}
                       alt="Previsualización 1:1"
-                      className="relative z-10 w-full h-full object-contain object-center"
+                      className="w-full h-full object-cover object-top"
                       referrerPolicy="no-referrer"
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80';
@@ -522,7 +559,10 @@ export const CMSDirectorTab: React.FC = () => {
                   </div>
 
                   <div className="pt-1 text-center">
-                    <p className="font-bold text-xs text-slate-800 truncate">{formData.name || 'Mayor General, ERD'}</p>
+                    <p className="font-bold text-xs text-slate-800 truncate">{formData.name}</p>
+                    {formData.rank && (
+                      <p className="text-[10px] text-slate-500 font-semibold truncate">{formData.rank}</p>
+                    )}
                     <p className="text-[10px] text-[#CE1126] font-semibold truncate">{formData.title}</p>
                   </div>
 

@@ -237,7 +237,8 @@ export const INITIAL_SERVICES: ServiceItem[] = [
 
 export const INITIAL_DIRECTOR_DATA: DirectorData = {
   id: 'director_general',
-  name: 'Mayor General, ERD',
+  name: 'Ambiorix de Jesús Cepeda Hernández',
+  rank: 'General de Brigada, ERD.',
   title: 'Director General del PECPFFAA',
   institution: 'PECPFFAA / MIDE',
   photoUrl: 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg',

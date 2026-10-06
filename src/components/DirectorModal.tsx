@@ -38,6 +38,40 @@ export const DirectorModal: React.FC = () => {
 
   const isAdmin = currentUser?.role === 'Administrador';
 
+  // Separar y limpiar nombre y rango militar de forma precisa
+  const getParsedDirectorInfo = () => {
+    const rawName = (directorData.name || '').trim();
+    const explicitRank = (directorData.rank || '').trim();
+
+    if (explicitRank) {
+      let cleanName = rawName;
+      if (cleanName.includes(explicitRank)) {
+        cleanName = cleanName.replace(new RegExp(`,?\\s*${explicitRank.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i'), '').trim();
+      }
+      return {
+        name: cleanName || rawName,
+        rank: explicitRank
+      };
+    }
+
+    if (rawName.includes(',')) {
+      const commaIndex = rawName.indexOf(',');
+      const namePart = rawName.substring(0, commaIndex).trim();
+      const rankPart = rawName.substring(commaIndex + 1).trim();
+      return {
+        name: namePart,
+        rank: rankPart
+      };
+    }
+
+    return {
+      name: rawName,
+      rank: 'General de Brigada, ERD.'
+    };
+  };
+
+  const directorInfo = getParsedDirectorInfo();
+
   // Manejo de tecla ESC y bloqueo del scroll de fondo
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -228,12 +262,12 @@ export const DirectorModal: React.FC = () => {
               {/* Ficha Resumen con Fotografía 1:1 Completa */}
               <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center sm:items-start gap-5">
                 
-                {/* Foto en proporción 1:1 Completa sin cortes */}
-                <div className="w-36 h-36 sm:w-44 sm:h-44 aspect-square rounded-xl overflow-hidden bg-slate-900 border-2 border-[#003876] shadow-sm shrink-0 flex items-center justify-center p-0.5">
+                {/* Foto en proporción 1:1 con cover */}
+                <div className="w-36 h-36 sm:w-44 sm:h-44 aspect-square rounded-xl overflow-hidden bg-slate-100 border-2 border-[#003876] shadow-sm shrink-0 flex items-center justify-center">
                   <img
                     src={directorData.photoUrl || 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg'}
                     alt={directorData.name}
-                    className="w-full h-full object-contain object-center"
+                    className="w-full h-full object-cover object-top"
                     referrerPolicy="no-referrer"
                     onError={(e) => {
                       (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80';
@@ -248,10 +282,10 @@ export const DirectorModal: React.FC = () => {
                       Perfil del Titular
                     </span>
                     <h2 className="text-base sm:text-lg font-black text-[#003876]">
-                      {directorData.name}
+                      {directorInfo.name}
                     </h2>
                     <p className="text-xs font-bold text-slate-700">
-                      {directorData.title}
+                      {directorInfo.rank} • {directorData.title}
                     </p>
                     <p className="text-[11px] text-slate-600 font-medium">
                       {directorData.institution} • Fuerzas Armadas
@@ -820,23 +854,15 @@ export const DirectorModal: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Marco de Imagen 1:1 con la Foto Completa sin capas encima */}
+                  {/* Marco de Imagen 1:1 con la Foto en Cover Completo */}
                   <div className="p-3 bg-slate-50/70">
                     <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-900 shadow-md border-2 border-slate-300 flex items-center justify-center group">
                       
-                      {/* Fondo suave para complementar bordes si la imagen tiene margen */}
-                      <img
-                        src={directorData.photoUrl || 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg'}
-                        alt=""
-                        aria-hidden="true"
-                        className="absolute inset-0 w-full h-full object-cover blur-md opacity-20 scale-110 pointer-events-none"
-                      />
-
-                      {/* Fotografía Oficial en Proporción 1:1 que se ve completa al 100% */}
+                      {/* Fotografía Oficial en Proporción 1:1 con cover en el contenedor */}
                       <img
                         src={directorData.photoUrl || 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg'}
                         alt={directorData.name}
-                        className="relative z-10 w-full h-full object-contain object-center transition-transform duration-300 group-hover:scale-[1.01]"
+                        className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.02]"
                         referrerPolicy="no-referrer"
                         loading="eager"
                         onError={(e) => {
@@ -844,12 +870,6 @@ export const DirectorModal: React.FC = () => {
                           img.src = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=85';
                         }}
                       />
-
-                      {/* Insignia Oficial 1:1 en esquina */}
-                      <div className="absolute top-2.5 right-2.5 z-20 bg-[#003876]/90 backdrop-blur-md text-white px-2 py-0.5 rounded text-[9px] font-extrabold tracking-wider shadow border border-white/20 flex items-center gap-1">
-                        <Shield className="w-2.5 h-2.5 text-amber-300" />
-                        <span>FOTO 1:1</span>
-                      </div>
 
                     </div>
 
@@ -864,7 +884,7 @@ export const DirectorModal: React.FC = () => {
                         {directorData.title}
                       </p>
                       <p className="text-xs font-bold text-slate-800 leading-tight">
-                        {directorData.name}
+                        {directorInfo.name}
                       </p>
                     </div>
                   </div>
@@ -879,7 +899,7 @@ export const DirectorModal: React.FC = () => {
 
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                       <span className="text-slate-500 text-[11px] font-medium">Rango:</span>
-                      <span className="font-bold text-slate-800 text-[11px]">{directorData.name}</span>
+                      <span className="font-bold text-slate-800 text-[11px] text-right">{directorInfo.rank}</span>
                     </div>
 
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
