@@ -1,4 +1,4 @@
-import { SlideItem, NewsItem, ServiceItem, UserItem, DirectorData } from '../types';
+import { SlideItem, NewsItem, ServiceItem, UserItem, DirectorData, InstitutionalData } from '../types';
 
 export const INITIAL_USERS: UserItem[] = [
   {
@@ -322,5 +322,53 @@ export const INITIAL_DIRECTOR_DATA: DirectorData = {
       title: 'Reglamento Interno de Régimen y Docencia PECPFFAA',
       desc: 'Normas disciplinarias, planes de estudio y deberes académicos de cadetes y estudiantes.'
     }
+  ]
+};
+
+export const INITIAL_INSTITUTIONAL_DATA: InstitutionalData = {
+  id: 'general',
+  mainTitle: 'Programa de Educación y Capacitación Profesional de las FF.AA.',
+  subtitle: 'Gran General Restaurador "Gregorio Luperón"',
+  badgeTag: 'Naturaleza Institucional',
+  description: 'Órgano académico rector encargado de formar y capacitar a los miembros de las Fuerzas Armadas y sector civil afín en doctrina militar, liderazgo estratégico y seguridad nacional.',
+  missionTitle: 'Misión Institucional',
+  missionText: 'Formar y capacitar a los miembros de las Fuerzas Armadas, Policía Nacional y sector civil afín en doctrina militar conjunta, toma de decisiones estratégicas, seguridad y defensa nacional, con apego a los principios éticos y democráticos.',
+  visionTitle: 'Visión Prospectiva',
+  visionText: 'Ser el centro de excelencia académica militar de referencia regional y hemisférica, reconocido por la vanguardia en investigación doctrinal, innovación tecnológica en ciberdefensa y sólida formación en liderazgo estratégico.',
+  valuesTitle: 'Pilares Doctrinales y Valores Institucionales',
+  valuesSubtitle: 'Principios rectores que guían la enseñanza superior militar y la toma de decisiones estratégicas',
+  values: [
+    { title: 'Ciencia & Doctrina', desc: 'Investigación continua para la actualización de tácticas y doctrinas conjuntas.', iconName: 'BookOpenCheck' },
+    { title: 'Honor Militar', desc: 'Fidelidad inquebrantable a los valores patrios y a la Constitución de la República.', iconName: 'Shield' },
+    { title: 'Interoperabilidad', desc: 'Sinergia operativa entre las fuerzas de tierra, mar, aire y ciberespacio.', iconName: 'Compass' },
+    { title: 'Liderazgo Estratégico', desc: 'Capacitación para la toma de decisiones complejas en escenarios de crisis.', iconName: 'Award' },
+  ],
+  branchesTitle: 'Integración Doctrinal Conjunta',
+  branchesSubtitle: 'Convergencia de las tres ramas de las Fuerzas Armadas en un solo cuerpo de pensamiento',
+  branches: [
+    {
+      name: 'Ejército de República Dominicana',
+      role: 'Comando de Operaciones Terrestres y Seguridad Fronteriza',
+      color: 'border-emerald-700 bg-emerald-900/40 text-emerald-300',
+      iconName: 'Shield'
+    },
+    {
+      name: 'Armada de República Dominicana',
+      role: 'Seguridad Marítima, Defensa de Costas y Espacio Fluvial',
+      color: 'border-blue-700 bg-blue-900/40 text-blue-300',
+      iconName: 'Anchor'
+    },
+    {
+      name: 'Fuerza Aérea de República Dominicana',
+      role: 'Soberanía del Espacio Aéreo y Apoyo Táctico',
+      color: 'border-cyan-700 bg-cyan-900/40 text-cyan-300',
+      iconName: 'Plane'
+    }
+  ],
+  stats: [
+    { number: '+3,850', label: 'Oficiales & Civiles Graduados', sub: 'En programas de posgrado' },
+    { number: '28+', label: 'Años de Doctrina Conjunta', sub: 'Tradición y excelencia' },
+    { number: '16', label: 'Convenios Hemisféricos', sub: 'Con escuelas de defensa' },
+    { number: '100%', label: 'Acreditación Oficial', sub: 'Por el Ministerio de Educación' },
   ]
 };

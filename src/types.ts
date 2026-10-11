@@ -71,7 +71,7 @@ export interface ContactMessage {
 }
 
 export type AuditAction = 'Creación' | 'Modificación' | 'Eliminación' | 'Cambio de Estado' | 'Restauración BD' | 'Inicialización BD';
-export type CMSModule = 'Slides (Carrusel)' | 'Noticias' | 'Oferta Académica' | 'Usuarios' | 'Buzón Admisiones' | 'Base de Datos' | 'Despacho del Director';
+export type CMSModule = 'Slides (Carrusel)' | 'Noticias' | 'Oferta Académica' | 'Usuarios' | 'Buzón Admisiones' | 'Base de Datos' | 'Despacho del Director' | 'Naturaleza Institucional';
 
 export interface AuditLogEntry {
   id: string;
@@ -142,5 +142,44 @@ export interface DirectorData {
   messageParagraphs: string[];
   functions: DirectorFunction[];
   legalFramework: DirectorLegalItem[];
+  updatedAt?: string;
+}
+
+export interface DoctrinalValue {
+  title: string;
+  desc: string;
+  iconName?: string;
+}
+
+export interface ArmedForcesBranch {
+  name: string;
+  role: string;
+  color?: string;
+  iconName?: string;
+}
+
+export interface InstitutionalStat {
+  number: string;
+  label: string;
+  sub: string;
+}
+
+export interface InstitutionalData {
+  id?: string;
+  mainTitle: string;
+  subtitle: string;
+  badgeTag: string;
+  description: string;
+  missionTitle: string;
+  missionText: string;
+  visionTitle: string;
+  visionText: string;
+  valuesTitle: string;
+  valuesSubtitle: string;
+  values: DoctrinalValue[];
+  branchesTitle: string;
+  branchesSubtitle: string;
+  branches: ArmedForcesBranch[];
+  stats: InstitutionalStat[];
   updatedAt?: string;
 }

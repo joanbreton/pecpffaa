@@ -27,6 +27,7 @@ export const COLLECTIONS = {
   MESSAGES: 'messages',
   USERS: 'users',
   DIRECTOR: 'director_info',
+  INSTITUTIONAL: 'institutional_info',
   AUDIT_LOGS: 'audit_logs'
 } as const;
 

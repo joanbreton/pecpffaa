@@ -7,6 +7,7 @@ export const DB_KEYS = {
   USERS: 'pecpffaa_users',
   MESSAGES: 'pecpffaa_messages',
   DIRECTOR: 'pecpffaa_director_info',
+  INSTITUTIONAL: 'pecpffaa_institutional_info',
   AUDIT_LOGS: 'pecpffaa_db_audit_logs',
   CURRENT_USER: 'pecpffaa_current_user',
   DB_META: 'pecpffaa_db_metadata'
@@ -163,6 +164,11 @@ export function computeDatabaseStats(
       {
         name: 'tbl_despacho_director',
         description: 'Ficha oficial, fotografía 1:1 y alocución del Director General',
+        count: 1
+      },
+      {
+        name: 'tbl_naturaleza_institucional',
+        description: 'Misión, Visión, Valores, Ramas Armadas y Métricas del Portal',
         count: 1
       },
       {

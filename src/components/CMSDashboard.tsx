@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { DatabaseAuditTab } from './DatabaseAuditTab';
 import { CMSDirectorTab } from './CMSDirectorTab';
+import { CMSInstitutionalTab } from './CMSInstitutionalTab';
 
 export const CMSDashboard: React.FC = () => {
   const { 
@@ -62,7 +63,7 @@ export const CMSDashboard: React.FC = () => {
     firebaseSyncStatus
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'slides' | 'news' | 'services' | 'users' | 'messages' | 'director' | 'database'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'slides' | 'news' | 'services' | 'users' | 'messages' | 'director' | 'institutional' | 'database'>('overview');
   const [messageFilter, setMessageFilter] = useState<'Todos' | 'No leído' | 'Leído' | 'Respondido'>('Todos');
   const [confirmDeleteMessageId, setConfirmDeleteMessageId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -553,6 +554,23 @@ export const CMSDashboard: React.FC = () => {
                 </div>
                 <span className="text-[10px] bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded-full font-mono font-bold">
                   Popup
+                </span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('institutional')}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                  activeTab === 'institutional' 
+                    ? 'bg-white/10 text-white border-l-4 border-[#B91C1C] shadow-sm' 
+                    : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Shield className="w-4 h-4 text-amber-400" />
+                  <span>Naturaleza Institucional</span>
+                </div>
+                <span className="text-[10px] bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded-full font-mono font-bold">
+                  CMS
                 </span>
               </button>
 
@@ -1362,6 +1380,11 @@ export const CMSDashboard: React.FC = () => {
           {/* TAB: DIRECTOR GENERAL CMS */}
           {activeTab === 'director' && (
             <CMSDirectorTab />
+          )}
+
+          {/* TAB: NATURALEZA INSTITUCIONAL CMS */}
+          {activeTab === 'institutional' && (
+            <CMSInstitutionalTab />
           )}
 
           {/* TAB 7: DATABASE & AUDIT LOGS */}

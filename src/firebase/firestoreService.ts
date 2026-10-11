@@ -15,14 +15,16 @@ import {
   UserItem, 
   ContactMessage, 
   AuditLogEntry,
-  DirectorData 
+  DirectorData,
+  InstitutionalData 
 } from '../types';
 import { 
   INITIAL_SLIDES, 
   INITIAL_NEWS, 
   INITIAL_SERVICES, 
   INITIAL_USERS,
-  INITIAL_DIRECTOR_DATA 
+  INITIAL_DIRECTOR_DATA,
+  INITIAL_INSTITUTIONAL_DATA 
 } from '../data/initialData';
 
 export interface FirestoreSyncCallbacks {
@@ -32,6 +34,7 @@ export interface FirestoreSyncCallbacks {
   onUsersUpdate?: (users: UserItem[]) => void;
   onMessagesUpdate?: (messages: ContactMessage[]) => void;
   onDirectorUpdate?: (director: DirectorData) => void;
+  onInstitutionalUpdate?: (institutional: InstitutionalData) => void;
   onAuditLogsUpdate?: (logs: AuditLogEntry[]) => void;
   onSyncStatusChange?: (status: 'connecting' | 'connected' | 'error', error?: string) => void;
 }
@@ -215,6 +218,28 @@ export const initAndSyncFirestore = async (callbacks: FirestoreSyncCallbacks): P
     });
     unsubscribers.push(unsubDirector);
 
+    // 8. Parallel Institutional Info Listener
+    const institutionalDocRef = doc(db, COLLECTIONS.INSTITUTIONAL, 'general');
+    const unsubInstitutional = onSnapshot(institutionalDocRef, async (docSnap) => {
+      markConnected();
+      if (docSnap.exists()) {
+        callbacks.onInstitutionalUpdate?.({ ...(docSnap.data() as InstitutionalData), id: docSnap.id });
+      } else {
+        try {
+          const clean = sanitizeForFirestore({ ...INITIAL_INSTITUTIONAL_DATA, id: 'general' });
+          await setDoc(institutionalDocRef, clean);
+          callbacks.onInstitutionalUpdate?.(INITIAL_INSTITUTIONAL_DATA);
+        } catch (e) {
+          console.warn('Initial institutional seed note:', e);
+          callbacks.onInstitutionalUpdate?.(INITIAL_INSTITUTIONAL_DATA);
+        }
+      }
+    }, (err) => {
+      console.warn('Firestore institutional listener warning:', err);
+      callbacks.onSyncStatusChange?.('error', err.message);
+    });
+    unsubscribers.push(unsubInstitutional);
+
   } catch (error) {
     console.error('Firebase Firestore connection error:', error);
     callbacks.onSyncStatusChange?.('error', String(error));
@@ -372,6 +397,22 @@ export const saveDirectorToFirestore = async (item: DirectorData): Promise<boole
   }
 };
 
+/* --- INSTITUTIONAL INFO CRUD --- */
+export const saveInstitutionalToFirestore = async (item: InstitutionalData): Promise<boolean> => {
+  try {
+    const clean = sanitizeForFirestore({
+      ...item,
+      id: 'general',
+      updatedAt: new Date().toISOString()
+    });
+    await setDoc(doc(db, COLLECTIONS.INSTITUTIONAL, 'general'), clean);
+    return true;
+  } catch (err) {
+    console.error('Error saving institutional info to Firestore:', err);
+    return false;
+  }
+};
+
 /* --- AUDIT LOGS --- */
 export const saveAuditLogToFirestore = async (item: AuditLogEntry): Promise<boolean> => {
   try {
@@ -434,6 +475,13 @@ export const resetFirestoreToDefaults = async (): Promise<boolean> => {
     // Reset Director Info
     await setDoc(doc(db, COLLECTIONS.DIRECTOR, 'general'), sanitizeForFirestore({
       ...INITIAL_DIRECTOR_DATA,
+      id: 'general',
+      updatedAt: new Date().toISOString()
+    }));
+
+    // Reset Institutional Info
+    await setDoc(doc(db, COLLECTIONS.INSTITUTIONAL, 'general'), sanitizeForFirestore({
+      ...INITIAL_INSTITUTIONAL_DATA,
       id: 'general',
       updatedAt: new Date().toISOString()
     }));

@@ -1,5 +1,6 @@
 import React from 'react';
 import officialLogo from '../assets/images/programalogo.jpg';
+import { useApp } from '../context/AppContext';
 import { 
   Shield, 
   Award, 
@@ -9,44 +10,45 @@ import {
   Anchor, 
   Plane, 
   BookOpenCheck,
-  Building2
+  Building2,
+  GraduationCap,
+  Sparkles,
+  BookOpen,
+  Cpu,
+  Layers,
+  CheckCircle2,
+  LucideIcon
 } from 'lucide-react';
 
+const ICON_MAP: Record<string, LucideIcon> = {
+  BookOpenCheck,
+  Shield,
+  Compass,
+  Award,
+  Anchor,
+  Plane,
+  Target,
+  Eye,
+  Building2,
+  GraduationCap,
+  Sparkles,
+  BookOpen,
+  Cpu,
+  Layers,
+  CheckCircle2
+};
+
 export const InstitutionalInfo: React.FC = () => {
-  const values = [
-    { title: 'Ciencia & Doctrina', desc: 'Investigación continua para la actualización de tácticas y doctrinas conjuntas.', icon: BookOpenCheck },
-    { title: 'Honor Militar', desc: 'Fidelidad inquebrantable a los valores patrios y a la Constitución de la República.', icon: Shield },
-    { title: 'Interoperabilidad', desc: 'Sinergia operativa entre las fuerzas de tierra, mar, aire y ciberespacio.', icon: Compass },
-    { title: 'Liderazgo Estratégico', desc: 'Capacitación para la toma de decisiones complejas en escenarios de crisis.', icon: Award },
-  ];
+  const { institutionalData } = useApp();
 
-  const stats = [
-    { number: '+3,850', label: 'Oficiales & Civiles Graduados', sub: 'En programas de posgrado' },
-    { number: '28+', label: 'Años de Doctrina Conjunta', sub: 'Tradición y excelencia' },
-    { number: '16', label: 'Convenios Hemisféricos', sub: 'Con escuelas de defensa' },
-    { number: '100%', label: 'Acreditación Oficial', sub: 'Por el Ministerio de Educación' },
-  ];
+  const getIcon = (name?: string, fallback: LucideIcon = Shield) => {
+    if (!name) return fallback;
+    return ICON_MAP[name] || fallback;
+  };
 
-  const branches = [
-    {
-      name: 'Ejército de República Dominicana',
-      role: 'Comando de Operaciones Terrestres y Seguridad Fronteriza',
-      icon: Shield,
-      color: 'border-emerald-700 bg-emerald-900/40 text-emerald-300'
-    },
-    {
-      name: 'Armada de República Dominicana',
-      role: 'Seguridad Marítima, Defensa de Costas y Espacio Fluvial',
-      icon: Anchor,
-      color: 'border-blue-700 bg-blue-900/40 text-blue-300'
-    },
-    {
-      name: 'Fuerza Aérea de República Dominicana',
-      role: 'Soberanía del Espacio Aéreo y Apoyo Táctico',
-      icon: Plane,
-      color: 'border-cyan-700 bg-cyan-900/40 text-cyan-300'
-    }
-  ];
+  const values = institutionalData?.values || [];
+  const stats = institutionalData?.stats || [];
+  const branches = institutionalData?.branches || [];
 
   return (
     <section id="institucion" className="py-16 sm:py-24 bg-slate-900 text-white relative overflow-hidden">
@@ -76,17 +78,19 @@ export const InstitutionalInfo: React.FC = () => {
           </div>
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 text-amber-300 text-xs font-bold uppercase tracking-wider border border-white/10">
             <Building2 className="w-3.5 h-3.5" />
-            Naturaleza Institucional
+            {institutionalData.badgeTag || 'Naturaleza Institucional'}
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-serif tracking-tight">
-            Programa de Educación y Capacitación Profesional de las FF.AA.
+            {institutionalData.mainTitle}
           </h2>
-          <p className="text-xs sm:text-sm font-semibold text-amber-300 tracking-wider uppercase">
-            Gran General Restaurador "Gregorio Luperón"
-          </p>
+          {institutionalData.subtitle && (
+            <p className="text-xs sm:text-sm font-semibold text-amber-300 tracking-wider uppercase">
+              {institutionalData.subtitle}
+            </p>
+          )}
           <div className="w-20 h-1 bg-[#B91C1C] mx-auto rounded-full"></div>
           <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-            Órgano académico rector encargado de formar y capacitar a los miembros de las Fuerzas Armadas y sector civil afín en doctrina militar, liderazgo estratégico y seguridad nacional.
+            {institutionalData.description}
           </p>
         </div>
 
@@ -96,9 +100,9 @@ export const InstitutionalInfo: React.FC = () => {
             <div className="w-12 h-12 rounded-xl bg-[#0D3671] text-white flex items-center justify-center shadow-lg border border-white/20">
               <Target className="w-6 h-6 text-amber-400" />
             </div>
-            <h3 className="text-xl font-bold text-white font-serif">Misión Institucional</h3>
+            <h3 className="text-xl font-bold text-white font-serif">{institutionalData.missionTitle}</h3>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Formar y capacitar a los miembros de las Fuerzas Armadas, Policía Nacional y sector civil afín en doctrina militar conjunta, toma de decisiones estratégicas, seguridad y defensa nacional, con apego a los principios éticos y democráticos.
+              {institutionalData.missionText}
             </p>
           </div>
 
@@ -106,83 +110,103 @@ export const InstitutionalInfo: React.FC = () => {
             <div className="w-12 h-12 rounded-xl bg-[#B91C1C] text-white flex items-center justify-center shadow-lg border border-white/20">
               <Eye className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-white font-serif">Visión Prospectiva</h3>
+            <h3 className="text-xl font-bold text-white font-serif">{institutionalData.visionTitle}</h3>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Ser el centro de excelencia académica militar de referencia regional y hemisférica, reconocido por la vanguardia en investigación doctrinal, innovación tecnológica en ciberdefensa y sólida formación en liderazgo estratégico.
+              {institutionalData.visionText}
             </p>
           </div>
         </div>
 
         {/* Core Doctrinal Values */}
-        <div className="space-y-6 pt-2">
-          <div className="text-center">
-            <h3 className="text-xl font-bold text-slate-200 font-serif">Pilares Doctrinales y Valores Institucionales</h3>
-            <p className="text-xs text-slate-400 mt-1">Principios rectores que guían la enseñanza superior militar y la toma de decisiones estratégicas</p>
-          </div>
+        {values.length > 0 && (
+          <div className="space-y-6 pt-2">
+            <div className="text-center">
+              <h3 className="text-xl font-bold text-slate-200 font-serif">
+                {institutionalData.valuesTitle || 'Pilares Doctrinales y Valores Institucionales'}
+              </h3>
+              {institutionalData.valuesSubtitle && (
+                <p className="text-xs text-slate-400 mt-1">{institutionalData.valuesSubtitle}</p>
+              )}
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {values.map((val, idx) => {
-              const Icon = val.icon;
-              return (
-                <div 
-                  key={idx}
-                  className="bg-slate-800/60 rounded-xl p-5 border border-slate-700/80 hover:border-amber-400/50 transition-all group"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-[#0D3671] text-amber-300 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform shadow">
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <h4 className="font-bold text-sm text-white mb-1.5">{val.title}</h4>
-                  <p className="text-xs text-slate-300 leading-relaxed">{val.desc}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Inter-institutional Armed Forces Unity */}
-        <div className="space-y-6 pt-4">
-          <div className="text-center">
-            <h3 className="text-xl font-bold text-slate-200 font-serif">Integración Doctrinal Conjunta</h3>
-            <p className="text-xs text-slate-400 mt-1">Convergencia de las tres ramas de las Fuerzas Armadas en un solo cuerpo de pensamiento</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {branches.map((branch, idx) => {
-              const Icon = branch.icon;
-              return (
-                <div 
-                  key={idx}
-                  className={`rounded-xl p-5 border backdrop-blur-sm ${branch.color} transition-transform hover:-translate-y-1`}
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 rounded-lg bg-black/40">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {values.map((val, idx) => {
+                const Icon = getIcon(val.iconName, Shield);
+                return (
+                  <div 
+                    key={idx}
+                    className="bg-slate-800/60 rounded-xl p-5 border border-slate-700/80 hover:border-amber-400/50 transition-all group"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-[#0D3671] text-amber-300 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform shadow">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <h4 className="font-bold text-sm text-white">{branch.name}</h4>
+                    <h4 className="font-bold text-sm text-white mb-1.5">{val.title}</h4>
+                    <p className="text-xs text-slate-300 leading-relaxed">{val.desc}</p>
                   </div>
-                  <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                    {branch.role}
-                  </p>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Inter-institutional Armed Forces Unity */}
+        {branches.length > 0 && (
+          <div className="space-y-6 pt-4">
+            <div className="text-center">
+              <h3 className="text-xl font-bold text-slate-200 font-serif">
+                {institutionalData.branchesTitle || 'Integración Doctrinal Conjunta'}
+              </h3>
+              {institutionalData.branchesSubtitle && (
+                <p className="text-xs text-slate-400 mt-1">{institutionalData.branchesSubtitle}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {branches.map((branch, idx) => {
+                const Icon = getIcon(branch.iconName, Shield);
+                const colorClass = branch.color || (
+                  idx === 0 ? 'border-emerald-700 bg-emerald-900/40 text-emerald-300' :
+                  idx === 1 ? 'border-blue-700 bg-blue-900/40 text-blue-300' :
+                  'border-cyan-700 bg-cyan-900/40 text-cyan-300'
+                );
+
+                return (
+                  <div 
+                    key={idx}
+                    className={`rounded-xl p-5 border backdrop-blur-sm ${colorClass} transition-transform hover:-translate-y-1`}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="p-2 rounded-lg bg-black/40">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <h4 className="font-bold text-sm text-white">{branch.name}</h4>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                      {branch.role}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Key Numerical Metrics Counter Ribbon */}
-        <div className="bg-[#0D3671] rounded-2xl p-8 border-2 border-[#B91C1C] shadow-2xl">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center divide-y lg:divide-y-0 lg:divide-x divide-white/10">
-            {stats.map((st, idx) => (
-              <div key={idx} className="pt-4 lg:pt-0 px-2 space-y-1">
-                <div className="text-3xl sm:text-4xl font-extrabold text-amber-400 font-mono tracking-tight">
-                  {st.number}
+        {stats.length > 0 && (
+          <div className="bg-[#0D3671] rounded-2xl p-8 border-2 border-[#B91C1C] shadow-2xl">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center divide-y lg:divide-y-0 lg:divide-x divide-white/10">
+              {stats.map((st, idx) => (
+                <div key={idx} className="pt-4 lg:pt-0 px-2 space-y-1">
+                  <div className="text-3xl sm:text-4xl font-extrabold text-amber-400 font-mono tracking-tight">
+                    {st.number}
+                  </div>
+                  <div className="text-sm font-bold text-white">{st.label}</div>
+                  <div className="text-xs text-slate-300">{st.sub}</div>
                 </div>
-                <div className="text-sm font-bold text-white">{st.label}</div>
-                <div className="text-xs text-slate-300">{st.sub}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
     </section>

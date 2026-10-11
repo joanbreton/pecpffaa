@@ -9,14 +9,16 @@ import {
   AuditAction,
   CMSModule,
   DatabaseStats,
-  DirectorData
+  DirectorData,
+  InstitutionalData
 } from '../types';
 import { 
   INITIAL_SLIDES, 
   INITIAL_NEWS, 
   INITIAL_SERVICES, 
   INITIAL_USERS,
-  INITIAL_DIRECTOR_DATA 
+  INITIAL_DIRECTOR_DATA,
+  INITIAL_INSTITUTIONAL_DATA
 } from '../data/initialData';
 import { 
   DB_KEYS, 
@@ -42,6 +44,7 @@ import {
   saveUserToFirestore,
   deleteUserFromFirestore,
   saveDirectorToFirestore,
+  saveInstitutionalToFirestore,
   saveAuditLogToFirestore,
   clearAuditLogsInFirestore,
   resetFirestoreToDefaults,
@@ -79,6 +82,9 @@ interface AppContextType {
   directorData: DirectorData;
   updateDirectorData: (data: Partial<DirectorData>) => Promise<boolean>;
   resetDirectorData: () => Promise<boolean>;
+  institutionalData: InstitutionalData;
+  updateInstitutionalData: (data: Partial<InstitutionalData>) => Promise<boolean>;
+  resetInstitutionalData: () => Promise<boolean>;
   
   // Slide Actions
   addSlide: (slide: Omit<SlideItem, 'id'>) => Promise<boolean>;
@@ -208,6 +214,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
+  const [institutionalData, setInstitutionalData] = useState<InstitutionalData>(() => {
+    try {
+      const saved = localStorage.getItem(DB_KEYS.INSTITUTIONAL);
+      return saved ? JSON.parse(saved) : INITIAL_INSTITUTIONAL_DATA;
+    } catch {
+      return INITIAL_INSTITUTIONAL_DATA;
+    }
+  });
+
   // Audit Logs table for database activity recording
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>(() => {
     return getStoredAuditLogs();
@@ -236,6 +251,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           if (m) setMessages(JSON.parse(m));
           const d = localStorage.getItem(DB_KEYS.DIRECTOR);
           if (d) setDirectorData(JSON.parse(d));
+          const inst = localStorage.getItem(DB_KEYS.INSTITUTIONAL);
+          if (inst) setInstitutionalData(JSON.parse(inst));
         } catch (e) {
           console.error('Error syncing tab state', e);
         }
@@ -311,6 +328,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             localStorage.setItem(DB_KEYS.DIRECTOR, JSON.stringify(firestoreDirector));
           } catch (e) {
             console.error('Error saving director cache', e);
+          }
+        }
+      },
+      onInstitutionalUpdate: (firestoreInstitutional) => {
+        if (isMounted && firestoreInstitutional) {
+          setInstitutionalData(firestoreInstitutional);
+          try {
+            localStorage.setItem(DB_KEYS.INSTITUTIONAL, JSON.stringify(firestoreInstitutional));
+          } catch (e) {
+            console.error('Error saving institutional cache', e);
           }
         }
       },
@@ -1066,6 +1093,64 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return success;
   };
 
+  // Institutional Info CMS Actions
+  const updateInstitutionalData = async (data: Partial<InstitutionalData>): Promise<boolean> => {
+    const updated: InstitutionalData = {
+      ...institutionalData,
+      ...data,
+      id: 'general',
+      updatedAt: new Date().toISOString()
+    };
+
+    setInstitutionalData(updated);
+    try {
+      localStorage.setItem(DB_KEYS.INSTITUTIONAL, JSON.stringify(updated));
+    } catch (e) {
+      console.error('Error caching institutional info', e);
+    }
+    notifyCrossTab();
+
+    const success = await saveInstitutionalToFirestore(updated);
+
+    recordAuditChange(
+      'Modificación',
+      'Naturaleza Institucional',
+      'Misión, Visión, Valores y Métricas',
+      'general',
+      `Actualización general de la sección Naturaleza Institucional en el CMS.`
+    );
+
+    if (success) {
+      showNotification('Naturaleza Institucional guardada en Firebase Firestore', 'success');
+    } else {
+      showNotification('Cambios guardados localmente (sin conexión)', 'info');
+    }
+
+    return true;
+  };
+
+  const resetInstitutionalData = async (): Promise<boolean> => {
+    setInstitutionalData(INITIAL_INSTITUTIONAL_DATA);
+    try {
+      localStorage.setItem(DB_KEYS.INSTITUTIONAL, JSON.stringify(INITIAL_INSTITUTIONAL_DATA));
+    } catch (e) {
+      console.error('Error resetting institutional info', e);
+    }
+    notifyCrossTab();
+
+    const success = await saveInstitutionalToFirestore(INITIAL_INSTITUTIONAL_DATA);
+    recordAuditChange(
+      'Modificación',
+      'Naturaleza Institucional',
+      'Restablecimiento de Sección',
+      'general',
+      'Restablecimiento de los datos de Naturaleza Institucional a los valores iniciales.'
+    );
+
+    showNotification('Naturaleza Institucional restablecida a valores iniciales', 'success');
+    return success;
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -1092,6 +1177,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         directorData,
         updateDirectorData,
         resetDirectorData,
+        institutionalData,
+        updateInstitutionalData,
+        resetInstitutionalData,
         addSlide,
         updateSlide,
         deleteSlide,
