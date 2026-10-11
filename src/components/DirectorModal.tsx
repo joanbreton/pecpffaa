@@ -645,10 +645,10 @@ export const DirectorModal: React.FC = () => {
                 <button
                   onClick={handleOpenPrintPreview}
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-300 shadow-2xs transition-colors cursor-pointer"
-                  title="Abrir previsualización de impresión de todo el contenido biográfico y foto"
+                  title="Abrir previsualización de impresión de todo el contenido biográfico"
                 >
                   <Printer className="w-3.5 h-3.5 text-[#003876]" />
-                  <span>Imprimir</span>
+                  <span>Imprimir Biografía</span>
                 </button>
                 <button
                   onClick={handleGoToContact}
@@ -705,7 +705,7 @@ export const DirectorModal: React.FC = () => {
                   <div className="space-y-5 animate-fadeIn">
                     
                     {/* Encabezado Semblanza */}
-                    <div className="border-b border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="border-b border-slate-200 pb-3">
                       <div>
                         <span className="text-xs font-bold uppercase tracking-wider text-[#CE1126]">
                           {directorData.bioSubtitle || 'Semblanza Oficial'}
@@ -717,16 +717,6 @@ export const DirectorModal: React.FC = () => {
                           {directorData.bioSummary || `${directorData.title} • Fuerzas Armadas de la República Dominicana`}
                         </p>
                       </div>
-
-                      <button
-                        type="button"
-                        onClick={handleOpenPrintPreview}
-                        className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#003876] text-xs font-bold border border-blue-200 shadow-2xs transition-colors cursor-pointer shrink-0"
-                        title="Abrir previsualización de impresión de todo el contenido biográfico y foto"
-                      >
-                        <Printer className="w-3.5 h-3.5 text-[#CE1126]" />
-                        <span>Imprimir Biografía</span>
-                      </button>
                     </div>
 
                     {/* Columna de Párrafos Biográficos Dinámicos */}
@@ -1038,19 +1028,6 @@ export const DirectorModal: React.FC = () => {
                       </span>
                     </div>
 
-                    {/* Botón Imprimir Biografía & Foto (abre la previsualización de impresión) */}
-                    <div className="pt-1">
-                      <button
-                        type="button"
-                        onClick={handleOpenPrintPreview}
-                        className="w-full py-2.5 px-3 rounded-xl bg-[#003876] hover:bg-blue-900 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer active:scale-98"
-                        title="Abrir previsualización de impresión de todo el contenido biográfico y foto"
-                      >
-                        <Printer className="w-4 h-4 text-amber-300" />
-                        <span>Imprimir Biografía & Foto</span>
-                      </button>
-                    </div>
-
                   </div>
 
                 </div>
@@ -1080,10 +1057,10 @@ export const DirectorModal: React.FC = () => {
               <button
                 onClick={handleOpenPrintPreview}
                 className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs border border-slate-300 shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
-                title="Abrir previsualización de impresión"
+                title="Abrir previsualización de impresión de la biografía"
               >
                 <Printer className="w-3.5 h-3.5 text-[#003876]" />
-                <span>Imprimir Expediente</span>
+                <span>Imprimir Biografía</span>
               </button>
 
               <button
