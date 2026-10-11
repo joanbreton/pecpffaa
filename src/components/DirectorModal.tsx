@@ -250,18 +250,10 @@ export const DirectorModal: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <Printer className="w-4 h-4 text-white" />
-                    <span>Imprimir / Guardar PDF</span>
+                    <Download className="w-4 h-4 text-white" />
+                    <span>Generar PDF Expediente</span>
                   </>
                 )}
-              </button>
-
-              <button
-                onClick={handleExecutePrint}
-                className="hidden sm:inline-flex p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer items-center justify-center"
-                title="Diálogo de impresión del sistema (Ctrl+P)"
-              >
-                <Printer className="w-4 h-4 text-white/80" />
               </button>
 
               <button
