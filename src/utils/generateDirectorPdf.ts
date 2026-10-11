@@ -7,6 +7,62 @@ export interface GeneratePdfOptions {
 }
 
 /**
+ * Convierte una URL de imagen a Data URL base64 usando canvas / fetch / Image
+ * para garantizar que html2canvas no sufra bloqueos de CORS ni manche el canvas (canvas tainting).
+ */
+async function imageToDataUrl(src: string): Promise<string | null> {
+  if (!src) return null;
+  if (src.startsWith('data:')) return src;
+
+  // Intento 1: Fetch directo con CORS
+  try {
+    const res = await fetch(src, { mode: 'cors' });
+    if (res.ok) {
+      const blob = await res.blob();
+      return await new Promise<string | null>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+      });
+    }
+  } catch {
+    // Si fetch modo cors falla, se intenta con el elemento Image
+  }
+
+  // Intento 2: Elemento HTMLImageElement con crossOrigin = 'anonymous'
+  try {
+    const dataUrl = await new Promise<string | null>((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          const cvs = document.createElement('canvas');
+          cvs.width = img.naturalWidth || img.width || 300;
+          cvs.height = img.naturalHeight || img.height || 300;
+          const ctx = cvs.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0);
+            resolve(cvs.toDataURL('image/jpeg', 0.95));
+            return;
+          }
+        } catch {
+          // ignore
+        }
+        resolve(null);
+      };
+      img.onerror = () => resolve(null);
+      img.src = src;
+    });
+    if (dataUrl) return dataUrl;
+  } catch {
+    // ignore
+  }
+
+  return null;
+}
+
+/**
  * Genera un archivo PDF oficial institucional de alta resolución a partir del
  * elemento HTML de la Previsualización de Impresión del Expediente Biográfico.
  */
@@ -24,28 +80,15 @@ export async function generateDirectorPdf(
   const originalSrcs = new Map<HTMLImageElement, string>();
 
   try {
-    options.onProgress?.('Preparando documento institucional...');
+    options.onProgress?.('Preparando documento e imágenes oficiales...');
 
-    // Pre-cargar imágenes externas a Data URL para evitar restricciones de CORS
+    // Pre-cargar imágenes externas a Data URL para evitar restricciones de CORS y tainting
     for (const img of images) {
       originalSrcs.set(img, img.src);
-      if (img.src && img.src.startsWith('http') && !img.src.startsWith('data:')) {
-        try {
-          const res = await fetch(img.src, { mode: 'cors' });
-          if (res.ok) {
-            const blob = await res.blob();
-            const dataUrl = await new Promise<string>((resolve) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result as string);
-              reader.onerror = () => resolve(img.src);
-              reader.readAsDataURL(blob);
-            });
-            if (dataUrl && dataUrl.startsWith('data:')) {
-              img.src = dataUrl;
-            }
-          }
-        } catch {
-          // Si fetch directo falla, html2canvas useCORS lo intentará
+      if (img.src && !img.src.startsWith('data:')) {
+        const dataUrl = await imageToDataUrl(img.src);
+        if (dataUrl) {
+          img.src = dataUrl;
         }
       }
 
@@ -53,23 +96,37 @@ export async function generateDirectorPdf(
         await new Promise((resolve) => {
           img.onload = resolve;
           img.onerror = resolve;
+          setTimeout(resolve, 600);
         });
       }
     }
 
     options.onProgress?.('Renderizando gráficos y semblanza en alta definición...');
 
-    // Captura en escala 2x para nitidez tipográfica y fotográfica
+    // Captura en escala 2x con allowTaint: false para evitar SecurityError en toDataURL
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
-      allowTaint: true,
+      allowTaint: false,
       backgroundColor: '#ffffff',
       logging: false,
-      windowWidth: element.scrollWidth,
+      onclone: (clonedDoc) => {
+        const clonedElem = clonedDoc.getElementById(elementId);
+        if (clonedElem) {
+          clonedElem.style.maxHeight = 'none';
+          clonedElem.style.height = 'auto';
+          clonedElem.style.overflow = 'visible';
+          clonedElem.style.boxShadow = 'none';
+          clonedElem.style.borderRadius = '0';
+          clonedElem.style.border = 'none';
+          clonedElem.style.padding = '30px';
+          clonedElem.style.margin = '0';
+          clonedElem.style.width = '800px';
+        }
+      }
     });
 
-    options.onProgress?.('Estructurando formato A4...');
+    options.onProgress?.('Estructurando formato PDF A4 oficial...');
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -126,7 +183,7 @@ export async function generateDirectorPdf(
         try {
           pageImgData = pageCanvas.toDataURL('image/jpeg', 0.95);
         } catch {
-          pageImgData = pageCanvas.toDataURL();
+          pageImgData = pageCanvas.toDataURL('image/png');
         }
 
         const renderedHeightMm = (currentSliceHeightPx * contentWidthMm) / canvasWidthPx;

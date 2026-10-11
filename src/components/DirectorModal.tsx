@@ -184,10 +184,32 @@ export const DirectorModal: React.FC = () => {
       {/* Estilos para impresión limpia (oculta controles web e imprime solo el documento) */}
       <style>{`
         @media print {
-          body * {
-            visibility: hidden !important;
+          @page {
+            size: A4 portrait;
+            margin: 10mm;
           }
-          #director-printable-document, #director-printable-document * {
+          html, body {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .no-print,
+          header,
+          footer,
+          nav,
+          button,
+          .fixed.inset-0:not(.print-container) {
+            display: none !important;
+          }
+          body * {
+            visibility: hidden;
+          }
+          #director-printable-document,
+          #director-printable-document * {
             visibility: visible !important;
           }
           #director-printable-document {
@@ -195,15 +217,13 @@ export const DirectorModal: React.FC = () => {
             left: 0 !important;
             top: 0 !important;
             width: 100% !important;
+            max-width: 100% !important;
             margin: 0 !important;
-            padding: 1.5cm !important;
-            background: white !important;
-            color: #0f172a !important;
+            padding: 0 !important;
+            background: #ffffff !important;
             box-shadow: none !important;
             border: none !important;
-          }
-          .no-print {
-            display: none !important;
+            overflow: visible !important;
           }
         }
       `}</style>
