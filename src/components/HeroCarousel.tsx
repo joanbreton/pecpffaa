@@ -73,29 +73,49 @@ export const HeroCarousel: React.FC = () => {
       <div className="relative w-full h-[768px] flex items-center overflow-hidden">
 
         {/* Background Slide Image - crisp, properly scaled and adapted to container */}
-        {activeSlides.map((slide, idx) => (
-          <div
-            key={slide.id}
-            className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
-              idx === currentIdx ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-            }`}
-          >
-            {/* Ambient soft background to prevent harsh borders on any non-standard image proportions */}
-            <img
-              src={slide.image}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-25 scale-110 pointer-events-none"
-            />
-            {/* Main high-resolution image adapting to container with sharp focus */}
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="relative w-full h-full object-cover object-center transform transition-transform duration-1000 ease-out"
-              loading="eager"
-            />
-          </div>
-        ))}
+        {activeSlides.map((slide, idx) => {
+          const isTargetPhoto = slide.image && slide.image.includes('photo-1541829070764');
+
+          return (
+            <div
+              key={slide.id}
+              className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
+                idx === currentIdx ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+              }`}
+            >
+              {/* Ambient soft background to prevent harsh borders on any non-standard image proportions */}
+              <img
+                src={slide.image}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-25 scale-110 pointer-events-none"
+              />
+              {/* Main high-resolution image adapting to container with sharp focus */}
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="relative w-full h-full object-cover object-center transform transition-transform duration-1000 ease-out"
+                loading="eager"
+              />
+
+              {/* Seamless blended wall patch to remove printed text on the auditorium board/wall */}
+              {isTargetPhoto && (
+                <div 
+                  className="absolute pointer-events-none z-10 rounded-2xl bg-gradient-to-r from-[#1e232a]/95 via-[#252b34]/95 to-[#1c2128]/95 backdrop-blur-md shadow-2xl border border-white/5"
+                  style={{
+                    top: '20%',
+                    left: '10%',
+                    width: '32%',
+                    height: '28%',
+                    boxShadow: 'inset 0 0 35px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4)',
+                    filter: 'blur(1px)'
+                  }}
+                  title="Superficie limpia de pared/pizarra"
+                />
+              )}
+            </div>
+          );
+        })}
 
         {/* Foreground Content: Alinado a la izquierda y centrado verticalmente en un contenedor Liquid Glass */}
         {currentSlide.showTextContainer !== false && (

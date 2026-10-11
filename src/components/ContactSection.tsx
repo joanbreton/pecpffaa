@@ -165,7 +165,7 @@ export const ContactSection: React.FC = () => {
                   <div>
                     <h4 className="font-bold text-sm text-slate-900">Correo Institucional</h4>
                     <p className="text-xs text-slate-600 mt-0.5">
-                      admisiones@pecpffaa.edu.do • info@pecpffaa.edu.do
+                      admisiones@pecpfa.mil.do • info@pecpfa.mil.do
                     </p>
                   </div>
                 </div>

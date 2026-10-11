@@ -234,7 +234,7 @@ export const DirectorModal: React.FC = () => {
             margin: 10mm;
           }
           html, body {
-            background: #ffffff !important;
+            background: #E8EDF4 !important;
             color: #0f172a !important;
             height: auto !important;
             min-height: 0 !important;
@@ -264,8 +264,8 @@ export const DirectorModal: React.FC = () => {
             width: 100% !important;
             max-width: 100% !important;
             margin: 0 !important;
-            padding: 0 !important;
-            background: #ffffff !important;
+            padding: 20px !important;
+            background: #E8EDF4 !important;
             box-shadow: none !important;
             border: none !important;
             overflow: visible !important;
@@ -277,7 +277,7 @@ export const DirectorModal: React.FC = () => {
           MODO PREVISUALIZACIÓN DE IMPRESIÓN COMPLETA (BIOGRAFÍA, FOTO 1:1, FUNCIONES, DOCTRINA)
          ========================================================================= */}
       {isPrintPreviewOpen ? (
-        <div className="relative bg-slate-100 rounded-2xl max-w-4xl w-full max-h-[96vh] flex flex-col shadow-2xl border-2 border-slate-300 overflow-hidden my-auto animate-fadeIn">
+        <div className="relative bg-[#E8EDF4] rounded-2xl max-w-4xl w-full max-h-[96vh] flex flex-col shadow-2xl border-2 border-slate-300 overflow-hidden my-auto animate-fadeIn">
           
           {/* Barra Superior de Control de la Previsualización */}
           <div className="no-print bg-[#003876] text-white px-5 sm:px-6 py-3.5 flex items-center justify-between gap-3 border-b-4 border-[#CE1126] shrink-0 shadow-md">
@@ -293,7 +293,7 @@ export const DirectorModal: React.FC = () => {
               <div>
                 <h3 className="text-xs sm:text-sm font-extrabold uppercase tracking-wide flex items-center gap-2">
                   <FileText className="w-4 h-4 text-amber-300" />
-                  Previsualización de Impresión • Expediente Biográfico Oficial
+                  Previsualización de Impresión • EXPEDIENTE BIOGRÁFICO DEL OFICIAL
                 </h3>
                 <p className="text-[11px] text-blue-100 hidden sm:block">
                   Documento institucional completo listo para imprimir o exportar a PDF
@@ -344,224 +344,237 @@ export const DirectorModal: React.FC = () => {
           </div>
 
           {/* Hoja de Impresión Institucional (Área Imprimible) */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-200/60 flex justify-center">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-[#E8EDF4] flex justify-center">
             
             <div 
               id="director-printable-document" 
-              className="bg-white max-w-3xl w-full p-6 sm:p-10 shadow-lg rounded-xl border border-slate-300 text-slate-800 space-y-6 text-xs sm:text-[13px] leading-relaxed"
+              className="bg-[#E8EDF4] max-w-3xl w-full p-[20px] shadow-lg rounded-xl border border-slate-300 text-slate-800 space-y-6 text-xs sm:text-[13px] leading-relaxed min-h-full h-full flex flex-col justify-between"
+              style={{ minHeight: '100%', height: '100%', padding: '20px', backgroundColor: '#E8EDF4' }}
             >
               
-              {/* Membrete Oficial Dominicano */}
-              <div className="border-b-2 border-[#003876] pb-4 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white p-1 border border-slate-300 flex items-center justify-center shrink-0">
-                    <img 
-                      src={officialLogo} 
-                      alt="Escudo Oficial PECPFFAA" 
-                      className="w-full h-full object-contain rounded-full"
+              <div className="space-y-6">
+                {/* Membrete Oficial Dominicano */}
+                <div className="border-b-2 border-[#003876] pb-4 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#E8EDF4] p-1 border border-slate-300 flex items-center justify-center shrink-0">
+                      <img 
+                        src={officialLogo} 
+                        alt="Escudo Oficial PECPFFAA" 
+                        className="w-full h-full object-contain rounded-full"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#CE1126] block">
+                        República Dominicana • Ministerio de Defensa
+                      </span>
+                      <h1 className="text-base sm:text-lg font-black text-[#003876] uppercase tracking-tight font-serif">
+                        Programa de Educación y Capacitación Profesional de las FF.AA.
+                      </h1>
+                      <p className="text-[11px] font-semibold text-slate-600">
+                        "Gran General Restaurador Gregorio Luperón"
+                      </p>
+                      <span className="inline-block mt-1 font-bold text-[11px] uppercase tracking-wider text-slate-700 bg-[#E8EDF4] px-2 py-0.5 rounded border border-slate-300">
+                        DESPACHO DEL DIRECTOR GENERAL
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="text-right hidden sm:block shrink-0">
+                    <span className="text-[10px] text-slate-500 font-mono block">Fecha de Expedición:</span>
+                    <span className="text-xs font-bold text-slate-700 block">{todayFormatted}</span>
+                    <span className="text-[10px] text-emerald-700 font-semibold bg-[#E8EDF4] px-2 py-0.5 rounded border border-emerald-300 inline-block mt-1">
+                      ✓ Documento Oficial
+                    </span>
+                  </div>
+                </div>
+
+                {/* Ficha Resumen con Fotografía 1:1 Completa */}
+                <div className="p-4 bg-[#E8EDF4] rounded-xl border border-slate-300 flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                  
+                  {/* Foto en proporción 1:1 con cover */}
+                  <div className="w-36 h-36 sm:w-44 sm:h-44 aspect-square rounded-xl overflow-hidden bg-[#E8EDF4] border-2 border-[#003876] shadow-sm shrink-0 flex items-center justify-center">
+                    <img
+                      src={directorData.photoUrl || 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg'}
+                      alt={directorData.name}
+                      className="w-full h-full object-cover object-top"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80';
+                      }}
                     />
                   </div>
-                  <div>
-                    <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#CE1126] block">
-                      República Dominicana • Ministerio de Defensa
-                    </span>
-                    <h1 className="text-base sm:text-lg font-black text-[#003876] uppercase tracking-tight font-serif">
-                      Programa de Educación y Capacitación Profesional de las FF.AA.
-                    </h1>
-                    <p className="text-[11px] font-semibold text-slate-600">
-                      "Gran General Restaurador Gregorio Luperón"
-                    </p>
-                    <span className="inline-block mt-1 font-bold text-[11px] uppercase tracking-wider text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                      DESPACHO DEL DIRECTOR GENERAL
-                    </span>
+
+                  {/* Datos de Identificación Protocolar */}
+                  <div className="flex-1 space-y-2 text-center sm:text-left w-full">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-[#CE1126] tracking-wider block">
+                        Perfil del Titular
+                      </span>
+                      <h2 className="text-base sm:text-lg font-black text-[#003876]">
+                        {directorInfo.name}
+                      </h2>
+                      <p className="text-xs font-bold text-slate-700">
+                        {directorInfo.rank} • {directorData.title}
+                      </p>
+                      <p className="text-[11px] text-slate-600 font-medium">
+                        {directorData.institution} • Fuerzas Armadas
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-2 border-t border-slate-300 text-[11px]">
+                      <div>
+                        <span className="font-bold text-slate-700">Teléfono:</span> {directorData.phone} {directorData.extension}
+                      </div>
+                      <div>
+                        <span className="font-bold text-slate-700">Correo:</span> {directorData.email}
+                      </div>
+                      <div>
+                        <span className="font-bold text-slate-700">Horario:</span> {directorData.schedule}
+                      </div>
+                      <div>
+                        <span className="font-bold text-slate-700">Sede:</span> MIDE, Santo Domingo, D.N.
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* I. SEMBLANZA Y BIOGRAFÍA COMPLETA */}
+                <div className="space-y-3 pt-2">
+                  <div className="border-b border-slate-300 pb-1 flex items-center justify-between">
+                    <h3 className="font-black text-xs sm:text-sm uppercase tracking-wider text-[#003876] flex items-center gap-1.5">
+                      <UserCheck className="w-4 h-4 text-[#CE1126]" />
+                      I. Semblanza Oficial y Trayectoria
+                    </h3>
+                    <span className="text-[10px] text-slate-500 font-semibold">{directorData.bioSubtitle}</span>
+                  </div>
+
+                  <div className="space-y-2.5 text-justify leading-relaxed text-slate-700">
+                    {directorData.bioParagraphs?.map((parr, idx) => (
+                      <p key={idx}>{parr}</p>
+                    ))}
+                  </div>
+
+                  {/* Formación Académica */}
+                  {directorData.academicDegrees && directorData.academicDegrees.length > 0 && (
+                    <div className="pt-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-800 block mb-1.5">
+                        Grados Académicos y Especializaciones:
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {directorData.academicDegrees.map((deg, idx) => (
+                          <div key={idx} className="p-2 bg-[#E8EDF4] rounded border border-slate-300">
+                            <span className="font-bold text-slate-800 block text-[11px]">• {deg.title}</span>
+                            <span className="text-[10px] text-slate-500">{deg.institution}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Distinciones */}
+                  {directorData.distinctions && directorData.distinctions.length > 0 && (
+                    <div className="pt-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-800 block mb-1">
+                        Condecoraciones y Distinciones Castrenses:
+                      </span>
+                      <p className="text-[11px] text-slate-700 font-medium">
+                        {directorData.distinctions.join(' • ')}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* II. ALOCUCIÓN Y MENSAJE OFICIAL */}
+                <div className="space-y-3 pt-3">
+                  <div className="border-b border-slate-300 pb-1">
+                    <h3 className="font-black text-xs sm:text-sm uppercase tracking-wider text-[#003876] flex items-center gap-1.5">
+                      <Quote className="w-4 h-4 text-[#CE1126]" />
+                      II. Alocución y Mensaje a la Comunidad Académica
+                    </h3>
+                  </div>
+
+                  {/* Cita Destacada */}
+                  <div className="p-3 bg-[#E8EDF4] rounded-lg border-l-4 border-[#CE1126] border border-slate-300 text-slate-800 font-serif italic text-xs leading-relaxed">
+                    "{directorData.messageQuote}"
+                  </div>
+
+                  <div className="space-y-2.5 text-justify leading-relaxed text-slate-700">
+                    {directorData.messageParagraphs?.map((parr, idx) => (
+                      <p key={idx}>{parr}</p>
+                    ))}
                   </div>
                 </div>
 
-                <div className="text-right hidden sm:block shrink-0">
-                  <span className="text-[10px] text-slate-500 font-mono block">Fecha de Expedición:</span>
-                  <span className="text-xs font-bold text-slate-700 block">{todayFormatted}</span>
-                  <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block mt-1">
-                    ✓ Documento Oficial
-                  </span>
-                </div>
-              </div>
-
-              {/* Ficha Resumen con Fotografía 1:1 Completa */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center sm:items-start gap-5">
-                
-                {/* Foto en proporción 1:1 con cover */}
-                <div className="w-36 h-36 sm:w-44 sm:h-44 aspect-square rounded-xl overflow-hidden bg-slate-100 border-2 border-[#003876] shadow-sm shrink-0 flex items-center justify-center">
-                  <img
-                    src={directorData.photoUrl || 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg'}
-                    alt={directorData.name}
-                    className="w-full h-full object-cover object-top"
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80';
-                    }}
-                  />
-                </div>
-
-                {/* Datos de Identificación Protocolar */}
-                <div className="flex-1 space-y-2 text-center sm:text-left w-full">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-[#CE1126] tracking-wider block">
-                      Perfil del Titular
-                    </span>
-                    <h2 className="text-base sm:text-lg font-black text-[#003876]">
-                      {directorInfo.name}
-                    </h2>
-                    <p className="text-xs font-bold text-slate-700">
-                      {directorInfo.rank} • {directorData.title}
-                    </p>
-                    <p className="text-[11px] text-slate-600 font-medium">
-                      {directorData.institution} • Fuerzas Armadas
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-2 border-t border-slate-200 text-[11px]">
-                    <div>
-                      <span className="font-bold text-slate-700">Teléfono:</span> {directorData.phone} {directorData.extension}
+                {/* III. FUNCIONES DEL DESPACHO */}
+                {directorData.functions && directorData.functions.length > 0 && (
+                  <div className="space-y-2.5 pt-3">
+                    <div className="border-b border-slate-300 pb-1">
+                      <h3 className="font-black text-xs sm:text-sm uppercase tracking-wider text-[#003876] flex items-center gap-1.5">
+                        <Briefcase className="w-4 h-4 text-[#CE1126]" />
+                        III. Funciones y Atribuciones del Despacho
+                      </h3>
                     </div>
-                    <div>
-                      <span className="font-bold text-slate-700">Correo:</span> {directorData.email}
-                    </div>
-                    <div>
-                      <span className="font-bold text-slate-700">Horario:</span> {directorData.schedule}
-                    </div>
-                    <div>
-                      <span className="font-bold text-slate-700">Sede:</span> MIDE, Santo Domingo, D.N.
-                    </div>
-                  </div>
-                </div>
 
-              </div>
-
-              {/* I. SEMBLANZA Y BIOGRAFÍA COMPLETA */}
-              <div className="space-y-3 pt-2">
-                <div className="border-b border-slate-200 pb-1 flex items-center justify-between">
-                  <h3 className="font-black text-xs sm:text-sm uppercase tracking-wider text-[#003876] flex items-center gap-1.5">
-                    <UserCheck className="w-4 h-4 text-[#CE1126]" />
-                    I. Semblanza Oficial y Trayectoria
-                  </h3>
-                  <span className="text-[10px] text-slate-500 font-semibold">{directorData.bioSubtitle}</span>
-                </div>
-
-                <div className="space-y-2.5 text-justify leading-relaxed text-slate-700">
-                  {directorData.bioParagraphs?.map((parr, idx) => (
-                    <p key={idx}>{parr}</p>
-                  ))}
-                </div>
-
-                {/* Formación Académica */}
-                {directorData.academicDegrees && directorData.academicDegrees.length > 0 && (
-                  <div className="pt-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-800 block mb-1.5">
-                      Grados Académicos y Especializaciones:
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {directorData.academicDegrees.map((deg, idx) => (
-                        <div key={idx} className="p-2 bg-slate-50 rounded border border-slate-200">
-                          <span className="font-bold text-slate-800 block text-[11px]">• {deg.title}</span>
-                          <span className="text-[10px] text-slate-500">{deg.institution}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                      {directorData.functions.map((f, idx) => (
+                        <div key={idx} className="p-2 bg-[#E8EDF4] rounded border border-slate-300">
+                          <span className="font-bold text-slate-900 block">{f.num}. {f.title}</span>
+                          <span className="text-slate-600 block text-[10px] leading-snug">{f.desc}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Distinciones */}
-                {directorData.distinctions && directorData.distinctions.length > 0 && (
-                  <div className="pt-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-800 block mb-1">
-                      Condecoraciones y Distinciones Castrenses:
-                    </span>
-                    <p className="text-[11px] text-slate-700 font-medium">
-                      {directorData.distinctions.join(' • ')}
-                    </p>
+                {/* IV. MARCO LEGAL */}
+                {directorData.legalFramework && directorData.legalFramework.length > 0 && (
+                  <div className="space-y-2 pt-3">
+                    <div className="border-b border-slate-300 pb-1">
+                      <h3 className="font-black text-xs sm:text-sm uppercase tracking-wider text-[#003876] flex items-center gap-1.5">
+                        <Scale className="w-4 h-4 text-[#CE1126]" />
+                        IV. Marco Legal e Institucional
+                      </h3>
+                    </div>
+                    <div className="space-y-1.5 text-[11px]">
+                      {directorData.legalFramework.map((leg, idx) => (
+                        <div key={idx}>
+                          <span className="font-bold text-slate-800">• {leg.title}:</span>{' '}
+                          <span className="text-slate-600">{leg.desc}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
+
+                {/* V. FIRMA OFICIAL Y CIERRE INSTITUCIONAL */}
+                <div className="pt-8 border-t-2 border-slate-300 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+                  <div>
+                    <div className="w-48 h-0.5 bg-slate-400 mx-auto sm:mx-0 mb-2"></div>
+                    <p className="font-black text-xs text-[#003876] uppercase tracking-wider">{directorData.name}</p>
+                    <p className="text-[11px] font-bold text-slate-700">{directorData.title}</p>
+                    <p className="text-[10px] text-slate-500">Ministerio de Defensa • República Dominicana</p>
+                  </div>
+
+                  <div className="text-center sm:text-right">
+                    <span className="text-[11px] font-serif font-black tracking-widest text-[#003876] block">
+                      DIOS • PATRIA • LIBERTAD
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mt-0.5">
+                      Honor • Disciplina • Deber
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              {/* II. ALOCUCIÓN Y MENSAJE OFICIAL */}
-              <div className="space-y-3 pt-3">
-                <div className="border-b border-slate-200 pb-1">
-                  <h3 className="font-black text-xs sm:text-sm uppercase tracking-wider text-[#003876] flex items-center gap-1.5">
-                    <Quote className="w-4 h-4 text-[#CE1126]" />
-                    II. Alocución y Mensaje a la Comunidad Académica
-                  </h3>
-                </div>
-
-                {/* Cita Destacada */}
-                <div className="p-3 bg-blue-50/60 rounded-lg border-l-4 border-[#CE1126] text-slate-800 font-serif italic text-xs leading-relaxed">
-                  "{directorData.messageQuote}"
-                </div>
-
-                <div className="space-y-2.5 text-justify leading-relaxed text-slate-700">
-                  {directorData.messageParagraphs?.map((parr, idx) => (
-                    <p key={idx}>{parr}</p>
-                  ))}
-                </div>
-              </div>
-
-              {/* III. FUNCIONES DEL DESPACHO */}
-              {directorData.functions && directorData.functions.length > 0 && (
-                <div className="space-y-2.5 pt-3">
-                  <div className="border-b border-slate-200 pb-1">
-                    <h3 className="font-black text-xs sm:text-sm uppercase tracking-wider text-[#003876] flex items-center gap-1.5">
-                      <Briefcase className="w-4 h-4 text-[#CE1126]" />
-                      III. Funciones y Atribuciones del Despacho
-                    </h3>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-                    {directorData.functions.map((f, idx) => (
-                      <div key={idx} className="p-2 bg-slate-50 rounded border border-slate-200">
-                        <span className="font-bold text-slate-900 block">{f.num}. {f.title}</span>
-                        <span className="text-slate-600 block text-[10px] leading-snug">{f.desc}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* IV. MARCO LEGAL */}
-              {directorData.legalFramework && directorData.legalFramework.length > 0 && (
-                <div className="space-y-2 pt-3">
-                  <div className="border-b border-slate-200 pb-1">
-                    <h3 className="font-black text-xs sm:text-sm uppercase tracking-wider text-[#003876] flex items-center gap-1.5">
-                      <Scale className="w-4 h-4 text-[#CE1126]" />
-                      IV. Marco Legal e Institucional
-                    </h3>
-                  </div>
-                  <div className="space-y-1.5 text-[11px]">
-                    {directorData.legalFramework.map((leg, idx) => (
-                      <div key={idx}>
-                        <span className="font-bold text-slate-800">• {leg.title}:</span>{' '}
-                        <span className="text-slate-600">{leg.desc}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* V. FIRMA OFICIAL Y CIERRE INSTITUCIONAL */}
-              <div className="pt-8 border-t-2 border-slate-300 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
-                <div>
-                  <div className="w-48 h-0.5 bg-slate-400 mx-auto sm:mx-0 mb-2"></div>
-                  <p className="font-black text-xs text-[#003876] uppercase tracking-wider">{directorData.name}</p>
-                  <p className="text-[11px] font-bold text-slate-700">{directorData.title}</p>
-                  <p className="text-[10px] text-slate-500">Ministerio de Defensa • República Dominicana</p>
-                </div>
-
-                <div className="text-center sm:text-right">
-                  <span className="text-[11px] font-serif font-black tracking-widest text-[#003876] block">
-                    DIOS • PATRIA • LIBERTAD
-                  </span>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mt-0.5">
-                    Honor • Disciplina • Deber
-                  </span>
-                </div>
+              {/* Pie de la previsualización de impresión */}
+              <div className="pt-6 border-t-2 border-[#003876] text-center shrink-0">
+                <span className="text-xs sm:text-sm font-black tracking-widest text-[#003876] uppercase block">
+                  EXPEDIENTE BIOGRÁFICO DEL OFICIAL
+                </span>
+                <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block mt-0.5">
+                  PROGRAMA DE EDUCACIÓN Y CAPACITACIÓN PROFESIONAL DE LAS FF.AA. (PECPFFAA)
+                </span>
               </div>
 
             </div>

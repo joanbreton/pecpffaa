@@ -88,7 +88,14 @@ export const initAndSyncFirestore = async (callbacks: FirestoreSyncCallbacks): P
         }
       } else {
         const items: SlideItem[] = [];
-        snapshot.forEach((d) => items.push({ ...(d.data() as SlideItem), id: d.id }));
+        snapshot.forEach((d) => {
+          const item = { ...(d.data() as SlideItem), id: d.id };
+          if (item.image && item.image.includes('photo-1541829070764')) {
+            item.image = 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1600&q=80';
+            setDoc(doc(db, COLLECTIONS.SLIDES, d.id), sanitizeForFirestore(item), { merge: true }).catch(console.error);
+          }
+          items.push(item);
+        });
         items.sort((a, b) => (a.order || 0) - (b.order || 0));
         callbacks.onSlidesUpdate?.(items);
       }

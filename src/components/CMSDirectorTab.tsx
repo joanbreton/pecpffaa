@@ -504,7 +504,7 @@ export const CMSDirectorTab: React.FC = () => {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="despacho@pecpffaa.edu.do"
+                      placeholder="despacho@pecpfa.mil.do"
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-[#003876] focus:bg-white outline-none"
                     />
                   </div>

@@ -156,7 +156,7 @@ export const CMSDashboard: React.FC = () => {
         title: '',
         subtitle: '',
         tag: 'Nueva Convocatoria',
-        image: 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1600&q=80',
+        image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1600&q=80',
         ctaText: 'Ver Más',
         ctaLink: '#servicios',
         secondaryText: 'Contacto',

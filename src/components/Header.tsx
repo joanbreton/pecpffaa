@@ -83,7 +83,7 @@ export const Header: React.FC = () => {
             </span>
             <span className="hidden lg:inline-flex items-center gap-1 text-slate-100">
               <Mail className="w-3.5 h-3.5 text-red-400" />
-              admisiones@pecpffaa.edu.do
+              admisiones@pecpfa.mil.do
             </span>
           </div>
 
