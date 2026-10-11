@@ -335,6 +335,10 @@ export const INITIAL_INSTITUTIONAL_DATA: InstitutionalData = {
   missionText: 'Formar y capacitar a los miembros de las Fuerzas Armadas, Policía Nacional y sector civil afín en doctrina militar conjunta, toma de decisiones estratégicas, seguridad y defensa nacional, con apego a los principios éticos y democráticos.',
   visionTitle: 'Visión Prospectiva',
   visionText: 'Ser el centro de excelencia académica militar de referencia regional y hemisférica, reconocido por la vanguardia en investigación doctrinal, innovación tecnológica en ciberdefensa y sólida formación en liderazgo estratégico.',
+  valuesTextTitle: 'Valores Institucionales',
+  valuesText: 'El PECPFFAA fomenta en su personal y en los Estudiantes beneficiados de los programas los valores mostrados previamente.',
+  objectiveTitle: 'Objetivo Institucional',
+  objectiveText: 'Otorgar diferentes facilidades educativas, para la capacitación y profesionalización de los Miembros de las Fuerzas Armadas activos, en la honrosa condición de retiro y sus familiares directos, en distintas universidades, institutos y colegios.',
   valuesTitle: 'Pilares Doctrinales y Valores Institucionales',
   valuesSubtitle: 'Principios rectores que guían la enseñanza superior militar y la toma de decisiones estratégicas',
   values: [

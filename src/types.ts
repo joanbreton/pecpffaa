@@ -174,6 +174,10 @@ export interface InstitutionalData {
   missionText: string;
   visionTitle: string;
   visionText: string;
+  valuesTextTitle?: string;
+  valuesText?: string;
+  objectiveTitle?: string;
+  objectiveText?: string;
   valuesTitle: string;
   valuesSubtitle: string;
   values: DoctrinalValue[];

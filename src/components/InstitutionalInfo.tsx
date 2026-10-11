@@ -94,25 +94,49 @@ export const InstitutionalInfo: React.FC = () => {
           </p>
         </div>
 
-        {/* Mission & Vision Cards */}
+        {/* Mission, Vision, Values & Objective Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Misión */}
           <div className="bg-slate-800/80 rounded-2xl p-6 sm:p-8 border border-slate-700 hover:border-[#0D3671] transition-all space-y-4">
             <div className="w-12 h-12 rounded-xl bg-[#0D3671] text-white flex items-center justify-center shadow-lg border border-white/20">
               <Target className="w-6 h-6 text-amber-400" />
             </div>
-            <h3 className="text-xl font-bold text-white font-serif">{institutionalData.missionTitle}</h3>
+            <h3 className="text-xl font-bold text-white font-serif">{institutionalData.missionTitle || 'Misión Institucional'}</h3>
             <p className="text-sm text-slate-300 leading-relaxed">
               {institutionalData.missionText}
             </p>
           </div>
 
+          {/* Visión */}
           <div className="bg-slate-800/80 rounded-2xl p-6 sm:p-8 border border-slate-700 hover:border-[#B91C1C] transition-all space-y-4">
             <div className="w-12 h-12 rounded-xl bg-[#B91C1C] text-white flex items-center justify-center shadow-lg border border-white/20">
               <Eye className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-white font-serif">{institutionalData.visionTitle}</h3>
+            <h3 className="text-xl font-bold text-white font-serif">{institutionalData.visionTitle || 'Visión Prospectiva'}</h3>
             <p className="text-sm text-slate-300 leading-relaxed">
               {institutionalData.visionText}
+            </p>
+          </div>
+
+          {/* Valores */}
+          <div className="bg-slate-800/80 rounded-2xl p-6 sm:p-8 border border-slate-700 hover:border-amber-500 transition-all space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-600/90 text-white flex items-center justify-center shadow-lg border border-white/20">
+              <Award className="w-6 h-6 text-amber-200" />
+            </div>
+            <h3 className="text-xl font-bold text-white font-serif">{institutionalData.valuesTextTitle || 'Valores'}</h3>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              {institutionalData.valuesText || 'El PECPFFAA fomenta en su personal y en los Estudiantes beneficiados de los programas los valores mostrados previamente.'}
+            </p>
+          </div>
+
+          {/* Objetivo */}
+          <div className="bg-slate-800/80 rounded-2xl p-6 sm:p-8 border border-slate-700 hover:border-emerald-500 transition-all space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-700/90 text-white flex items-center justify-center shadow-lg border border-white/20">
+              <GraduationCap className="w-6 h-6 text-emerald-200" />
+            </div>
+            <h3 className="text-xl font-bold text-white font-serif">{institutionalData.objectiveTitle || 'Objetivo'}</h3>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              {institutionalData.objectiveText || 'Otorgar diferentes facilidades educativas, para la capacitación y profesionalización de los Miembros de las Fuerzas Armadas activos, en la honrosa condición de retiro y sus familiares directos, en distintas universidades, institutos y colegios.'}
             </p>
           </div>
         </div>

@@ -333,87 +333,157 @@ export const CMSInstitutionalTab: React.FC = () => {
           </div>
         )}
 
-        {/* 2. MISIÓN & VISIÓN */}
+        {/* 2. MISIÓN, VISIÓN, VALORES & OBJETIVO */}
         {activeSection === 'misionVision' && (
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-6 animate-fadeIn">
             <div className="border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-slate-900">
-                Misión Institucional y Visión Prospectiva
+                Misión, Visión, Valores y Objetivo Institucional
               </h3>
               <p className="text-xs text-slate-500">
-                Configure los enunciados oficiales de la misión de formación y visión estratégica.
+                Configure los pilares fundamentales del PECPFFAA: Misión, Visión, Valores e Identidad y Objetivo educativo.
               </p>
             </div>
 
-            {/* Misión */}
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-              <div className="flex items-center gap-2 text-[#0D3671] font-bold text-sm">
-                <Target className="w-4 h-4 text-amber-500" />
-                <span>Tarjeta de Misión Institucional</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Misión */}
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                <div className="flex items-center gap-2 text-[#0D3671] font-bold text-sm">
+                  <Target className="w-4 h-4 text-amber-500" />
+                  <span>1. Misión Institucional</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Título
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.missionTitle}
+                    onChange={(e) => setFormData({ ...formData, missionTitle: e.target.value })}
+                    placeholder="Misión Institucional"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold outline-none"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Contenido
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={formData.missionText}
+                    onChange={(e) => setFormData({ ...formData, missionText: e.target.value })}
+                    placeholder="Formar y capacitar a los miembros de las Fuerzas Armadas..."
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs leading-relaxed outline-none"
+                    required
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Título de la Misión
-                </label>
-                <input
-                  type="text"
-                  value={formData.missionTitle}
-                  onChange={(e) => setFormData({ ...formData, missionTitle: e.target.value })}
-                  placeholder="Misión Institucional"
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold outline-none"
-                  required
-                />
+              {/* Visión */}
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                <div className="flex items-center gap-2 text-[#B91C1C] font-bold text-sm">
+                  <Eye className="w-4 h-4 text-[#B91C1C]" />
+                  <span>2. Visión Prospectiva</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Título
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.visionTitle}
+                    onChange={(e) => setFormData({ ...formData, visionTitle: e.target.value })}
+                    placeholder="Visión Prospectiva"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold outline-none"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Contenido
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={formData.visionText}
+                    onChange={(e) => setFormData({ ...formData, visionText: e.target.value })}
+                    placeholder="Ser el centro de excelencia académica militar de referencia..."
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs leading-relaxed outline-none"
+                    required
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Contenido de la Misión
-                </label>
-                <textarea
-                  rows={4}
-                  value={formData.missionText}
-                  onChange={(e) => setFormData({ ...formData, missionText: e.target.value })}
-                  placeholder="Formar y capacitar a los miembros de las Fuerzas Armadas..."
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs leading-relaxed outline-none"
-                  required
-                />
-              </div>
-            </div>
+              {/* Valores Texto */}
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                <div className="flex items-center gap-2 text-amber-700 font-bold text-sm">
+                  <Award className="w-4 h-4 text-amber-600" />
+                  <span>3. Valores (Descripción)</span>
+                </div>
 
-            {/* Visión */}
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-              <div className="flex items-center gap-2 text-[#B91C1C] font-bold text-sm">
-                <Eye className="w-4 h-4 text-[#B91C1C]" />
-                <span>Tarjeta de Visión Prospectiva</span>
-              </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Título del Bloque
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.valuesTextTitle || 'Valores'}
+                    onChange={(e) => setFormData({ ...formData, valuesTextTitle: e.target.value })}
+                    placeholder="Valores"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold outline-none"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Título de la Visión
-                </label>
-                <input
-                  type="text"
-                  value={formData.visionTitle}
-                  onChange={(e) => setFormData({ ...formData, visionTitle: e.target.value })}
-                  placeholder="Visión Prospectiva"
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold outline-none"
-                  required
-                />
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Texto Descriptivo de Valores
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={formData.valuesText || 'El PECPFFAA fomenta en su personal y en los Estudiantes beneficiados de los programas los valores mostrados previamente.'}
+                    onChange={(e) => setFormData({ ...formData, valuesText: e.target.value })}
+                    placeholder="El PECPFFAA fomenta en su personal y en los Estudiantes..."
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs leading-relaxed outline-none"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Contenido de la Visión
-                </label>
-                <textarea
-                  rows={4}
-                  value={formData.visionText}
-                  onChange={(e) => setFormData({ ...formData, visionText: e.target.value })}
-                  placeholder="Ser el centro de excelencia académica militar de referencia..."
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs leading-relaxed outline-none"
-                  required
-                />
+              {/* Objetivo */}
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm">
+                  <Building2 className="w-4 h-4 text-emerald-600" />
+                  <span>4. Objetivo Institucional</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Título
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.objectiveTitle || 'Objetivo'}
+                    onChange={(e) => setFormData({ ...formData, objectiveTitle: e.target.value })}
+                    placeholder="Objetivo"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Contenido del Objetivo
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={formData.objectiveText || 'Otorgar diferentes facilidades educativas, para la capacitación y profesionalización de los Miembros de las Fuerzas Armadas activos, en la honrosa condición de retiro y sus familiares directos, en distintas universidades, institutos y colegios.'}
+                    onChange={(e) => setFormData({ ...formData, objectiveText: e.target.value })}
+                    placeholder="Otorgar diferentes facilidades educativas..."
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs leading-relaxed outline-none"
+                  />
+                </div>
               </div>
             </div>
           </div>
