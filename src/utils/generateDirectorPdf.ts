@@ -14,7 +14,28 @@ async function imageToDataUrl(src: string): Promise<string | null> {
   if (!src) return null;
   if (src.startsWith('data:')) return src;
 
-  // Intento 1: Fetch directo con CORS
+  // Intento 1: Si la imagen ya está cargada en el DOM, dibujarla directamente en canvas
+  try {
+    const existingImgs = Array.from(document.querySelectorAll('img'));
+    const matched = existingImgs.find(i => i.src === src && i.complete && i.naturalWidth > 0);
+    if (matched) {
+      const cvs = document.createElement('canvas');
+      cvs.width = matched.naturalWidth;
+      cvs.height = matched.naturalHeight;
+      const ctx = cvs.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(matched, 0, 0);
+        const dataUrl = cvs.toDataURL('image/png');
+        if (dataUrl && dataUrl.length > 200) {
+          return dataUrl;
+        }
+      }
+    }
+  } catch {
+    // Si la captura directa da error de origen, se intenta fetch o Image con CORS
+  }
+
+  // Intento 2: Fetch directo con mode cors
   try {
     const res = await fetch(src, { mode: 'cors' });
     if (res.ok) {
@@ -27,10 +48,10 @@ async function imageToDataUrl(src: string): Promise<string | null> {
       });
     }
   } catch {
-    // Si fetch modo cors falla, se intenta con el elemento Image
+    // ignora error
   }
 
-  // Intento 2: Elemento HTMLImageElement con crossOrigin = 'anonymous'
+  // Intento 3: Elemento HTMLImageElement con crossOrigin = 'anonymous'
   try {
     const dataUrl = await new Promise<string | null>((resolve) => {
       const img = new Image();
@@ -38,8 +59,8 @@ async function imageToDataUrl(src: string): Promise<string | null> {
       img.onload = () => {
         try {
           const cvs = document.createElement('canvas');
-          cvs.width = img.naturalWidth || img.width || 300;
-          cvs.height = img.naturalHeight || img.height || 300;
+          cvs.width = img.naturalWidth || 300;
+          cvs.height = img.naturalHeight || 300;
           const ctx = cvs.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0);
@@ -82,7 +103,7 @@ export async function generateDirectorPdf(
   try {
     options.onProgress?.('Preparando documento e imágenes oficiales...');
 
-    // Pre-cargar imágenes externas a Data URL para evitar restricciones de CORS y tainting
+    // Convertir imágenes a Data URLs para evitar bloqueos
     for (const img of images) {
       originalSrcs.set(img, img.src);
       if (img.src && !img.src.startsWith('data:')) {
@@ -96,37 +117,69 @@ export async function generateDirectorPdf(
         await new Promise((resolve) => {
           img.onload = resolve;
           img.onerror = resolve;
-          setTimeout(resolve, 600);
+          setTimeout(resolve, 500);
         });
       }
     }
 
-    options.onProgress?.('Renderizando gráficos y semblanza en alta definición...');
+    options.onProgress?.('Renderizando gráficos y texto en alta definición...');
 
-    // Captura en escala 2x con allowTaint: false para evitar SecurityError en toDataURL
+    // Asegurar que html2canvas capture desde el origen (0,0) sin desfases de scroll
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
-      allowTaint: false,
+      allowTaint: true,
       backgroundColor: '#ffffff',
       logging: false,
+      scrollX: 0,
+      scrollY: 0,
+      x: 0,
+      y: 0,
       onclone: (clonedDoc) => {
         const clonedElem = clonedDoc.getElementById(elementId);
         if (clonedElem) {
+          // Asegurar visibilidad total de todos los ancestros en el clon
+          clonedDoc.body.style.overflow = 'visible';
+          clonedDoc.body.style.height = 'auto';
+
+          let curr: HTMLElement | null = clonedElem;
+          while (curr && curr !== clonedDoc.body) {
+            curr.style.visibility = 'visible';
+            curr.style.opacity = '1';
+            curr.style.display = 'block';
+            curr.style.overflow = 'visible';
+            curr.style.maxHeight = 'none';
+            curr.style.height = 'auto';
+            curr = curr.parentElement;
+          }
+
+          // Estilo del elemento contenedor a capturar
+          clonedElem.style.display = 'block';
+          clonedElem.style.visibility = 'visible';
+          clonedElem.style.opacity = '1';
           clonedElem.style.maxHeight = 'none';
           clonedElem.style.height = 'auto';
           clonedElem.style.overflow = 'visible';
           clonedElem.style.boxShadow = 'none';
           clonedElem.style.borderRadius = '0';
           clonedElem.style.border = 'none';
-          clonedElem.style.padding = '30px';
-          clonedElem.style.margin = '0';
+          clonedElem.style.padding = '32px';
+          clonedElem.style.margin = '0 auto';
+          clonedElem.style.backgroundColor = '#ffffff';
+          clonedElem.style.color = '#0f172a';
           clonedElem.style.width = '800px';
+
+          // Forzar visibilidad y opacidad en todos los elementos hijos
+          const allDescendants = Array.from(clonedElem.querySelectorAll('*')) as HTMLElement[];
+          for (const el of allDescendants) {
+            el.style.visibility = 'visible';
+            el.style.opacity = '1';
+          }
         }
       }
     });
 
-    options.onProgress?.('Estructurando formato PDF A4 oficial...');
+    options.onProgress?.('Estructurando documento PDF A4...');
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -144,7 +197,7 @@ export async function generateDirectorPdf(
     const canvasWidthPx = canvas.width;
     const canvasHeightPx = canvas.height;
 
-    // Altura en píxeles de canvas correspondiente a una página A4
+    // Altura en píxeles de canvas correspondiente a 1 página A4
     const pageCanvasHeightPx = Math.floor((canvasWidthPx * contentHeightMm) / contentWidthMm);
 
     let renderedHeightPx = 0;
@@ -158,7 +211,7 @@ export async function generateDirectorPdf(
 
       const currentSliceHeightPx = Math.min(pageCanvasHeightPx, canvasHeightPx - renderedHeightPx);
 
-      // Crear canvas temporal para la página actual
+      // Canvas para el fragmento de la página actual
       const pageCanvas = document.createElement('canvas');
       pageCanvas.width = canvasWidthPx;
       pageCanvas.height = currentSliceHeightPx;
@@ -225,7 +278,7 @@ export async function generateDirectorPdf(
     console.error('Error generating PDF:', error);
     return false;
   } finally {
-    // Restaurar imágenes originales
+    // Restaurar las fuentes originales de imágenes
     for (const [img, originalSrc] of originalSrcs.entries()) {
       img.src = originalSrc;
     }
