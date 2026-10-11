@@ -21,7 +21,9 @@ import {
   FileText,
   ArrowLeft,
   Loader2,
-  Download
+  Download,
+  ExternalLink,
+  Eye
 } from 'lucide-react';
 import officialLogo from '../assets/images/programalogo.jpg';
 import { generateDirectorPdf } from '../utils/generateDirectorPdf';
@@ -39,6 +41,7 @@ export const DirectorModal: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'biografia' | 'mensaje' | 'funciones' | 'marco-legal' | 'contacto'>('biografia');
   const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
 
   const isAdmin = currentUser?.role === 'Administrador';
 
@@ -113,33 +116,75 @@ export const DirectorModal: React.FC = () => {
   const handleGeneratePdf = async () => {
     if (isGeneratingPdf) return;
     setIsGeneratingPdf(true);
-    showNotification('Generando expediente oficial en PDF...', 'info');
+    showNotification('Generando y descargando expediente oficial en PDF...', 'info');
 
     try {
+      // Asegurar que el contenedor esté en el origen de scroll para captura limpia
+      const scrollParent = document.getElementById('director-printable-document')?.parentElement;
+      if (scrollParent) {
+        scrollParent.scrollTop = 0;
+      }
+
       const sanitizedName = directorInfo.name.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]/g, '_');
       const fileName = `Expediente_Biografico_${sanitizedName || 'Director_General'}_PECPFFAA.pdf`;
 
-      const success = await generateDirectorPdf('director-printable-document', {
+      const result = await generateDirectorPdf('director-printable-document', {
         fileName,
         onProgress: (status) => {
           showNotification(status, 'info');
         }
       });
 
-      if (success) {
+      if (result.success && result.blobUrl) {
+        setPdfBlobUrl(result.blobUrl);
         showNotification('¡Expediente PDF oficial generado y descargado exitosamente!', 'success');
       } else {
-        showNotification('Abriendo diálogo del sistema para imprimir o guardar PDF...', 'info');
-        setTimeout(() => {
-          window.print();
-        }, 300);
+        showNotification('Error al generar el archivo PDF.', 'error');
       }
     } catch (err) {
-      console.error('Error generating PDF:', err);
-      showNotification('Abriendo diálogo del sistema para imprimir o guardar PDF...', 'info');
-      setTimeout(() => {
-        window.print();
-      }, 300);
+      console.error('Error al generar PDF:', err);
+      showNotification('Error inesperado al generar el PDF.', 'error');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
+  const handlePreviewPdfInNewTab = async () => {
+    if (pdfBlobUrl) {
+      window.open(pdfBlobUrl, '_blank');
+      return;
+    }
+
+    if (isGeneratingPdf) return;
+    setIsGeneratingPdf(true);
+    showNotification('Generando objeto Blob/ObjectURL para abrir previsualización...', 'info');
+
+    try {
+      const scrollParent = document.getElementById('director-printable-document')?.parentElement;
+      if (scrollParent) {
+        scrollParent.scrollTop = 0;
+      }
+
+      const sanitizedName = directorInfo.name.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]/g, '_');
+      const fileName = `Expediente_Biografico_${sanitizedName || 'Director_General'}_PECPFFAA.pdf`;
+
+      const result = await generateDirectorPdf('director-printable-document', {
+        fileName,
+        onProgress: (status) => {
+          showNotification(status, 'info');
+        }
+      });
+
+      if (result.success && result.blobUrl) {
+        setPdfBlobUrl(result.blobUrl);
+        window.open(result.blobUrl, '_blank');
+        showNotification('Previsualización del PDF abierta en nueva pestaña', 'success');
+      } else {
+        showNotification('No se pudo generar la previsualización del PDF.', 'error');
+      }
+    } catch (err) {
+      console.error('Error al previsualizar PDF:', err);
+      showNotification('Error al abrir la previsualización del PDF.', 'error');
     } finally {
       setIsGeneratingPdf(false);
     }
@@ -257,11 +302,12 @@ export const DirectorModal: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2">
+              {/* Botón Principal: Generar y Descargar PDF */}
               <button
                 onClick={handleGeneratePdf}
                 disabled={isGeneratingPdf}
-                className="px-4 py-2 rounded-xl bg-[#CE1126] hover:bg-red-700 disabled:bg-red-400 text-white text-xs font-extrabold flex items-center gap-2 shadow-md transition-all cursor-pointer active:scale-95 disabled:cursor-wait"
-                title="Generar y descargar documento PDF oficial con toda la información biográfica y fotografía"
+                className="px-4 py-2 rounded-xl bg-[#CE1126] hover:bg-red-700 disabled:bg-red-400 text-white text-xs sm:text-sm font-extrabold flex items-center gap-2 shadow-md transition-all cursor-pointer active:scale-95 disabled:cursor-wait"
+                title="Capturar contenedor con html2canvas, generar PDF con jsPDF y descargar directamente"
               >
                 {isGeneratingPdf ? (
                   <>
@@ -271,9 +317,20 @@ export const DirectorModal: React.FC = () => {
                 ) : (
                   <>
                     <Download className="w-4 h-4 text-white" />
-                    <span>Generar PDF Expediente</span>
+                    <span>Generar y Descargar PDF</span>
                   </>
                 )}
+              </button>
+
+              {/* Botón Secundario: Previsualizar en Nueva Pestaña mediante Blob/ObjectURL */}
+              <button
+                onClick={handlePreviewPdfInNewTab}
+                disabled={isGeneratingPdf}
+                className="hidden sm:inline-flex px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold items-center gap-1.5 transition-colors cursor-pointer border border-white/20 shadow-xs"
+                title="Generar objeto Blob / ObjectURL para abrir y previsualizar el PDF en una pestaña nueva del navegador"
+              >
+                <ExternalLink className="w-4 h-4 text-amber-300" />
+                <span>Previsualizar en Nueva Pestaña</span>
               </button>
 
               <button
