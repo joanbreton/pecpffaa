@@ -69,9 +69,9 @@ export const HeroCarousel: React.FC = () => {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Container: 768px de altura */}
-      <div className="relative w-full h-[768px] flex items-end overflow-hidden">
-        
+      {/* Container: 768px de altura con centrado vertical */}
+      <div className="relative w-full h-[768px] flex items-center overflow-hidden">
+
         {/* Background Slide Image - crisp, properly scaled and adapted to container */}
         {activeSlides.map((slide, idx) => (
           <div
@@ -97,9 +97,9 @@ export const HeroCarousel: React.FC = () => {
           </div>
         ))}
 
-        {/* Foreground Content: docked at bottom-left in a highly transparent Liquid Glass container */}
+        {/* Foreground Content: Alinado a la izquierda y centrado verticalmente en un contenedor Liquid Glass */}
         {currentSlide.showTextContainer !== false && (
-          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 w-full pb-14 sm:pb-16 pt-6">
+          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 md:px-12 w-full py-6">
             <div className="relative max-w-lg lg:max-w-xl p-5 sm:p-6 lg:p-7 rounded-3xl overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/[0.14] via-white/[0.03] to-black/[0.12] border border-white/40 border-t-white/75 border-l-white/55 border-b-white/20 shadow-[0_16px_45px_rgba(0,0,0,0.35),inset_0_1px_2px_rgba(255,255,255,0.75),inset_0_-1px_1px_rgba(255,255,255,0.15)] space-y-3.5 animate-fadeIn">
               
               {/* Liquid Glass Specular Shimmer Highlights */}

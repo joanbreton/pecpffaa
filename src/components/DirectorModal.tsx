@@ -1017,11 +1017,6 @@ export const DirectorModal: React.FC = () => {
                     </div>
 
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                      <span className="text-slate-500 text-[11px] font-medium">Extensión:</span>
-                      <span className="font-mono font-bold text-[#CE1126] text-[11px]">{directorData.extension}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                       <span className="text-slate-500 text-[11px] font-medium">Correo:</span>
                       <span className="text-slate-700 text-[10px] font-mono font-semibold truncate max-w-[170px]" title={directorData.email}>
                         {directorData.email}
