@@ -322,7 +322,11 @@ export const INITIAL_DIRECTOR_DATA: DirectorData = {
       title: 'Reglamento Interno de Régimen y Docencia PECPFFAA',
       desc: 'Normas disciplinarias, planes de estudio y deberes académicos de cadetes y estudiantes.'
     }
-  ]
+  ],
+  sectionBadge: 'Liderazgo Institucional',
+  sectionTitle: 'NUESTRO DIRECTOR',
+  sectionSubtitle: 'Despacho de la Dirección General • Fuerzas Armadas',
+  sectionSummary: 'El General de Brigada Ambiorix de Jesús Cepeda Hernández lidera con vocación patria y visión de futuro el Programa de Educación y Capacitación Profesional de las Fuerzas Armadas (PECPFFAA), impulsando la modernización académica, la excelencia operativa y la formación integral de los hombres y mujeres que engrandecen a la República Dominicana.'
 };
 
 export const INITIAL_INSTITUTIONAL_DATA: InstitutionalData = {

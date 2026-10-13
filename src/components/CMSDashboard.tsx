@@ -60,10 +60,13 @@ export const CMSDashboard: React.FC = () => {
     auditLogs,
     resetToDefaults,
     showNotification,
-    firebaseSyncStatus
+    firebaseSyncStatus,
+    dashboardTab,
+    setDashboardTab
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'slides' | 'news' | 'services' | 'users' | 'messages' | 'director' | 'institutional' | 'database'>('overview');
+  const activeTab = dashboardTab;
+  const setActiveTab = setDashboardTab;
   const [messageFilter, setMessageFilter] = useState<'Todos' | 'No leído' | 'Leído' | 'Respondido'>('Todos');
   const [confirmDeleteMessageId, setConfirmDeleteMessageId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -550,10 +553,10 @@ export const CMSDashboard: React.FC = () => {
               >
                 <div className="flex items-center gap-3">
                   <Building2 className="w-4 h-4 text-amber-300" />
-                  <span>Despacho del Director</span>
+                  <span>Nuestro Director</span>
                 </div>
                 <span className="text-[10px] bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded-full font-mono font-bold">
-                  Popup
+                  CMS
                 </span>
               </button>
 
@@ -740,7 +743,7 @@ export const CMSDashboard: React.FC = () => {
                     className="py-3 px-4 bg-amber-500/20 hover:bg-amber-500/30 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-amber-400/40 transition-colors text-amber-200"
                   >
                     <Building2 className="w-4 h-4 text-amber-300" />
-                    <span>Despacho Director</span>
+                    <span>Nuestro Director</span>
                   </button>
 
                   <button

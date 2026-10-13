@@ -45,6 +45,7 @@ export const Header: React.FC = () => {
 
   const navLinks = [
     { label: 'Inicio', href: '#inicio' },
+    { label: 'Nuestro Director', href: '#director' },
     { label: 'Oferta Académica', href: '#servicios' },
     { label: 'Noticias & Eventos', href: '#noticias' },
     { label: 'Admisiones', href: '#admisiones' },
@@ -260,6 +261,16 @@ export const Header: React.FC = () => {
                     <div className="px-2 pt-1 pb-1 space-y-1">
                       <button
                         onClick={() => {
+                          handleNavClick('#director');
+                          setNosotrosDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-xs font-semibold text-slate-700 hover:text-[#0D3671] flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span>Sección Nuestro Director</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                      </button>
+                      <button
+                        onClick={() => {
                           handleNavClick('#institucion');
                           setNosotrosDropdownOpen(false);
                         }}
@@ -370,6 +381,17 @@ export const Header: React.FC = () => {
                       <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-[#B91C1C] text-white">
                         Popup
                       </span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        handleNavClick('#director');
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
+                    >
+                      <span>Sección Nuestro Director</span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                     </button>
 
                     <button

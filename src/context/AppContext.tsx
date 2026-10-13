@@ -59,6 +59,8 @@ interface AppContextType {
   // Navigation & Modals
   activeView: 'portal' | 'dashboard';
   setActiveView: (view: 'portal' | 'dashboard') => void;
+  dashboardTab: 'overview' | 'slides' | 'news' | 'services' | 'users' | 'messages' | 'director' | 'institutional' | 'database';
+  setDashboardTab: (tab: 'overview' | 'slides' | 'news' | 'services' | 'users' | 'messages' | 'director' | 'institutional' | 'database') => void;
   isLoginModalOpen: boolean;
   setIsLoginModalOpen: (open: boolean) => void;
   isDirectorModalOpen: boolean;
@@ -144,6 +146,7 @@ const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in windo
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeView, setActiveView] = useState<'portal' | 'dashboard'>('portal');
+  const [dashboardTab, setDashboardTab] = useState<'overview' | 'slides' | 'news' | 'services' | 'users' | 'messages' | 'director' | 'institutional' | 'database'>('overview');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isDirectorModalOpen, setIsDirectorModalOpen] = useState(false);
   const [selectedNewsModal, setSelectedNewsModal] = useState<NewsItem | null>(null);
@@ -1176,6 +1179,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         firebaseProjectId: firebaseConfig.projectId,
         activeView,
         setActiveView,
+        dashboardTab,
+        setDashboardTab,
         isLoginModalOpen,
         setIsLoginModalOpen,
         isDirectorModalOpen,

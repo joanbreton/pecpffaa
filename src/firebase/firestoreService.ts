@@ -201,7 +201,8 @@ export const initAndSyncFirestore = async (callbacks: FirestoreSyncCallbacks): P
     const unsubDirector = onSnapshot(directorDocRef, async (docSnap) => {
       markConnected();
       if (docSnap.exists()) {
-        callbacks.onDirectorUpdate?.({ ...(docSnap.data() as DirectorData), id: docSnap.id });
+        const data = docSnap.data() as DirectorData;
+        callbacks.onDirectorUpdate?.({ ...INITIAL_DIRECTOR_DATA, ...data, id: docSnap.id });
       } else {
         // Seed default initial director data if empty
         try {

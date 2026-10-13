@@ -23,7 +23,9 @@ import {
   Shield,
   GraduationCap,
   Award,
-  ExternalLink
+  ExternalLink,
+  Upload,
+  Layout
 } from 'lucide-react';
 
 export const CMSDirectorTab: React.FC = () => {
@@ -34,7 +36,8 @@ export const CMSDirectorTab: React.FC = () => {
     setIsDirectorModalOpen, 
     showNotification,
     firebaseSyncStatus,
-    currentUser 
+    currentUser,
+    setActiveView
   } = useApp();
 
   const isAdmin = currentUser?.role === 'Administrador';
@@ -67,7 +70,11 @@ export const CMSDirectorTab: React.FC = () => {
     return {
       ...directorData,
       name,
-      rank
+      rank,
+      sectionBadge: directorData.sectionBadge || 'Liderazgo Institucional',
+      sectionTitle: directorData.sectionTitle || 'NUESTRO DIRECTOR',
+      sectionSubtitle: directorData.sectionSubtitle || 'Despacho de la Dirección General • PECPFFAA',
+      sectionSummary: directorData.sectionSummary || directorData.bioSummary || 'El General de Brigada Ambiorix de Jesús Cepeda Hernández lidera con vocación patria y visión de futuro el Programa de Educación y Capacitación Profesional de las Fuerzas Armadas (PECPFFAA), impulsando la modernización académica, la excelencia operativa y la formación integral de los hombres y mujeres que engrandecen a la República Dominicana.',
     };
   });
 
@@ -77,9 +84,55 @@ export const CMSDirectorTab: React.FC = () => {
     setFormData({
       ...directorData,
       name,
-      rank
+      rank,
+      sectionBadge: directorData.sectionBadge || 'Liderazgo Institucional',
+      sectionTitle: directorData.sectionTitle || 'NUESTRO DIRECTOR',
+      sectionSubtitle: directorData.sectionSubtitle || 'Despacho de la Dirección General • PECPFFAA',
+      sectionSummary: directorData.sectionSummary || directorData.bioSummary || 'El General de Brigada Ambiorix de Jesús Cepeda Hernández lidera con vocación patria y visión de futuro el Programa de Educación y Capacitación Profesional de las Fuerzas Armadas (PECPFFAA), impulsando la modernización académica, la excelencia operativa y la formación integral de los hombres y mujeres que engrandecen a la República Dominicana.',
     });
   }, [directorData]);
+
+  // Handle uploading image from user's device
+  const handleImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showNotification('Seleccione un archivo de imagen válido (JPG, PNG, WEBP)', 'error');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showNotification('La imagen no debe superar los 5 MB', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      if (result) {
+        setFormData(prev => ({
+          ...prev,
+          photoUrl: result
+        }));
+        showNotification('Imagen cargada correctamente desde su dispositivo', 'success');
+      }
+    };
+    reader.onerror = () => {
+      showNotification('Error al procesar la imagen seleccionada', 'error');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleViewSectionInPortal = () => {
+    setActiveView('portal');
+    setTimeout(() => {
+      const el = document.getElementById('director');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 150);
+  };
 
   // Handlers for dynamic lists
   // Academic degrees
@@ -257,14 +310,14 @@ export const CMSDirectorTab: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 font-sans">
-                  CMS • Despacho del Director General
+                  CMS • Sección "NUESTRO DIRECTOR" & Despacho Oficial
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-blue-100 text-[#003876]">
-                  Popup Oficial
+                  Landing & Popup
                 </span>
               </div>
               <p className="text-xs text-slate-500">
-                Administre la ficha técnica, fotografía en proporción 1:1 completa, semblanza, alocución y funciones institucionales.
+                Administre los textos, imagen oficial, lema, semblanza y datos de contacto de la sección "NUESTRO DIRECTOR" en la web.
               </p>
             </div>
           </div>
@@ -272,6 +325,16 @@ export const CMSDirectorTab: React.FC = () => {
 
         {/* Global Action Buttons */}
         <div className="flex items-center flex-wrap gap-2.5">
+          <button
+            type="button"
+            onClick={handleViewSectionInPortal}
+            className="px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#003876] font-bold text-xs border border-blue-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+            title="Ir a la sección NUESTRO DIRECTOR en el portal principal"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            <span>Ver Sección en la Web</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setIsDirectorModalOpen(true)}
@@ -331,7 +394,7 @@ export const CMSDirectorTab: React.FC = () => {
       {/* Module Navigation Tabs */}
       <div className="flex items-center gap-1.5 bg-slate-200/70 p-1.5 rounded-xl overflow-x-auto scrollbar-none">
         {[
-          { id: 'ficha', label: '1. Ficha & Foto 1:1', icon: ImageIcon },
+          { id: 'ficha', label: '1. Sección "Nuestro Director" & Ficha', icon: Layout },
           { id: 'biografia', label: '2. Biografía & Formación', icon: UserCheck },
           { id: 'mensaje', label: '3. Alocución & Cita', icon: Quote },
           { id: 'funciones', label: '4. Funciones del Despacho', icon: Briefcase },
@@ -360,18 +423,19 @@ export const CMSDirectorTab: React.FC = () => {
       <form onSubmit={handleSaveAll} className="space-y-6">
         
         {/* ===================================================================
-            SECCIÓN 1: FICHA GENERAL, DATOS DE CONTACTO & FOTO 9:16
+            SECCIÓN 1: CONFIGURACIÓN DE LA SECCIÓN "NUESTRO DIRECTOR" (LANDING)
            =================================================================== */}
         {activeSection === 'ficha' && (
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-6 animate-fadeIn">
             
             <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-slate-900">
-                  Ficha Identificativa y Fotografía Oficial 1:1
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Layout className="w-4 h-4 text-[#003876]" />
+                  <span>Configuración de la Sección "NUESTRO DIRECTOR" (Landing Page)</span>
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Configure los datos del Director y la fotografía oficial en proporción cuadrada 1:1 (completa sin cortes).
+                  Modifique la imagen oficial, el texto principal, lema y ficha institucional que se muestran debajo del Slider.
                 </p>
               </div>
               <span className="text-[11px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
@@ -379,11 +443,138 @@ export const CMSDirectorTab: React.FC = () => {
               </span>
             </div>
 
+            {/* Bloque A: Títulos y Textos de la Sección en la Landing */}
+            <div className="p-4 rounded-xl bg-slate-50/70 border border-slate-200 space-y-4">
+              <h4 className="text-xs font-black uppercase tracking-wider text-[#003876] flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>Textos de la Sección en la Página Principal</span>
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Título Principal de la Sección *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.sectionTitle || 'NUESTRO DIRECTOR'}
+                    onChange={(e) => setFormData({ ...formData, sectionTitle: e.target.value })}
+                    placeholder="Ej: NUESTRO DIRECTOR"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold focus:ring-2 focus:ring-[#003876] transition-all outline-none"
+                    required
+                  />
+                  <span className="text-[10px] text-slate-500 block mt-0.5">Encabezado principal visible</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Etiqueta Superior (Badge) *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.sectionBadge || 'Liderazgo Institucional'}
+                    onChange={(e) => setFormData({ ...formData, sectionBadge: e.target.value })}
+                    placeholder="Ej: Liderazgo Institucional"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-[#003876] transition-all outline-none"
+                    required
+                  />
+                  <span className="text-[10px] text-slate-500 block mt-0.5">Distintivo sobre el título</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Subtítulo de la Sección
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.sectionSubtitle || 'Despacho de la Dirección General • PECPFFAA'}
+                    onChange={(e) => setFormData({ ...formData, sectionSubtitle: e.target.value })}
+                    placeholder="Ej: Despacho de la Dirección General • PECPFFAA"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-[#003876] transition-all outline-none"
+                  />
+                  <span className="text-[10px] text-slate-500 block mt-0.5">Línea descriptiva inferior</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Texto Resumen / Presentación Principal de la Sección *
+                </label>
+                <textarea
+                  rows={3}
+                  value={formData.sectionSummary || ''}
+                  onChange={(e) => setFormData({ ...formData, sectionSummary: e.target.value })}
+                  placeholder="Redacte la presentación del Director que los visitantes leerán en la página principal..."
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs leading-relaxed focus:ring-2 focus:ring-[#003876] transition-all outline-none"
+                  required
+                />
+                <span className="text-[10px] text-slate-500 block mt-0.5">Párrafo destacado que introduce al Director en la landing page.</span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                  <Quote className="w-3.5 h-3.5 text-[#CE1126]" />
+                  <span>Cita o Lema Oficial Destacado en la Sección *</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.messageQuote || ''}
+                  onChange={(e) => setFormData({ ...formData, messageQuote: e.target.value })}
+                  placeholder="Ej: Formar con disciplina, liderar con honor y servir a la Patria..."
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs italic font-medium focus:ring-2 focus:ring-[#003876] transition-all outline-none"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Bloque B: Imagen y Ficha Oficial */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               
-              {/* Columna Izquierda: Campos de texto */}
+              {/* Columna Izquierda: Datos del Director & Carga de Imagen */}
               <div className="lg:col-span-8 space-y-4">
                 
+                {/* Gestión de la Fotografía Oficial */}
+                <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-200/80 space-y-3">
+                  <label className="block text-xs font-bold text-[#003876]">
+                    Fotografía Oficial de la Sección (Subir o URL) *
+                  </label>
+                  
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <input
+                      type="text"
+                      value={formData.photoUrl}
+                      onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
+                      placeholder="https://..."
+                      className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-[#003876] outline-none"
+                      required
+                    />
+
+                    {/* Botón de carga local desde dispositivo */}
+                    <label className="px-4 py-2 bg-[#003876] hover:bg-blue-900 active:scale-95 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-sm transition-all shrink-0">
+                      <Upload className="w-3.5 h-3.5 text-amber-300" />
+                      <span>Subir Imagen</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleImageFileUpload} 
+                        className="hidden" 
+                      />
+                    </label>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, photoUrl: 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg' })}
+                      className="text-[11px] text-[#003876] hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>Usar foto oficial original (director-pecpffaa.jpg)</span>
+                    </button>
+                    <span className="text-[10px] text-slate-400">• Formatos admitidos: JPG, PNG, WEBP (hasta 5MB)</span>
+                  </div>
+                </div>
+
+                {/* Campos de Nombre, Rango, Cargo e Institución */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -444,29 +635,7 @@ export const CMSDirectorTab: React.FC = () => {
                   </div>
                 </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      URL de la Fotografía Oficial (Proporción 1:1) *
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.photoUrl}
-                      onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
-                      placeholder="https://..."
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-[#003876] focus:bg-white transition-all outline-none"
-                      required
-                    />
-                    <div className="flex items-center gap-2 mt-1">
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, photoUrl: 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg' })}
-                        className="text-[10px] text-[#003876] hover:underline font-semibold"
-                      >
-                        Usar foto oficial provista (director-pecpffaa.jpg)
-                      </button>
-                    </div>
-                  </div>
-
+                {/* Contacto Oficial del Despacho */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -538,36 +707,46 @@ export const CMSDirectorTab: React.FC = () => {
 
               </div>
 
-              {/* Columna Derecha: Previsualizador de Fotografía 1:1 en Vivo */}
+              {/* Columna Derecha: Previsualizador en Vivo de la Fotografía */}
               <div className="lg:col-span-4 flex flex-col items-center">
-                <div className="w-full max-w-[240px] bg-slate-50 p-3.5 rounded-2xl border-2 border-slate-300 shadow-sm text-center space-y-2.5">
+                <div className="w-full max-w-[280px] bg-slate-50 p-4 rounded-2xl border-2 border-slate-300 shadow-sm text-center space-y-3">
                   <div className="flex items-center justify-between text-[11px] font-bold text-[#003876]">
-                    <span>Vista Previa 1:1</span>
-                    <span className="bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded text-[9px] font-mono font-extrabold">1:1 Completa</span>
+                    <span>Vista Previa de Imagen</span>
+                    <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[9px] font-mono font-extrabold">Oficial</span>
                   </div>
 
-                  <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-900 shadow-inner border border-slate-300 flex items-center justify-center">
+                  <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-900 shadow-lg border border-slate-300 flex items-center justify-center group">
                     <img
                       src={formData.photoUrl || 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg'}
-                      alt="Previsualización 1:1"
+                      alt="Previsualización de Fotografía Oficial"
                       className="w-full h-full object-cover object-top"
                       referrerPolicy="no-referrer"
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80';
                       }}
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute bottom-2 left-2 right-2 text-center text-white">
+                      <span className="text-[10px] font-black uppercase text-amber-300 block">{formData.rank || 'General de Brigada'}</span>
+                      <span className="text-xs font-bold block truncate">{formData.name || 'Director'}</span>
+                    </div>
                   </div>
 
-                  <div className="pt-1 text-center">
+                  <div className="pt-1 text-center space-y-1">
                     <p className="text-[10px] uppercase font-extrabold tracking-wider text-[#CE1126] truncate">{formData.title}</p>
-                    {formData.rank && (
-                      <p className="text-[10px] text-slate-600 font-semibold truncate">{formData.rank}</p>
-                    )}
+                    <p className="text-[10px] text-slate-500 font-medium">
+                      Esta imagen se reflejará en la sección "NUESTRO DIRECTOR" y en el popup oficial.
+                    </p>
                   </div>
 
-                  <p className="text-[10px] text-slate-500 font-medium">
-                    Proporción 1:1 que muestra la fotografía completa sin cortes.
-                  </p>
+                  <button
+                    type="button"
+                    onClick={handleViewSectionInPortal}
+                    className="w-full py-2 px-3 rounded-lg bg-blue-100 hover:bg-blue-200 text-[#003876] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Ver cómo se ve en la web</span>
+                  </button>
                 </div>
               </div>
 

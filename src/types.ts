@@ -143,6 +143,11 @@ export interface DirectorData {
   functions: DirectorFunction[];
   legalFramework: DirectorLegalItem[];
   updatedAt?: string;
+  // Campos específicos para la sección Landing "NUESTRO DIRECTOR"
+  sectionBadge?: string;
+  sectionTitle?: string;
+  sectionSubtitle?: string;
+  sectionSummary?: string;
 }
 
 export interface DoctrinalValue {
