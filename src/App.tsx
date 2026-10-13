@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
 import { HeroCarousel } from './components/HeroCarousel';
@@ -7,14 +7,23 @@ import { InstitutionalInfo } from './components/InstitutionalInfo';
 import { NewsSection } from './components/NewsSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
-import { CMSDashboard } from './components/CMSDashboard';
-import { LoginModal } from './components/LoginModal';
-import { ItemModals } from './components/ItemModals';
-import { DirectorModal } from './components/DirectorModal';
 import { CheckCircle2, AlertCircle, Info } from 'lucide-react';
 
+// Lazy-loaded components for optimal initial payload & lightning-fast initial paint
+const CMSDashboard = lazy(() => import('./components/CMSDashboard').then(m => ({ default: m.CMSDashboard })));
+const LoginModal = lazy(() => import('./components/LoginModal').then(m => ({ default: m.LoginModal })));
+const ItemModals = lazy(() => import('./components/ItemModals').then(m => ({ default: m.ItemModals })));
+const DirectorModal = lazy(() => import('./components/DirectorModal').then(m => ({ default: m.DirectorModal })));
+
 const MainContent: React.FC = () => {
-  const { activeView, notification } = useApp();
+  const { 
+    activeView, 
+    notification,
+    isLoginModalOpen,
+    isDirectorModalOpen,
+    selectedNewsModal,
+    selectedServiceModal
+  } = useApp();
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-[#B91C1C] selection:text-white">
@@ -38,9 +47,16 @@ const MainContent: React.FC = () => {
         </div>
       )}
 
-      {/* Dynamic View rendering: CMS Dashboard or Public Landing Portal */}
+      {/* Dynamic View rendering: CMS Dashboard (on demand) or Public Landing Portal */}
       {activeView === 'dashboard' ? (
-        <CMSDashboard />
+        <Suspense fallback={
+          <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white space-y-3">
+            <div className="w-8 h-8 border-3 border-[#B91C1C] border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-xs font-semibold text-slate-300">Cargando Panel Administrativo...</p>
+          </div>
+        }>
+          <CMSDashboard />
+        </Suspense>
       ) : (
         <>
           <Header />
@@ -55,10 +71,22 @@ const MainContent: React.FC = () => {
         </>
       )}
 
-      {/* Global Interactive Modals */}
-      <LoginModal />
-      <ItemModals />
-      <DirectorModal />
+      {/* Global Interactive Modals: Rendered on-demand via React.Suspense */}
+      {isLoginModalOpen && (
+        <Suspense fallback={null}>
+          <LoginModal />
+        </Suspense>
+      )}
+      {(selectedNewsModal || selectedServiceModal) && (
+        <Suspense fallback={null}>
+          <ItemModals />
+        </Suspense>
+      )}
+      {isDirectorModalOpen && (
+        <Suspense fallback={null}>
+          <DirectorModal />
+        </Suspense>
+      )}
     </div>
   );
 };

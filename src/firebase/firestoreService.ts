@@ -4,6 +4,7 @@ import {
   collection, 
   doc, 
   setDoc, 
+  getDocs,
   onSnapshot, 
   deleteDoc, 
   updateDoc 
@@ -93,8 +94,8 @@ export const initAndSyncFirestore = async (callbacks: FirestoreSyncCallbacks): P
         const items: SlideItem[] = [];
         snapshot.forEach((d) => {
           const item = { ...(d.data() as SlideItem), id: d.id };
-          if (item.image && item.image.includes('photo-1541829070764')) {
-            item.image = 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1600&q=80';
+          if (item.image && (item.image.includes('images.unsplash.com') || item.image.includes('photo-1541829070764') || item.image.includes('photo-1517245386807'))) {
+            item.image = '';
             setDoc(doc(db, COLLECTIONS.SLIDES, d.id), sanitizeForFirestore(item), { merge: true }).catch(console.error);
           }
           items.push(item);
@@ -427,7 +428,6 @@ export const saveAuditLogToFirestore = async (item: AuditLogEntry): Promise<bool
 
 export const clearAuditLogsInFirestore = async (): Promise<boolean> => {
   try {
-    const { getDocs } = await import('firebase/firestore');
     const snap = await getDocs(collection(db, COLLECTIONS.AUDIT_LOGS));
     for (const d of snap.docs) {
       await deleteDoc(d.ref);
@@ -442,7 +442,6 @@ export const clearAuditLogsInFirestore = async (): Promise<boolean> => {
 /* --- BULK RESTORE & FACTORY RESET --- */
 export const resetFirestoreToDefaults = async (): Promise<boolean> => {
   try {
-    const { getDocs } = await import('firebase/firestore');
     const clearCol = async (colName: string) => {
       const snap = await getDocs(collection(db, colName));
       for (const d of snap.docs) {
@@ -501,7 +500,6 @@ export const importDataToFirestore = async (tables: {
   auditLogs?: AuditLogEntry[];
 }): Promise<boolean> => {
   try {
-    const { getDocs } = await import('firebase/firestore');
     const clearCol = async (colName: string) => {
       const snap = await getDocs(collection(db, colName));
       for (const d of snap.docs) {

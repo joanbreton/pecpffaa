@@ -51,13 +51,13 @@ export const InstitutionalInfo: React.FC = () => {
   const branches = institutionalData?.branches || [];
 
   return (
-    <section id="institucion" className="py-16 sm:py-24 bg-slate-900 text-white relative overflow-hidden">
+    <section id="institucion" className="py-16 sm:py-24 bg-[#F8FAFC] text-[#0F172B] relative overflow-hidden">
       
       {/* Subtle Background Pattern */}
       <div 
-        className="absolute inset-0 opacity-5 pointer-events-none"
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, #B91C1C 1px, transparent 0)`,
+          backgroundImage: `radial-gradient(circle at 1px 1px, #0D3671 1px, transparent 0)`,
           backgroundSize: '24px 24px'
         }}
       />
@@ -67,7 +67,7 @@ export const InstitutionalInfo: React.FC = () => {
         {/* Top Header with Official Seal */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="flex justify-center">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white p-1 shadow-2xl border-4 border-[#0D3671] ring-4 ring-amber-400/30">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white p-1 shadow-xl border-4 border-[#0D3671] ring-4 ring-[#0D3671]/10">
               <img 
                 src={officialLogo} 
                 alt="Emblema Oficial Gran General Restaurador Gregorio Luperón"
@@ -76,20 +76,20 @@ export const InstitutionalInfo: React.FC = () => {
               />
             </div>
           </div>
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 text-amber-300 text-xs font-bold uppercase tracking-wider border border-white/10">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0D3671]/10 text-[#0D3671] text-xs font-bold uppercase tracking-wider border border-[#0D3671]/20 font-sans">
             <Building2 className="w-3.5 h-3.5" />
             {institutionalData.badgeTag || 'Naturaleza Institucional'}
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-serif tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0F172B] font-serif tracking-tight">
             {institutionalData.mainTitle}
           </h2>
           {institutionalData.subtitle && (
-            <p className="text-xs sm:text-sm font-semibold text-amber-300 tracking-wider uppercase">
+            <p className="text-xs sm:text-sm font-bold text-[#0D3671] tracking-wider uppercase">
               {institutionalData.subtitle}
             </p>
           )}
           <div className="w-20 h-1 bg-[#B91C1C] mx-auto rounded-full"></div>
-          <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+          <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-medium">
             {institutionalData.description}
           </p>
         </div>
@@ -97,45 +97,45 @@ export const InstitutionalInfo: React.FC = () => {
         {/* Mission, Vision, Values & Objective Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Misión */}
-          <div className="bg-slate-800/80 rounded-2xl p-6 sm:p-8 border border-slate-700 hover:border-[#0D3671] transition-all space-y-4">
-            <div className="w-12 h-12 rounded-xl bg-[#0D3671] text-white flex items-center justify-center shadow-lg border border-white/20">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/90 shadow-md hover:shadow-xl hover:border-[#0D3671] transition-all space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-[#0D3671] text-white flex items-center justify-center shadow-md">
               <Target className="w-6 h-6 text-amber-400" />
             </div>
-            <h3 className="text-xl font-bold text-white font-serif">{institutionalData.missionTitle || 'Misión Institucional'}</h3>
-            <p className="text-sm text-slate-300 leading-relaxed">
+            <h3 className="text-xl font-bold text-[#0F172B] font-serif">{institutionalData.missionTitle || 'Misión Institucional'}</h3>
+            <p className="text-sm text-slate-600 leading-relaxed font-normal">
               {institutionalData.missionText}
             </p>
           </div>
 
           {/* Visión */}
-          <div className="bg-slate-800/80 rounded-2xl p-6 sm:p-8 border border-slate-700 hover:border-[#B91C1C] transition-all space-y-4">
-            <div className="w-12 h-12 rounded-xl bg-[#B91C1C] text-white flex items-center justify-center shadow-lg border border-white/20">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/90 shadow-md hover:shadow-xl hover:border-[#B91C1C] transition-all space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-[#B91C1C] text-white flex items-center justify-center shadow-md">
               <Eye className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-white font-serif">{institutionalData.visionTitle || 'Visión Prospectiva'}</h3>
-            <p className="text-sm text-slate-300 leading-relaxed">
+            <h3 className="text-xl font-bold text-[#0F172B] font-serif">{institutionalData.visionTitle || 'Visión Prospectiva'}</h3>
+            <p className="text-sm text-slate-600 leading-relaxed font-normal">
               {institutionalData.visionText}
             </p>
           </div>
 
           {/* Valores */}
-          <div className="bg-slate-800/80 rounded-2xl p-6 sm:p-8 border border-slate-700 hover:border-amber-500 transition-all space-y-4">
-            <div className="w-12 h-12 rounded-xl bg-amber-600/90 text-white flex items-center justify-center shadow-lg border border-white/20">
-              <Award className="w-6 h-6 text-amber-200" />
+          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/90 shadow-md hover:shadow-xl hover:border-amber-500 transition-all space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-500 text-slate-900 flex items-center justify-center shadow-md">
+              <Award className="w-6 h-6 text-slate-900" />
             </div>
-            <h3 className="text-xl font-bold text-white font-serif">{institutionalData.valuesTextTitle || 'Valores'}</h3>
-            <p className="text-sm text-slate-300 leading-relaxed">
+            <h3 className="text-xl font-bold text-[#0F172B] font-serif">{institutionalData.valuesTextTitle || 'Valores'}</h3>
+            <p className="text-sm text-slate-600 leading-relaxed font-normal">
               {institutionalData.valuesText || 'El PECPFFAA fomenta en su personal y en los Estudiantes beneficiados de los programas los valores mostrados previamente.'}
             </p>
           </div>
 
           {/* Objetivo */}
-          <div className="bg-slate-800/80 rounded-2xl p-6 sm:p-8 border border-slate-700 hover:border-emerald-500 transition-all space-y-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-700/90 text-white flex items-center justify-center shadow-lg border border-white/20">
-              <GraduationCap className="w-6 h-6 text-emerald-200" />
+          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/90 shadow-md hover:shadow-xl hover:border-emerald-600 transition-all space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
+              <GraduationCap className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-white font-serif">{institutionalData.objectiveTitle || 'Objetivo'}</h3>
-            <p className="text-sm text-slate-300 leading-relaxed">
+            <h3 className="text-xl font-bold text-[#0F172B] font-serif">{institutionalData.objectiveTitle || 'Objetivo'}</h3>
+            <p className="text-sm text-slate-600 leading-relaxed font-normal">
               {institutionalData.objectiveText || 'Otorgar diferentes facilidades educativas, para la capacitación y profesionalización de los Miembros de las Fuerzas Armadas activos, en la honrosa condición de retiro y sus familiares directos, en distintas universidades, institutos y colegios.'}
             </p>
           </div>
@@ -145,11 +145,11 @@ export const InstitutionalInfo: React.FC = () => {
         {values.length > 0 && (
           <div className="space-y-6 pt-2">
             <div className="text-center">
-              <h3 className="text-xl font-bold text-slate-200 font-serif">
+              <h3 className="text-xl sm:text-2xl font-bold text-[#0F172B] font-serif">
                 {institutionalData.valuesTitle || 'Pilares Doctrinales y Valores Institucionales'}
               </h3>
               {institutionalData.valuesSubtitle && (
-                <p className="text-xs text-slate-400 mt-1">{institutionalData.valuesSubtitle}</p>
+                <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">{institutionalData.valuesSubtitle}</p>
               )}
             </div>
 
@@ -159,13 +159,13 @@ export const InstitutionalInfo: React.FC = () => {
                 return (
                   <div 
                     key={idx}
-                    className="bg-slate-800/60 rounded-xl p-5 border border-slate-700/80 hover:border-amber-400/50 transition-all group"
+                    className="bg-white rounded-xl p-5 border border-slate-200/90 shadow-sm hover:border-[#0D3671] hover:shadow-md transition-all group"
                   >
                     <div className="w-10 h-10 rounded-lg bg-[#0D3671] text-amber-300 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform shadow">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <h4 className="font-bold text-sm text-white mb-1.5">{val.title}</h4>
-                    <p className="text-xs text-slate-300 leading-relaxed">{val.desc}</p>
+                    <h4 className="font-bold text-sm text-[#0F172B] mb-1.5">{val.title}</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed">{val.desc}</p>
                   </div>
                 );
               })}
@@ -177,35 +177,35 @@ export const InstitutionalInfo: React.FC = () => {
         {branches.length > 0 && (
           <div className="space-y-6 pt-4">
             <div className="text-center">
-              <h3 className="text-xl font-bold text-slate-200 font-serif">
+              <h3 className="text-xl sm:text-2xl font-bold text-[#0F172B] font-serif">
                 {institutionalData.branchesTitle || 'Integración Doctrinal Conjunta'}
               </h3>
               {institutionalData.branchesSubtitle && (
-                <p className="text-xs text-slate-400 mt-1">{institutionalData.branchesSubtitle}</p>
+                <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">{institutionalData.branchesSubtitle}</p>
               )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {branches.map((branch, idx) => {
                 const Icon = getIcon(branch.iconName, Shield);
-                const colorClass = branch.color || (
-                  idx === 0 ? 'border-emerald-700 bg-emerald-900/40 text-emerald-300' :
-                  idx === 1 ? 'border-blue-700 bg-blue-900/40 text-blue-300' :
-                  'border-cyan-700 bg-cyan-900/40 text-cyan-300'
-                );
+                const colorClass = idx === 0 
+                  ? 'border-emerald-200 bg-emerald-50/80 text-emerald-950' 
+                  : idx === 1 
+                  ? 'border-blue-200 bg-blue-50/80 text-blue-950' 
+                  : 'border-sky-200 bg-sky-50/80 text-sky-950';
 
                 return (
                   <div 
                     key={idx}
-                    className={`rounded-xl p-5 border backdrop-blur-sm ${colorClass} transition-transform hover:-translate-y-1`}
+                    className={`rounded-xl p-5 border ${colorClass} shadow-sm transition-transform hover:-translate-y-1`}
                   >
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 rounded-lg bg-black/40">
+                      <div className="p-2 rounded-lg bg-[#0D3671] text-white">
                         <Icon className="w-5 h-5" />
                       </div>
-                      <h4 className="font-bold text-sm text-white">{branch.name}</h4>
+                      <h4 className="font-bold text-sm text-[#0F172B]">{branch.name}</h4>
                     </div>
-                    <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                    <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                       {branch.role}
                     </p>
                   </div>
@@ -217,7 +217,7 @@ export const InstitutionalInfo: React.FC = () => {
 
         {/* Key Numerical Metrics Counter Ribbon */}
         {stats.length > 0 && (
-          <div className="bg-[#0D3671] rounded-2xl p-8 border-2 border-[#B91C1C] shadow-2xl">
+          <div className="bg-[#0D3671] text-white rounded-2xl p-8 border-2 border-[#B91C1C] shadow-2xl">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center divide-y lg:divide-y-0 lg:divide-x divide-white/10">
               {stats.map((st, idx) => (
                 <div key={idx} className="pt-4 lg:pt-0 px-2 space-y-1">

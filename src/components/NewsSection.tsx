@@ -89,6 +89,8 @@ export const NewsSection: React.FC = () => {
                     src={featuredNews.image}
                     alt={featuredNews.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
                   
@@ -145,6 +147,8 @@ export const NewsSection: React.FC = () => {
                         src={item.image}
                         alt={item.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                        decoding="async"
                       />
                       <div className="absolute top-2.5 left-2.5">
                         <span className="bg-[#0D3671] text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">

@@ -7,7 +7,8 @@ import {
   Sparkles,
   Pause,
   Play,
-  Edit3
+  Edit3,
+  Shield
 } from 'lucide-react';
 
 export const HeroCarousel: React.FC = () => {
@@ -16,6 +17,34 @@ export const HeroCarousel: React.FC = () => {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Touch swipe support for mobile and tablets
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    const distance = touchStartX.current - touchEndX.current;
+    if (distance > minSwipeDistance) {
+      // Swiped left -> next
+      handleNext();
+    } else if (distance < -minSwipeDistance) {
+      // Swiped right -> prev
+      handlePrev();
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
 
   // Auto-advance
   useEffect(() => {
@@ -39,8 +68,8 @@ export const HeroCarousel: React.FC = () => {
 
   if (activeSlides.length === 0) {
     return (
-      <div className="w-full bg-slate-900 text-white py-20 px-4 text-center">
-        <p className="text-lg text-slate-300">No hay diapositivas activas en el carrusel.</p>
+      <div className="w-full bg-slate-900 text-white py-16 sm:py-20 px-4 text-center">
+        <p className="text-base sm:text-lg text-slate-300">No hay diapositivas activas en el carrusel.</p>
       </div>
     );
   }
@@ -68,83 +97,121 @@ export const HeroCarousel: React.FC = () => {
       className="relative w-full bg-slate-950 overflow-hidden select-none"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      aria-label="Carrusel Institucional"
     >
-      {/* Container: 768px de altura con centrado vertical */}
-      <div className="relative w-full h-[768px] flex items-center overflow-hidden">
+      {/* 
+        Responsive Container:
+        - Mobile: min-h-[520px] h-[72vh] max-h-[600px]
+        - Tablet: md:h-[640px] md:max-h-[680px]
+        - Desktop: lg:h-[720px] xl:h-[768px] 2xl:h-[820px] max-h-[880px]
+        Adapts seamlessly to any resolution, ultra-wide screens, laptops, and mobile orientations.
+      */}
+      <div className="relative w-full h-[540px] sm:h-[600px] md:h-[660px] lg:h-[720px] xl:h-[768px] 2xl:h-[820px] min-h-[500px] flex items-center overflow-hidden">
 
-        {/* Background Slide Image - crisp, properly scaled and adapted to container */}
+        {/* Slides loop */}
         {activeSlides.map((slide, idx) => {
-          const isTargetPhoto = slide.image && slide.image.includes('photo-1541829070764');
+          const isCurrent = idx === currentIdx;
+          const hasCustomImage = Boolean(slide.image && slide.image.trim().length > 0);
 
           return (
             <div
               key={slide.id}
               className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
-                idx === currentIdx ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                isCurrent ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
               }`}
+              style={{
+                WebkitBackfaceVisibility: 'hidden',
+                backfaceVisibility: 'hidden',
+              }}
             >
-              {/* Ambient soft background to prevent harsh borders on any non-standard image proportions */}
-              <img
-                src={slide.image}
-                alt=""
-                aria-hidden="true"
-                className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-25 scale-110 pointer-events-none"
-              />
-              {/* Main high-resolution image adapting to container with sharp focus */}
-              <img
-                src={slide.image}
-                alt={slide.title}
-                className="relative w-full h-full object-cover object-center transform transition-transform duration-1000 ease-out"
-                loading="eager"
-              />
+              {hasCustomImage ? (
+                <div className="relative w-full h-full overflow-hidden">
+                  {/* Imagen del Slider limpia, nítida y 100% visible sin capas intermedias */}
+                  <img
+                    src={slide.image}
+                    alt={slide.title}
+                    sizes="100vw"
+                    className="w-full h-full object-cover object-center transform transition-transform duration-1000 ease-out"
+                    loading={idx === 0 ? "eager" : "lazy"}
+                    fetchPriority={idx === 0 ? "high" : "low"}
+                    decoding={idx === 0 ? "sync" : "async"}
+                    draggable={false}
+                    style={{
+                      objectFit: 'cover',
+                      objectPosition: 'center center',
+                      WebkitBackfaceVisibility: 'hidden',
+                      backfaceVisibility: 'hidden',
+                      WebkitTransform: 'translate3d(0, 0, 0)',
+                      transform: 'translate3d(0, 0, 0)',
+                    }}
+                  />
+                </div>
+              ) : (
+                /* Elegant Institutional Military Theme without external default images */
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#061836] via-[#0D3671] to-[#041126] overflow-hidden">
+                  {/* Fine Geometric Point Matrix */}
+                  <div 
+                    className="absolute inset-0 opacity-[0.06] pointer-events-none"
+                    style={{
+                      backgroundImage: `radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0)`,
+                      backgroundSize: '30px 30px'
+                    }}
+                  />
+                  
+                  {/* Atmospheric Light Glows */}
+                  <div className="absolute top-1/2 right-6 sm:right-12 -translate-y-1/2 w-72 sm:w-[420px] lg:w-[520px] h-72 sm:h-[420px] lg:h-[520px] bg-gradient-to-tr from-[#B91C1C]/15 via-[#0D3671]/40 to-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute -top-16 -left-16 sm:-top-20 sm:-left-20 w-64 sm:w-96 h-64 sm:h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
 
-              {/* Seamless blended wall patch to remove printed text on the auditorium board/wall */}
-              {isTargetPhoto && (
-                <div 
-                  className="absolute pointer-events-none z-10 rounded-2xl bg-gradient-to-r from-[#1e232a]/95 via-[#252b34]/95 to-[#1c2128]/95 backdrop-blur-md shadow-2xl border border-white/5"
-                  style={{
-                    top: '20%',
-                    left: '10%',
-                    width: '32%',
-                    height: '28%',
-                    boxShadow: 'inset 0 0 35px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4)',
-                    filter: 'blur(1px)'
-                  }}
-                  title="Superficie limpia de pared/pizarra"
-                />
+                  {/* Subtle Heraldic Watermark Silhouette */}
+                  <div className="absolute right-6 sm:right-16 lg:right-28 top-1/2 -translate-y-1/2 opacity-[0.05] pointer-events-none select-none">
+                    <Shield className="w-56 h-56 sm:w-80 sm:h-80 lg:w-96 lg:h-96 text-white" />
+                  </div>
+
+                  {/* Vignette Overlay for Crisp Liquid Glass Card Contrast */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/30 sm:bg-gradient-to-r sm:from-black/70 sm:via-black/30 sm:to-black/40 pointer-events-none" />
+                </div>
               )}
             </div>
           );
         })}
 
-        {/* Foreground Content: Alinado a la izquierda y centrado verticalmente en un contenedor Liquid Glass */}
+        {/* Foreground Content: Liquid Glass Card centered vertically, responsive for Mobile, Tablet and Desktop */}
         {currentSlide.showTextContainer !== false && (
-          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 md:px-12 w-full py-6">
-            <div className="relative max-w-lg lg:max-w-xl p-5 sm:p-6 lg:p-7 rounded-3xl overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/[0.14] via-white/[0.03] to-black/[0.12] border border-white/40 border-t-white/75 border-l-white/55 border-b-white/20 shadow-[0_16px_45px_rgba(0,0,0,0.35),inset_0_1px_2px_rgba(255,255,255,0.75),inset_0_-1px_1px_rgba(255,255,255,0.15)] space-y-3.5 animate-fadeIn">
+          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 w-full py-4 sm:py-6">
+            <div 
+              className="relative w-full max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl p-4 sm:p-6 md:p-7 lg:p-8 rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-2xl bg-white/[0.16] border border-white/40 border-t-white/80 border-l-white/60 border-b-white/20 border-r-white/30 shadow-[0_20px_50px_rgba(0,0,0,0.35),inset_0_1px_2px_rgba(255,255,255,0.85),inset_0_-1px_1px_rgba(255,255,255,0.2)] space-y-3 sm:space-y-4 animate-fadeIn"
+              style={{
+                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+              }}
+            >
               
-              {/* Liquid Glass Specular Shimmer Highlights */}
-              <div className="pointer-events-none absolute -top-24 -left-24 w-60 h-60 rounded-full bg-white/25 blur-2xl opacity-50" />
-              <div className="pointer-events-none absolute -bottom-24 -right-24 w-60 h-60 rounded-full bg-cyan-400/10 blur-3xl opacity-40" />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-transparent rounded-3xl" />
+              {/* Apple Crystal Glass Pure Specular Highlights (sin tintes azules ni oscuros) */}
+              <div className="pointer-events-none absolute -top-24 -left-24 w-60 h-60 rounded-full bg-white/25 blur-2xl" />
+              <div className="pointer-events-none absolute -bottom-24 -right-24 w-60 h-60 rounded-full bg-white/10 blur-3xl" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/25 via-white/[0.05] to-transparent rounded-2xl sm:rounded-3xl" />
 
               {/* Tag / Badge en Cápsula Liquid Glass */}
-              <div className="relative z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#B91C1C]/90 backdrop-blur-md text-white text-xs font-bold tracking-wider uppercase shadow-[0_2px_10px_rgba(185,28,28,0.5),inset_0_1px_1px_rgba(255,255,255,0.6)] border border-white/40">
+              <div className="relative z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#B91C1C] text-white text-[11px] sm:text-xs font-bold tracking-wider uppercase shadow-[0_2px_10px_rgba(185,28,28,0.4),inset_0_1px_1px_rgba(255,255,255,0.7)] border border-white/40">
                 <Sparkles className="w-3 h-3 text-amber-300 shrink-0" />
                 <span>{currentSlide.tag || 'Formación de Excelencia'}</span>
               </div>
 
               {/* Title with Sleek Typography & Strong Contrast Shadow */}
-              <h1 className="relative z-10 text-lg sm:text-xl md:text-2xl lg:text-3xl font-black text-white uppercase leading-snug tracking-tight line-clamp-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] font-sans">
+              <h1 className="relative z-10 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-white uppercase leading-tight sm:leading-snug tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] font-sans line-clamp-3">
                 {currentSlide.title}
               </h1>
 
               {/* Subtitle */}
-              <p className="relative z-10 text-xs sm:text-sm text-slate-100 font-medium leading-relaxed line-clamp-2 sm:line-clamp-3 drop-shadow-[0_1px_5px_rgba(0,0,0,0.9)]">
+              <p className="relative z-10 text-xs sm:text-sm md:text-base text-white/95 font-medium leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] line-clamp-2 sm:line-clamp-3 md:line-clamp-4">
                 {currentSlide.subtitle}
               </p>
 
               {/* Accent Line con Brillo Líquido */}
-              <div className="relative z-10 w-14 sm:w-16 h-1 bg-gradient-to-r from-[#B91C1C] via-red-500 to-amber-400 rounded-full shadow-[0_0_12px_rgba(220,38,38,0.8)]"></div>
+              <div className="relative z-10 w-12 sm:w-16 h-1 bg-gradient-to-r from-[#B91C1C] via-red-500 to-amber-400 rounded-full shadow-[0_0_12px_rgba(220,38,38,0.8)]" />
 
               {/* CTA Buttons */}
               <div className="relative z-10 pt-1 flex flex-wrap items-center gap-2 sm:gap-3">
@@ -152,17 +219,21 @@ export const HeroCarousel: React.FC = () => {
                 <button
                   id="btn-hero-primary-cta"
                   onClick={() => handleScrollTo(currentSlide.ctaLink || '#servicios')}
-                  className="bg-[#B91C1C] hover:bg-red-700 active:scale-95 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-bold uppercase tracking-wider text-xs transition shadow-lg flex items-center gap-1.5 group cursor-pointer border border-red-400/50"
+                  className="bg-[#B91C1C] hover:bg-red-700 active:scale-95 text-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-full font-bold uppercase tracking-wider text-xs sm:text-sm transition shadow-lg flex items-center gap-1.5 group cursor-pointer border border-red-400/50 min-h-[40px] sm:min-h-[44px]"
                 >
                   <span>{currentSlide.ctaText || 'Explorar Carreras'}</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
 
-                {/* Secondary CTA Liquid Glass Button */}
+                {/* Secondary CTA Liquid Glass Button estilo Apple */}
                 <button
                   id="btn-hero-secondary-cta"
                   onClick={() => handleScrollTo(currentSlide.secondaryLink || '#admisiones')}
-                  className="bg-white/20 hover:bg-white/30 active:scale-95 backdrop-blur-xl text-white border border-white/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-bold uppercase tracking-wider text-xs transition flex items-center gap-1.5 cursor-pointer"
+                  className="bg-white/20 hover:bg-white/35 active:scale-95 text-white border border-white/50 border-t-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.8)] px-4 sm:px-5 py-2.5 sm:py-3 rounded-full font-bold uppercase tracking-wider text-xs sm:text-sm transition flex items-center gap-1.5 cursor-pointer min-h-[40px] sm:min-h-[44px]"
+                  style={{
+                    WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                    backdropFilter: 'blur(16px) saturate(180%)',
+                  }}
                 >
                   <span>{currentSlide.secondaryText || 'Admisiones 2026'}</span>
                 </button>
@@ -171,7 +242,7 @@ export const HeroCarousel: React.FC = () => {
                 {currentUser && (
                   <button
                     onClick={() => setActiveView('dashboard')}
-                    className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[11px] border border-amber-400/40 backdrop-blur-md shadow-xs cursor-pointer"
+                    className="hidden md:inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[11px] border border-amber-400/40 backdrop-blur-md shadow-xs cursor-pointer"
                     title="Editar este carrusel en el CMS"
                   >
                     <Edit3 className="w-3 h-3" />
@@ -183,52 +254,72 @@ export const HeroCarousel: React.FC = () => {
           </div>
         )}
 
-        {/* Carousel Navigation Arrows */}
+        {/* Carousel Navigation Arrows: Responsive hitboxes & Apple Crystal Glass styling */}
         {activeSlides.length > 1 && (
           <>
             <button
               id="btn-carousel-prev"
               onClick={handlePrev}
               aria-label="Slide anterior"
-              className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-slate-900/60 hover:bg-[#0D3671] text-white border border-white/20 backdrop-blur-sm transition-all shadow-lg hover:scale-110"
+              className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 md:p-3 rounded-full bg-white/20 hover:bg-white/35 active:scale-95 text-white border border-white/40 border-t-white/80 transition-all shadow-[0_8px_24px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.8)] hover:scale-110 cursor-pointer"
+              style={{
+                WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                backdropFilter: 'blur(16px) saturate(180%)',
+              }}
             >
-              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </button>
             <button
               id="btn-carousel-next"
               onClick={handleNext}
               aria-label="Slide siguiente"
-              className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-slate-900/60 hover:bg-[#0D3671] text-white border border-white/20 backdrop-blur-sm transition-all shadow-lg hover:scale-110"
+              className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 md:p-3 rounded-full bg-white/20 hover:bg-white/35 active:scale-95 text-white border border-white/40 border-t-white/80 transition-all shadow-[0_8px_24px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.8)] hover:scale-110 cursor-pointer"
+              style={{
+                WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                backdropFilter: 'blur(16px) saturate(180%)',
+              }}
             >
-              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </button>
           </>
         )}
 
-        {/* Slide Indicators and Play/Pause control cleanly positioned at bottom-right */}
-        <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-8 z-30 flex items-center gap-2.5 sm:gap-3 pointer-events-auto">
+        {/* Slide Indicators and Play/Pause control cleanly positioned at bottom-right in Apple Crystal Glass style */}
+        <div className="absolute bottom-3 sm:bottom-6 right-3 sm:right-8 z-30 flex items-center gap-2 sm:gap-3 pointer-events-auto">
           {/* Indicators */}
-          <div className="flex items-center space-x-2 bg-slate-950/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
+          <div 
+            className="flex items-center space-x-1.5 sm:space-x-2 bg-white/20 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/35 border-t-white/70 shadow-[0_8px_24px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.7)]"
+            style={{
+              WebkitBackdropFilter: 'blur(14px) saturate(180%)',
+              backdropFilter: 'blur(14px) saturate(180%)',
+            }}
+          >
             {activeSlides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentIdx(idx)}
                 aria-label={`Ir al slide ${idx + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                  idx === currentIdx ? 'w-8 bg-[#B91C1C]' : 'w-2 bg-white/40 hover:bg-white/70'
+                className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                  idx === currentIdx ? 'w-6 sm:w-8 bg-[#B91C1C]' : 'w-1.5 sm:w-2 bg-white/50 hover:bg-white/90'
                 }`}
               />
             ))}
           </div>
 
           {/* Slide Number & Pause Button */}
-          <div className="hidden sm:flex items-center space-x-2.5 bg-slate-950/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 text-xs text-slate-300 shadow-lg">
-            <span className="font-mono font-bold text-amber-400">
-              0{currentIdx + 1} <span className="text-slate-500">/ 0{activeSlides.length}</span>
+          <div 
+            className="hidden sm:flex items-center space-x-2.5 bg-white/20 px-3 py-1.5 rounded-full border border-white/35 border-t-white/70 text-xs text-white shadow-[0_8px_24px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.7)]"
+            style={{
+              WebkitBackdropFilter: 'blur(14px) saturate(180%)',
+              backdropFilter: 'blur(14px) saturate(180%)',
+            }}
+          >
+            <span className="font-mono font-bold text-amber-300">
+              0{currentIdx + 1} <span className="text-white/70">/ 0{activeSlides.length}</span>
             </span>
             <button
               onClick={() => setIsPaused(!isPaused)}
-              className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+              className="text-white/80 hover:text-white transition-colors cursor-pointer"
               title={isPaused ? 'Reanudar carrusel' : 'Pausar carrusel'}
             >
               {isPaused ? <Play className="w-3.5 h-3.5 text-amber-300" /> : <Pause className="w-3.5 h-3.5" />}
@@ -240,3 +331,4 @@ export const HeroCarousel: React.FC = () => {
     </section>
   );
 };
+

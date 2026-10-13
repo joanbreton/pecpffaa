@@ -1,6 +1,3 @@
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
-
 export interface GeneratePdfOptions {
   fileName?: string;
   onProgress?: (status: string) => void;
@@ -159,7 +156,17 @@ export async function generateDirectorPdf(
       }
     }
 
-    options.onProgress?.('Capturando documento con html2canvas en alta resolución...');
+    options.onProgress?.('Preparando motor de renderizado PDF...');
+    const [{ jsPDF }, html2canvasModule] = await Promise.all([
+      import('jspdf'),
+      import('html2canvas')
+    ]);
+    const html2canvas = (html2canvasModule.default ?? html2canvasModule) as (
+      element: HTMLElement,
+      options?: Record<string, unknown>
+    ) => Promise<HTMLCanvasElement>;
+
+    options.onProgress?.('Capturando documento en alta resolución...');
 
     // PASO CLAVE 4: Capturar contenedor con html2canvas re-posicionando el clon en el origen (0,0)
     const canvas = await html2canvas(element, {

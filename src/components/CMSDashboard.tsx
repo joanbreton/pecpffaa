@@ -78,7 +78,7 @@ export const CMSDashboard: React.FC = () => {
     title: '',
     subtitle: '',
     tag: 'Formación Superior',
-    image: 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1600&q=80',
+    image: '',
     ctaText: 'Ver Programas',
     ctaLink: '#servicios',
     secondaryText: 'Admisiones',
@@ -157,7 +157,7 @@ export const CMSDashboard: React.FC = () => {
         title: '',
         subtitle: '',
         tag: 'Nueva Convocatoria',
-        image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1600&q=80',
+        image: '',
         ctaText: 'Ver Más',
         ctaLink: '#servicios',
         secondaryText: 'Contacto',
@@ -854,11 +854,19 @@ export const CMSDashboard: React.FC = () => {
                     <div>
                       {/* 16:9 Image Preview Container */}
                       <div className="relative aspect-video w-full overflow-hidden bg-slate-900">
-                        <img 
-                          src={slide.image} 
-                          alt={slide.title}
-                          className="w-full h-full object-cover"
-                        />
+                        {slide.image ? (
+                          <img 
+                            src={slide.image} 
+                            alt={slide.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-[#061836] via-[#0D3671] to-[#041126] flex flex-col items-center justify-center text-white/80 p-4 text-center">
+                            <Shield className="w-8 h-8 text-amber-400 mb-1" />
+                            <span className="text-[11px] font-bold text-slate-100">Fondo Institucional Predeterminado</span>
+                            <span className="text-[9px] text-slate-300">Sin imagen externa (Fondo militar limpio)</span>
+                          </div>
+                        )}
                         <div className="absolute top-3 left-3">
                           <span className="bg-[#B91C1C] text-white text-[10px] font-bold px-2.5 py-0.5 rounded shadow">
                             {slide.tag || 'Slide 16:9'}
@@ -1454,15 +1462,17 @@ export const CMSDashboard: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">URL de Imagen (Proporción 16:9)</label>
+                <label className="block font-bold text-slate-700 mb-1">URL de Imagen (Opcional - Proporción 16:9)</label>
                 <input
-                  type="url"
-                  required
+                  type="text"
                   value={slideFormData.image}
                   onChange={(e) => setSlideFormData({ ...slideFormData, image: e.target.value })}
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="Dejar vacío para fondo institucional oficial o pegar URL de imagen..."
                   className="w-full px-3 py-2 border rounded-lg font-mono text-[11px]"
                 />
+                <span className="text-[10px] text-slate-500 mt-1 block">
+                  Si se deja en blanco, la diapositiva se mostrará con el fondo institucional militar oficial sin imágenes externas.
+                </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">

@@ -52,7 +52,7 @@ export const AcademicOffer: React.FC = () => {
   };
 
   return (
-    <section id="servicios" className="py-16 sm:py-24 bg-slate-50 relative">
+    <section id="servicios" className="py-16 sm:py-24 bg-white relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         
         {/* Section Header with Military Styling and Red Line Accent */}

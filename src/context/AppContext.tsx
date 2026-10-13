@@ -172,7 +172,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [slides, setSlides] = useState<SlideItem[]>(() => {
     try {
       const saved = localStorage.getItem(DB_KEYS.SLIDES);
-      return saved ? JSON.parse(saved) : INITIAL_SLIDES;
+      if (saved) {
+        const parsed = JSON.parse(saved) as SlideItem[];
+        return parsed.map((s) => (s.image && s.image.includes('images.unsplash.com') ? { ...s, image: '' } : s));
+      }
+      return INITIAL_SLIDES;
     } catch {
       return INITIAL_SLIDES;
     }
@@ -272,74 +276,88 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     initAndSyncFirestore({
       onSlidesUpdate: (firestoreSlides) => {
-        if (isMounted) {
-          setSlides(firestoreSlides);
+        if (!isMounted) return;
+        setSlides((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(firestoreSlides)) return prev;
           try {
             localStorage.setItem(DB_KEYS.SLIDES, JSON.stringify(firestoreSlides));
           } catch (e) {
             console.error('Error saving slides cache', e);
           }
-        }
+          return firestoreSlides;
+        });
       },
       onNewsUpdate: (firestoreNews) => {
-        if (isMounted) {
-          setNews(firestoreNews);
+        if (!isMounted) return;
+        setNews((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(firestoreNews)) return prev;
           try {
             localStorage.setItem(DB_KEYS.NEWS, JSON.stringify(firestoreNews));
           } catch (e) {
             console.error('Error saving news cache', e);
           }
-        }
+          return firestoreNews;
+        });
       },
       onServicesUpdate: (firestoreServices) => {
-        if (isMounted) {
-          setServices(firestoreServices);
+        if (!isMounted) return;
+        setServices((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(firestoreServices)) return prev;
           try {
             localStorage.setItem(DB_KEYS.SERVICES, JSON.stringify(firestoreServices));
           } catch (e) {
             console.error('Error saving services cache', e);
           }
-        }
+          return firestoreServices;
+        });
       },
       onUsersUpdate: (firestoreUsers) => {
-        if (isMounted) {
-          setUsers(firestoreUsers);
+        if (!isMounted) return;
+        setUsers((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(firestoreUsers)) return prev;
           try {
             localStorage.setItem(DB_KEYS.USERS, JSON.stringify(firestoreUsers));
           } catch (e) {
             console.error('Error saving users cache', e);
           }
-        }
+          return firestoreUsers;
+        });
       },
       onMessagesUpdate: (firestoreMessages) => {
-        if (isMounted) {
-          setMessages(firestoreMessages);
+        if (!isMounted) return;
+        setMessages((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(firestoreMessages)) return prev;
           try {
             localStorage.setItem(DB_KEYS.MESSAGES, JSON.stringify(firestoreMessages));
           } catch (e) {
             console.error('Error saving messages cache', e);
           }
-        }
+          return firestoreMessages;
+        });
       },
       onDirectorUpdate: (firestoreDirector) => {
-        if (isMounted && firestoreDirector) {
-          setDirectorData(firestoreDirector);
+        if (!isMounted || !firestoreDirector) return;
+        setDirectorData((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(firestoreDirector)) return prev;
           try {
             localStorage.setItem(DB_KEYS.DIRECTOR, JSON.stringify(firestoreDirector));
           } catch (e) {
             console.error('Error saving director cache', e);
           }
-        }
+          return firestoreDirector;
+        });
       },
       onInstitutionalUpdate: (firestoreInstitutional) => {
-        if (isMounted && firestoreInstitutional) {
-          setInstitutionalData(firestoreInstitutional);
+        if (!isMounted || !firestoreInstitutional) return;
+        setInstitutionalData((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(firestoreInstitutional)) return prev;
           try {
             localStorage.setItem(DB_KEYS.INSTITUTIONAL, JSON.stringify(firestoreInstitutional));
           } catch (e) {
             console.error('Error saving institutional cache', e);
           }
-        }
+          return firestoreInstitutional;
+        });
       },
       onAuditLogsUpdate: (firestoreLogs) => {
         if (isMounted && firestoreLogs.length > 0) {
