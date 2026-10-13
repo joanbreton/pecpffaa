@@ -139,22 +139,6 @@ export const DirectorSection: React.FC = () => {
                         target.src = 'https://i.postimg.cc/V6vqjfQf/director-pecpffaa.jpg';
                       }}
                     />
-
-                    {/* Gradient overlay at bottom of photo */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent pointer-events-none" />
-
-                    {/* Rank & Name badge over bottom of photo */}
-                    <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-slate-900/85 backdrop-blur-md border border-white/20 text-center">
-                      <span className="inline-block text-[11px] font-black uppercase tracking-wider text-amber-300 drop-shadow-sm">
-                        {directorRank}
-                      </span>
-                      <h4 className="text-sm sm:text-base font-extrabold text-white leading-tight font-serif drop-shadow-sm line-clamp-1">
-                        {directorName}
-                      </h4>
-                      <p className="text-[10px] text-slate-300 font-semibold line-clamp-1">
-                        {directorData?.title || 'Director General del PECPFFAA'}
-                      </p>
-                    </div>
                   </div>
 
                   {/* Insignia / Shield Floating Badge */}

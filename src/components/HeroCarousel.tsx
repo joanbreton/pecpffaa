@@ -178,8 +178,10 @@ export const HeroCarousel: React.FC = () => {
           );
         })}
 
-        {/* Foreground Content: Liquid Glass Card centered vertically, responsive for Mobile, Tablet and Desktop */}
-        {currentSlide.showTextContainer !== false && (
+        {/* Foreground Content: Liquid Glass Card centered vertically
+            Solo se muestra cuando la diapositiva no tiene imagen cargada (fondo institucional),
+            dejando las imágenes del slider totalmente limpias, visibles y sin informaciones sobrepuestas. */}
+        {Boolean(!currentSlide.image?.trim() ? currentSlide.showTextContainer !== false : currentSlide.showTextContainer === true) && (
           <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 w-full py-4 sm:py-6">
             <div 
               className="relative w-full max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl p-4 sm:p-6 md:p-7 lg:p-8 rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-2xl bg-white/[0.16] border border-white/40 border-t-white/80 border-l-white/60 border-b-white/20 border-r-white/30 shadow-[0_20px_50px_rgba(0,0,0,0.35),inset_0_1px_2px_rgba(255,255,255,0.85),inset_0_-1px_1px_rgba(255,255,255,0.2)] space-y-3 sm:space-y-4 animate-fadeIn"

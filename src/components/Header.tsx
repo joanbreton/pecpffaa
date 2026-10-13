@@ -13,7 +13,8 @@ import {
   ChevronDown,
   Building2,
   Sparkles,
-  LogOut 
+  LogOut,
+  FileText
 } from 'lucide-react';
 
 export const Header: React.FC = () => {
@@ -45,7 +46,6 @@ export const Header: React.FC = () => {
 
   const navLinks = [
     { label: 'Inicio', href: '#inicio' },
-    { label: 'Nuestro Director', href: '#director' },
     { label: 'Oferta Académica', href: '#servicios' },
     { label: 'Noticias & Eventos', href: '#noticias' },
     { label: 'Admisiones', href: '#admisiones' },
@@ -228,15 +228,14 @@ export const Header: React.FC = () => {
                       </span>
                     </div>
 
-                    {/* Primary Highlighted Option: DESPACHO DEL DIRECTOR */}
-                    <div className="p-2">
+                    {/* Primary Highlighted Option: NUESTRO DIRECTOR */}
+                    <div className="p-2 pb-1">
                       <button
-                        id="btn-nav-despacho-director"
                         onClick={() => {
-                          setIsDirectorModalOpen(true);
+                          handleNavClick('#director');
                           setNosotrosDropdownOpen(false);
                         }}
-                        className="w-full text-left p-3 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50/40 hover:from-blue-100 hover:to-indigo-100/60 border border-blue-200/80 transition-all flex items-start gap-3 group cursor-pointer shadow-xs hover:shadow-sm"
+                        className="w-full text-left p-3 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50/50 hover:from-blue-100 hover:to-indigo-100/70 border border-blue-200/80 transition-all flex items-start gap-3 group cursor-pointer shadow-xs hover:shadow-sm"
                       >
                         <div className="w-10 h-10 rounded-xl bg-[#0D3671] text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-105 group-hover:bg-[#B91C1C] transition-all">
                           <Building2 className="w-5 h-5 text-amber-300" />
@@ -244,14 +243,14 @@ export const Header: React.FC = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-1">
                             <span className="text-xs font-black uppercase tracking-wider text-[#0D3671] group-hover:text-[#B91C1C] transition-colors">
-                              DESPACHO DEL DIRECTOR
+                              Nuestro Director
                             </span>
-                            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#B91C1C] text-white shadow-xs">
-                              POPUP
+                            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#0D3671] text-white shadow-xs">
+                              Sección
                             </span>
                           </div>
                           <p className="text-[11px] text-slate-600 line-clamp-1 mt-0.5 font-medium">
-                            Alocución oficial y perfil del Director General
+                            Liderazgo institucional y dirección general
                           </p>
                         </div>
                       </button>
@@ -260,15 +259,22 @@ export const Header: React.FC = () => {
                     {/* Secondary Institutional Options */}
                     <div className="px-2 pt-1 pb-1 space-y-1">
                       <button
+                        id="btn-nav-despacho-director"
                         onClick={() => {
-                          handleNavClick('#director');
+                          setIsDirectorModalOpen(true);
                           setNosotrosDropdownOpen(false);
                         }}
                         className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-xs font-semibold text-slate-700 hover:text-[#0D3671] flex items-center justify-between transition-colors cursor-pointer"
                       >
-                        <span>Sección Nuestro Director</span>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-3.5 h-3.5 text-amber-500" />
+                          <span>Despacho Oficial & Semblanza</span>
+                        </div>
+                        <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#B91C1C] text-white shadow-xs">
+                          Popup
+                        </span>
                       </button>
+
                       <button
                         onClick={() => {
                           handleNavClick('#institucion');
@@ -276,17 +282,10 @@ export const Header: React.FC = () => {
                         }}
                         className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-xs font-semibold text-slate-700 hover:text-[#0D3671] flex items-center justify-between transition-colors cursor-pointer"
                       >
-                        <span>Nuestra Institución & Misión</span>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleNavClick('#institucion');
-                          setNosotrosDropdownOpen(false);
-                        }}
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-xs font-semibold text-slate-700 hover:text-[#0D3671] flex items-center justify-between transition-colors cursor-pointer"
-                      >
-                        <span>Ideario del Gran General Luperón</span>
+                        <div className="flex items-center gap-2">
+                          <Shield className="w-3.5 h-3.5 text-[#0D3671]" />
+                          <span>Nuestra Institución & Misión</span>
+                        </div>
                         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                       </button>
                     </div>
@@ -362,9 +361,8 @@ export const Header: React.FC = () => {
                 {mobileNosotrosOpen && (
                   <div className="p-2 space-y-1.5 bg-white border-t border-slate-200">
                     <button
-                      id="btn-mobile-despacho-director"
                       onClick={() => {
-                        setIsDirectorModalOpen(true);
+                        handleNavClick('#director');
                         setMobileMenuOpen(false);
                       }}
                       className="w-full text-left p-2.5 rounded-lg bg-blue-50/70 hover:bg-blue-100 border border-blue-200 text-xs font-bold text-[#0D3671] flex items-center justify-between shadow-xs transition-colors"
@@ -374,9 +372,24 @@ export const Header: React.FC = () => {
                           <Building2 className="w-4 h-4 text-amber-300" />
                         </div>
                         <div>
-                          <span className="block font-black text-[#0D3671]">DESPACHO DEL DIRECTOR</span>
-                          <span className="text-[10px] text-slate-500 font-normal">Alocución oficial y perfil</span>
+                          <span className="block font-black text-[#0D3671]">Nuestro Director</span>
+                          <span className="text-[10px] text-slate-500 font-normal">Liderazgo y Dirección General</span>
                         </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-400" />
+                    </button>
+
+                    <button
+                      id="btn-mobile-despacho-director"
+                      onClick={() => {
+                        setIsDirectorModalOpen(true);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-3.5 h-3.5 text-amber-500" />
+                        <span>Despacho Oficial & Semblanza</span>
                       </div>
                       <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-[#B91C1C] text-white">
                         Popup
@@ -385,20 +398,15 @@ export const Header: React.FC = () => {
 
                     <button
                       onClick={() => {
-                        handleNavClick('#director');
+                        handleNavClick('#institucion');
                         setMobileMenuOpen(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
                     >
-                      <span>Sección Nuestro Director</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                    </button>
-
-                    <button
-                      onClick={() => handleNavClick('#institucion')}
-                      className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between"
-                    >
-                      <span>Nuestra Institución & Misión</span>
+                      <div className="flex items-center gap-2">
+                        <Shield className="w-3.5 h-3.5 text-[#0D3671]" />
+                        <span>Nuestra Institución & Misión</span>
+                      </div>
                       <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                     </button>
                   </div>
