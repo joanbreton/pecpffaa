@@ -174,7 +174,7 @@ export const Header: React.FC = () => {
                   PECPFFAA
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-600 tracking-tight font-medium line-clamp-1 max-w-[260px] sm:max-w-md">
+              <p className="text-[12px] text-slate-600 leading-relaxed max-w-[280px] sm:max-w-md line-clamp-1">
                 Programa de Educación y Capacitación Profesional de las FF.AA.
               </p>
             </div>
