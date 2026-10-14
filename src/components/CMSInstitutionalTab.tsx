@@ -27,6 +27,7 @@ export const CMSInstitutionalTab: React.FC = () => {
     resetInstitutionalData, 
     showNotification,
     setActiveView,
+    setIsAboutModalOpen,
     currentUser 
   } = useApp();
 
@@ -160,14 +161,14 @@ export const CMSInstitutionalTab: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 font-sans">
-                  CMS • Naturaleza Institucional
+                  CMS • Quiénes Somos (Popup Institucional)
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-amber-100 text-amber-900 border border-amber-200">
-                  Sección Principal
+                  Popup & Submenú
                 </span>
               </div>
               <p className="text-xs text-slate-500">
-                Gestione la identidad, misión, visión, pilares doctrinales, ramas armadas y métricas del portal.
+                Gestione la información desplegada en el nuevo popup "Quiénes Somos": identidad institucional, misión, visión, pilares doctrinales, ramas armadas y métricas.
               </p>
             </div>
           </div>
@@ -175,6 +176,16 @@ export const CMSInstitutionalTab: React.FC = () => {
 
         {/* Global Action Buttons */}
         <div className="flex items-center flex-wrap gap-2.5">
+          <button
+            type="button"
+            onClick={() => setIsAboutModalOpen(true)}
+            className="px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#0D3671] font-bold text-xs border border-blue-200 flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            title="Abrir y previsualizar el nuevo popup Quiénes Somos"
+          >
+            <Shield className="w-3.5 h-3.5 text-amber-500" />
+            <span>Vista Previa del Popup</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveView('portal')}

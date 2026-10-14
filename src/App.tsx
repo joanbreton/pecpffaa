@@ -4,7 +4,6 @@ import { Header } from './components/Header';
 import { HeroCarousel } from './components/HeroCarousel';
 import { DirectorSection } from './components/DirectorSection';
 import { AcademicOffer } from './components/AcademicOffer';
-import { InstitutionalInfo } from './components/InstitutionalInfo';
 import { NewsSection } from './components/NewsSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
@@ -15,6 +14,7 @@ const CMSDashboard = lazy(() => import('./components/CMSDashboard').then(m => ({
 const LoginModal = lazy(() => import('./components/LoginModal').then(m => ({ default: m.LoginModal })));
 const ItemModals = lazy(() => import('./components/ItemModals').then(m => ({ default: m.ItemModals })));
 const DirectorModal = lazy(() => import('./components/DirectorModal').then(m => ({ default: m.DirectorModal })));
+const AboutUsModal = lazy(() => import('./components/AboutUsModal').then(m => ({ default: m.AboutUsModal })));
 
 const MainContent: React.FC = () => {
   const { 
@@ -22,6 +22,7 @@ const MainContent: React.FC = () => {
     notification,
     isLoginModalOpen,
     isDirectorModalOpen,
+    isAboutModalOpen,
     selectedNewsModal,
     selectedServiceModal
   } = useApp();
@@ -65,7 +66,6 @@ const MainContent: React.FC = () => {
             <HeroCarousel />
             <DirectorSection />
             <AcademicOffer />
-            <InstitutionalInfo />
             <NewsSection />
             <ContactSection />
           </main>
@@ -87,6 +87,11 @@ const MainContent: React.FC = () => {
       {isDirectorModalOpen && (
         <Suspense fallback={null}>
           <DirectorModal />
+        </Suspense>
+      )}
+      {isAboutModalOpen && (
+        <Suspense fallback={null}>
+          <AboutUsModal />
         </Suspense>
       )}
     </div>

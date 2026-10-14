@@ -97,10 +97,6 @@ export const DirectorSection: React.FC = () => {
             <div className="w-16 h-1.5 bg-[#B91C1C] rounded-full" />
             <div className="w-10 h-1 bg-[#0D3671] rounded-full" />
           </div>
-
-          <p className="text-xs sm:text-sm font-bold text-[#0D3671] tracking-wider uppercase font-sans">
-            {sectionSubtitle}
-          </p>
         </div>
 
         {/* Main Card Container */}

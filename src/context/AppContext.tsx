@@ -65,6 +65,8 @@ interface AppContextType {
   setIsLoginModalOpen: (open: boolean) => void;
   isDirectorModalOpen: boolean;
   setIsDirectorModalOpen: (open: boolean) => void;
+  isAboutModalOpen: boolean;
+  setIsAboutModalOpen: (open: boolean) => void;
   selectedNewsModal: NewsItem | null;
   setSelectedNewsModal: (news: NewsItem | null) => void;
   selectedServiceModal: ServiceItem | null;
@@ -149,6 +151,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [dashboardTab, setDashboardTab] = useState<'overview' | 'slides' | 'news' | 'services' | 'users' | 'messages' | 'director' | 'institutional' | 'database'>('overview');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isDirectorModalOpen, setIsDirectorModalOpen] = useState(false);
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [selectedNewsModal, setSelectedNewsModal] = useState<NewsItem | null>(null);
   const [selectedServiceModal, setSelectedServiceModal] = useState<ServiceItem | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -1185,6 +1188,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsLoginModalOpen,
         isDirectorModalOpen,
         setIsDirectorModalOpen,
+        isAboutModalOpen,
+        setIsAboutModalOpen,
         selectedNewsModal,
         setSelectedNewsModal,
         selectedServiceModal,

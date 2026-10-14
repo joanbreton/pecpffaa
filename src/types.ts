@@ -71,7 +71,7 @@ export interface ContactMessage {
 }
 
 export type AuditAction = 'Creación' | 'Modificación' | 'Eliminación' | 'Cambio de Estado' | 'Restauración BD' | 'Inicialización BD';
-export type CMSModule = 'Slides (Carrusel)' | 'Noticias' | 'Oferta Académica' | 'Usuarios' | 'Buzón Admisiones' | 'Base de Datos' | 'Despacho del Director' | 'Naturaleza Institucional';
+export type CMSModule = 'Slides (Carrusel)' | 'Noticias' | 'Oferta Académica' | 'Usuarios' | 'Buzón Admisiones' | 'Base de Datos' | 'Despacho del Director' | 'Naturaleza Institucional' | 'Quiénes Somos';
 
 export interface AuditLogEntry {
   id: string;

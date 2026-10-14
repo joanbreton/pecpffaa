@@ -561,6 +561,7 @@ export const CMSDashboard: React.FC = () => {
               </button>
 
               <button
+                id="btn-cms-quienes-somos"
                 onClick={() => setActiveTab('institutional')}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === 'institutional' 
@@ -570,7 +571,10 @@ export const CMSDashboard: React.FC = () => {
               >
                 <div className="flex items-center gap-3">
                   <Shield className="w-4 h-4 text-amber-400" />
-                  <span>Naturaleza Institucional</span>
+                  <div className="text-left">
+                    <span className="block font-bold">Quiénes Somos</span>
+                    <span className="text-[10px] text-slate-400 font-normal">Popup Institucional</span>
+                  </div>
                 </div>
                 <span className="text-[10px] bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded-full font-mono font-bold">
                   CMS

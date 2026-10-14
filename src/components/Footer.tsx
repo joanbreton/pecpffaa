@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { setActiveView, setIsLoginModalOpen, setIsDirectorModalOpen, currentUser } = useApp();
+  const { setActiveView, setIsLoginModalOpen, setIsDirectorModalOpen, setIsAboutModalOpen, currentUser } = useApp();
 
   const currentYear = new Date().getFullYear();
 
@@ -96,16 +96,22 @@ export const Footer: React.FC = () => {
                 </button>
               </li>
               <li>
-                <a href="#institucion" onClick={(e) => { e.preventDefault(); handleNavClick('#institucion'); }} className="hover:text-amber-300 transition-colors flex items-center gap-1">
+                <button 
+                  onClick={() => setIsAboutModalOpen(true)} 
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1 text-left text-slate-300 cursor-pointer"
+                >
                   <ChevronRight className="w-3 h-3 text-[#B91C1C]" />
-                  Misión, Visión y Valores
-                </a>
+                  Quiénes Somos (Naturaleza Institucional)
+                </button>
               </li>
               <li>
-                <a href="#institucion" onClick={(e) => { e.preventDefault(); handleNavClick('#institucion'); }} className="hover:text-amber-300 transition-colors flex items-center gap-1">
+                <button 
+                  onClick={() => setIsAboutModalOpen(true)} 
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1 text-left text-slate-300 cursor-pointer"
+                >
                   <ChevronRight className="w-3 h-3 text-[#B91C1C]" />
-                  Doctrina Militar Conjunta
-                </a>
+                  Misión, Visión y Doctrina Militar
+                </button>
               </li>
               <li>
                 <span className="hover:text-amber-300 transition-colors flex items-center gap-1 cursor-pointer">

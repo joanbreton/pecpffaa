@@ -73,7 +73,7 @@ export const CMSDirectorTab: React.FC = () => {
       rank,
       sectionBadge: directorData.sectionBadge || 'Liderazgo Institucional',
       sectionTitle: directorData.sectionTitle || 'NUESTRO DIRECTOR',
-      sectionSubtitle: directorData.sectionSubtitle || 'Despacho de la Dirección General • PECPFFAA',
+      sectionSubtitle: directorData.sectionSubtitle || '',
       sectionSummary: directorData.sectionSummary || directorData.bioSummary || 'El General de Brigada Ambiorix de Jesús Cepeda Hernández lidera con vocación patria y visión de futuro el Programa de Educación y Capacitación Profesional de las Fuerzas Armadas (PECPFFAA), impulsando la modernización académica, la excelencia operativa y la formación integral de los hombres y mujeres que engrandecen a la República Dominicana.',
     };
   });
@@ -87,7 +87,7 @@ export const CMSDirectorTab: React.FC = () => {
       rank,
       sectionBadge: directorData.sectionBadge || 'Liderazgo Institucional',
       sectionTitle: directorData.sectionTitle || 'NUESTRO DIRECTOR',
-      sectionSubtitle: directorData.sectionSubtitle || 'Despacho de la Dirección General • PECPFFAA',
+      sectionSubtitle: directorData.sectionSubtitle || '',
       sectionSummary: directorData.sectionSummary || directorData.bioSummary || 'El General de Brigada Ambiorix de Jesús Cepeda Hernández lidera con vocación patria y visión de futuro el Programa de Educación y Capacitación Profesional de las Fuerzas Armadas (PECPFFAA), impulsando la modernización académica, la excelencia operativa y la formación integral de los hombres y mujeres que engrandecen a la República Dominicana.',
     });
   }, [directorData]);
@@ -487,9 +487,9 @@ export const CMSDirectorTab: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={formData.sectionSubtitle || 'Despacho de la Dirección General • PECPFFAA'}
+                    value={formData.sectionSubtitle || ''}
                     onChange={(e) => setFormData({ ...formData, sectionSubtitle: e.target.value })}
-                    placeholder="Ej: Despacho de la Dirección General • PECPFFAA"
+                    placeholder="Opcional. Ej: Despacho de la Dirección General"
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-[#003876] transition-all outline-none"
                   />
                   <span className="text-[10px] text-slate-500 block mt-0.5">Línea descriptiva inferior</span>
