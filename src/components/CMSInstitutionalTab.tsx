@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { InstitutionalData, DoctrinalValue, ArmedForcesBranch, InstitutionalStat } from '../types';
+import { InstitutionalData, DoctrinalValue, ArmedForcesBranch } from '../types';
 import { 
   Building2, 
   Save, 
@@ -13,7 +13,6 @@ import {
   Compass, 
   Anchor, 
   Plane, 
-  BarChart3, 
   Plus, 
   Trash2, 
   ExternalLink,
@@ -34,7 +33,7 @@ export const CMSInstitutionalTab: React.FC = () => {
   const isAdmin = currentUser?.role === 'Administrador';
 
   // Sub-sections tabs
-  const [activeSection, setActiveSection] = useState<'encabezado' | 'misionVision' | 'valores' | 'ramas' | 'metricas'>('encabezado');
+  const [activeSection, setActiveSection] = useState<'encabezado' | 'misionVision' | 'valores' | 'ramas'>('encabezado');
   const [isSaving, setIsSaving] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
@@ -95,31 +94,7 @@ export const CMSInstitutionalTab: React.FC = () => {
     }));
   };
 
-  // Handlers for Key Stats
-  const [newStatNum, setNewStatNum] = useState('');
-  const [newStatLabel, setNewStatLabel] = useState('');
-  const [newStatSub, setNewStatSub] = useState('');
 
-  const handleAddStat = () => {
-    if (!newStatNum.trim() || !newStatLabel.trim()) {
-      showNotification('Complete la cifra numérica y la etiqueta de la métrica', 'error');
-      return;
-    }
-    setFormData(prev => ({
-      ...prev,
-      stats: [...(prev.stats || []), { number: newStatNum.trim(), label: newStatLabel.trim(), sub: newStatSub.trim() }]
-    }));
-    setNewStatNum('');
-    setNewStatLabel('');
-    setNewStatSub('');
-  };
-
-  const handleRemoveStat = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      stats: (prev.stats || []).filter((_, i) => i !== index)
-    }));
-  };
 
   // Save to Firebase & local context
   const handleSaveAll = async (e: React.FormEvent) => {
@@ -249,7 +224,6 @@ export const CMSInstitutionalTab: React.FC = () => {
           { id: 'misionVision', label: '2. Misión & Visión', icon: Target },
           { id: 'valores', label: '3. Pilares Doctrinales', icon: Shield },
           { id: 'ramas', label: '4. Ramas de las FF.AA.', icon: Layers },
-          { id: 'metricas', label: '5. Métricas & Cifras', icon: BarChart3 },
         ].map((sec) => {
           const Icon = sec.icon;
           const isActive = activeSection === sec.id;
@@ -288,14 +262,46 @@ export const CMSInstitutionalTab: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Etiqueta del Badge Superior
+                  Etiqueta del Badge Superior (Cabecera)
                 </label>
                 <input
                   type="text"
                   value={formData.badgeTag}
                   onChange={(e) => setFormData({ ...formData, badgeTag: e.target.value })}
-                  placeholder="Ej: Naturaleza Institucional"
+                  placeholder="Ej: Quiénes Somos / Naturaleza Institucional"
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-[#0D3671] outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Título del Bloque (Naturaleza & Mandato Rector)
+                </label>
+                <input
+                  type="text"
+                  value={formData.overviewTitle ?? ''}
+                  onChange={(e) => setFormData({ ...formData, overviewTitle: e.target.value })}
+                  placeholder="Ej: Naturaleza & Mandato Rector"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-[#0D3671] outline-none"
+                />
+                <span className="text-[10px] text-slate-500 mt-0.5 block">
+                  Encabezado del resumen institucional dentro del popup.
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Título Principal del Programa / Órgano
+                </label>
+                <input
+                  type="text"
+                  value={formData.mainTitle}
+                  onChange={(e) => setFormData({ ...formData, mainTitle: e.target.value })}
+                  placeholder="Ej: Programa de Educación y Capacitación Profesional de las FF.AA."
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold focus:ring-2 focus:ring-[#0D3671] outline-none"
                   required
                 />
               </div>
@@ -312,20 +318,6 @@ export const CMSInstitutionalTab: React.FC = () => {
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-[#0D3671] outline-none"
                 />
               </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Título Principal del Programa / Órgano
-              </label>
-              <input
-                type="text"
-                value={formData.mainTitle}
-                onChange={(e) => setFormData({ ...formData, mainTitle: e.target.value })}
-                placeholder="Ej: Programa de Educación y Capacitación Profesional de las FF.AA."
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold focus:ring-2 focus:ring-[#0D3671] outline-none"
-                required
-              />
             </div>
 
             <div>
@@ -727,85 +719,7 @@ export const CMSInstitutionalTab: React.FC = () => {
           </div>
         )}
 
-        {/* 5. MÉTRICAS & CIFRAS */}
-        {activeSection === 'metricas' && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-6 animate-fadeIn">
-            <div className="border-b border-slate-100 pb-3">
-              <h3 className="text-base font-bold text-slate-900">
-                Métricas Numéricas & Cinta de Estadísticas
-              </h3>
-              <p className="text-xs text-slate-500">
-                Cifras destacadas del portal (Número de graduados, años de doctrina, convenios y acreditación).
-              </p>
-            </div>
 
-            {/* Agregar Nueva Estadística */}
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-              <span className="text-xs font-bold text-slate-800 block">Agregar Nueva Cifra Métrica</span>
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
-                <div className="sm:col-span-3">
-                  <input
-                    type="text"
-                    value={newStatNum}
-                    onChange={(e) => setNewStatNum(e.target.value)}
-                    placeholder="Número (Ej: +3,850)"
-                    className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-mono font-bold outline-none"
-                  />
-                </div>
-                <div className="sm:col-span-4">
-                  <input
-                    type="text"
-                    value={newStatLabel}
-                    onChange={(e) => setNewStatLabel(e.target.value)}
-                    placeholder="Etiqueta (Ej: Graduados)"
-                    className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-bold outline-none"
-                  />
-                </div>
-                <div className="sm:col-span-3">
-                  <input
-                    type="text"
-                    value={newStatSub}
-                    onChange={(e) => setNewStatSub(e.target.value)}
-                    placeholder="Sub-leyenda (Ej: Posgrado)"
-                    className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded text-xs outline-none"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <button
-                    type="button"
-                    onClick={handleAddStat}
-                    className="w-full py-1.5 px-3 bg-[#0D3671] hover:bg-[#092652] text-white rounded text-xs font-bold flex items-center justify-center gap-1 cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Agregar</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Lista actual de métricas */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {formData.stats?.map((st, idx) => (
-                <div key={idx} className="p-4 bg-slate-900 text-white rounded-xl border border-slate-800 flex flex-col justify-between">
-                  <div>
-                    <div className="text-2xl font-extrabold text-amber-400 font-mono">{st.number}</div>
-                    <div className="text-xs font-bold mt-1 text-slate-100">{st.label}</div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">{st.sub}</div>
-                  </div>
-                  <div className="pt-3 border-t border-slate-800 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveStat(idx)}
-                      className="text-xs text-slate-400 hover:text-red-400 cursor-pointer"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
       </form>
 

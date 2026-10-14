@@ -18,12 +18,10 @@ import {
   Cpu,
   Layers,
   CheckCircle2,
-  Printer,
   Edit3,
   ExternalLink,
   Users,
-  Flag,
-  BarChart3
+  Flag
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -56,7 +54,7 @@ export const AboutUsModal: React.FC = () => {
     showNotification 
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'todos' | 'identidad' | 'doctrina' | 'fuerzas' | 'cifras'>('todos');
+  const [activeTab, setActiveTab] = useState<'todos' | 'identidad' | 'doctrina' | 'fuerzas'>('todos');
 
   const isAdmin = currentUser?.role === 'Administrador';
 
@@ -85,15 +83,7 @@ export const AboutUsModal: React.FC = () => {
   };
 
   const values = institutionalData?.values || [];
-  const stats = institutionalData?.stats || [];
   const branches = institutionalData?.branches || [];
-
-  const handlePrint = () => {
-    showNotification('Abriendo diálogo de impresión del documento...', 'info');
-    setTimeout(() => {
-      window.print();
-    }, 250);
-  };
 
   const handleGoToCMS = () => {
     setIsAboutModalOpen(false);
@@ -161,15 +151,7 @@ export const AboutUsModal: React.FC = () => {
               </button>
             )}
 
-            <button
-              onClick={handlePrint}
-              className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-              title="Imprimir o guardar resumen"
-            >
-              <Printer className="w-4 h-4 text-amber-300" />
-              <span className="hidden sm:inline">Imprimir</span>
-            </button>
-
+            {/* Close Button */}
             <button
               onClick={() => setIsAboutModalOpen(false)}
               className="w-9 h-9 rounded-xl bg-white/10 hover:bg-[#B91C1C] text-white flex items-center justify-center transition-all cursor-pointer"
@@ -186,8 +168,7 @@ export const AboutUsModal: React.FC = () => {
             { id: 'todos', label: 'Vista General', icon: Building2 },
             { id: 'identidad', label: 'Misión & Visión', icon: Target },
             { id: 'doctrina', label: 'Pilares Doctrinales', icon: BookOpenCheck },
-            { id: 'fuerzas', label: 'Integración FF.AA.', icon: Flag },
-            { id: 'cifras', label: 'Métricas de Impacto', icon: BarChart3 }
+            { id: 'fuerzas', label: 'Integración FF.AA.', icon: Flag }
           ].map(tab => {
             const Icon = tab.icon;
             const isSelected = activeTab === tab.id;
@@ -218,7 +199,7 @@ export const AboutUsModal: React.FC = () => {
                 <div className="max-w-3xl space-y-3">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D3671]/10 text-[#0D3671] font-bold text-xs uppercase tracking-wider">
                     <Building2 className="w-3.5 h-3.5" />
-                    <span>Naturaleza & Mandato Rector</span>
+                    <span>{institutionalData.overviewTitle || 'Naturaleza & Mandato Rector'}</span>
                   </div>
                   <h3 className="text-xl sm:text-2xl font-black text-[#0F172B] font-serif tracking-tight">
                     {institutionalData.mainTitle}
@@ -367,7 +348,6 @@ export const AboutUsModal: React.FC = () => {
                           <Icon className="w-5 h-5" />
                         </div>
                         <div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Rama Militar</span>
                           <h4 className="font-bold text-sm text-[#0F172B]">{branch.name}</h4>
                         </div>
                       </div>
@@ -381,29 +361,7 @@ export const AboutUsModal: React.FC = () => {
             </div>
           )}
 
-          {/* Key Metrics Counter Ribbon */}
-          {(activeTab === 'todos' || activeTab === 'cifras') && stats.length > 0 && (
-            <div className="space-y-3 pt-2 border-t border-slate-200/80">
-              <div className="text-center sm:text-left">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#0D3671]">Impacto Formativo</span>
-                <h3 className="text-lg sm:text-xl font-bold text-[#0F172B] font-serif">Cifras y Cobertura Nacional</h3>
-              </div>
 
-              <div className="bg-[#0D3671] text-white rounded-2xl p-6 sm:p-8 border-2 border-[#B91C1C] shadow-xl">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center divide-y lg:divide-y-0 lg:divide-x divide-white/10">
-                  {stats.map((st, idx) => (
-                    <div key={idx} className="pt-4 lg:pt-0 px-2 space-y-1">
-                      <div className="text-3xl sm:text-4xl font-extrabold text-amber-400 font-mono tracking-tight">
-                        {st.number}
-                      </div>
-                      <div className="text-xs sm:text-sm font-bold text-white">{st.label}</div>
-                      <div className="text-[11px] text-slate-300">{st.sub}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
 
         </div>
 

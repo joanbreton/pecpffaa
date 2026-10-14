@@ -174,6 +174,7 @@ export interface InstitutionalData {
   mainTitle: string;
   subtitle: string;
   badgeTag: string;
+  overviewTitle?: string;
   description: string;
   missionTitle: string;
   missionText: string;

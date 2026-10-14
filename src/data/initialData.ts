@@ -334,6 +334,7 @@ export const INITIAL_INSTITUTIONAL_DATA: InstitutionalData = {
   mainTitle: 'Programa de Educación y Capacitación Profesional de las FF.AA.',
   subtitle: 'Gran General Restaurador "Gregorio Luperón"',
   badgeTag: 'Naturaleza Institucional',
+  overviewTitle: 'Naturaleza & Mandato Rector',
   description: 'Órgano académico rector encargado de formar y capacitar a los miembros de las Fuerzas Armadas y sector civil afín en doctrina militar, liderazgo estratégico y seguridad nacional.',
   missionTitle: 'Misión Institucional',
   missionText: 'Formar y capacitar a los miembros de las Fuerzas Armadas, Policía Nacional y sector civil afín en doctrina militar conjunta, toma de decisiones estratégicas, seguridad y defensa nacional, con apego a los principios éticos y democráticos.',
