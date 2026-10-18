@@ -26,6 +26,7 @@ export interface SlideItem {
   order: number;
   active: boolean;
   showTextContainer?: boolean;
+  imageFit?: 'contain' | 'cover';
 }
 
 export interface NewsItem {

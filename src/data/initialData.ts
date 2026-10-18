@@ -49,6 +49,8 @@ export const INITIAL_SLIDES: SlideItem[] = [
     secondaryLink: '#admisiones',
     order: 1,
     active: true,
+    showTextContainer: false,
+    imageFit: 'cover',
   },
   {
     id: 'sld-2',
@@ -62,6 +64,8 @@ export const INITIAL_SLIDES: SlideItem[] = [
     secondaryLink: '#servicios',
     order: 2,
     active: true,
+    showTextContainer: false,
+    imageFit: 'cover',
   },
   {
     id: 'sld-3',
@@ -75,6 +79,8 @@ export const INITIAL_SLIDES: SlideItem[] = [
     secondaryLink: '#contacto',
     order: 3,
     active: true,
+    showTextContainer: true,
+    imageFit: 'cover',
   }
 ];
 

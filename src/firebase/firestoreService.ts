@@ -94,10 +94,6 @@ export const initAndSyncFirestore = async (callbacks: FirestoreSyncCallbacks): P
         const items: SlideItem[] = [];
         snapshot.forEach((d) => {
           const item = { ...(d.data() as SlideItem), id: d.id };
-          if (item.image && (item.image.includes('images.unsplash.com') || item.image.includes('photo-1541829070764') || item.image.includes('photo-1517245386807'))) {
-            item.image = '';
-            setDoc(doc(db, COLLECTIONS.SLIDES, d.id), sanitizeForFirestore(item), { merge: true }).catch(console.error);
-          }
           items.push(item);
         });
         items.sort((a, b) => (a.order || 0) - (b.order || 0));

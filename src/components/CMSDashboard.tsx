@@ -24,11 +24,17 @@ import {
   Building2,
   CheckCircle2,
   Eye,
-  EyeOff
+  EyeOff,
+  Upload,
+  FileImage,
+  Maximize2,
+  ZoomOut,
+  Loader2
 } from 'lucide-react';
 import { DatabaseAuditTab } from './DatabaseAuditTab';
 import { CMSDirectorTab } from './CMSDirectorTab';
 import { CMSInstitutionalTab } from './CMSInstitutionalTab';
+import { optimizeImageFile } from '../utils/imageOptimizer';
 
 export const CMSDashboard: React.FC = () => {
   const { 
@@ -89,7 +95,9 @@ export const CMSDashboard: React.FC = () => {
     order: 1,
     active: true,
     showTextContainer: true,
+    imageFit: 'cover',
   });
+  const [isProcessingSlideImage, setIsProcessingSlideImage] = useState(false);
 
   // News Form
   const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
@@ -153,6 +161,7 @@ export const CMSDashboard: React.FC = () => {
         order: slide.order,
         active: slide.active,
         showTextContainer: slide.showTextContainer !== false,
+        imageFit: slide.imageFit || 'cover',
       });
     } else {
       setEditingSlideId(null);
@@ -168,9 +177,38 @@ export const CMSDashboard: React.FC = () => {
         order: slides.length + 1,
         active: true,
         showTextContainer: true,
+        imageFit: 'cover',
       });
     }
     setIsSlideModalOpen(true);
+  };
+
+  const handleSlideImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showNotification('Seleccione un archivo de imagen válido (JPG, PNG, WEBP)', 'error');
+      return;
+    }
+
+    setIsProcessingSlideImage(true);
+    try {
+      showNotification('Optimizando y preparando imagen para la base de datos...', 'info');
+      const optimized = await optimizeImageFile(file, 1920, 1080, 0.82);
+      setSlideFormData(prev => ({
+        ...prev,
+        image: optimized.dataUrl,
+        imageFit: prev.imageFit || 'cover'
+      }));
+      showNotification(`Imagen cargada y optimizada (${optimized.sizeKb} KB) para sincronizar en base de datos.`, 'success');
+    } catch (err) {
+      console.error('Error al procesar imagen de slide:', err);
+      showNotification('Error al procesar la imagen seleccionada', 'error');
+    } finally {
+      setIsProcessingSlideImage(false);
+      e.target.value = '';
+    }
   };
 
   const handleSaveSlide = async (e: React.FormEvent) => {
@@ -183,10 +221,15 @@ export const CMSDashboard: React.FC = () => {
     try {
       if (editingSlideId) {
         await updateSlide(editingSlideId, slideFormData);
+        showNotification('Slide actualizado y registrado exitosamente en la base de datos Firestore.', 'success');
       } else {
         await addSlide(slideFormData);
+        showNotification('Nuevo slide creado y registrado en la base de datos Firestore.', 'success');
       }
       setIsSlideModalOpen(false);
+    } catch (err) {
+      console.error('Error al guardar slide en base de datos:', err);
+      showNotification('Error al registrar cambios en la base de datos', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -468,7 +511,7 @@ export const CMSDashboard: React.FC = () => {
               >
                 <div className="flex items-center gap-3">
                   <ImageIcon className="w-4 h-4 text-red-400" />
-                  <span>Slider 16:9 Carrusel</span>
+                  <span>Slider Carrusel (1280x624)</span>
                 </div>
                 <span className="text-[10px] bg-white/15 text-white px-2 py-0.5 rounded-full font-mono">
                   {slides.length}
@@ -658,7 +701,7 @@ export const CMSDashboard: React.FC = () => {
                   className="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-[#0D3671] transition-all cursor-pointer"
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-slate-500">Slides 16:9</span>
+                    <span className="text-xs font-bold text-slate-500">Slides Carrusel</span>
                     <ImageIcon className="w-4 h-4 text-[#0D3671]" />
                   </div>
                   <div className="text-2xl font-extrabold text-slate-900">{slides.filter(s => s.active).length}</div>
@@ -723,7 +766,7 @@ export const CMSDashboard: React.FC = () => {
                     className="py-3 px-4 bg-white/10 hover:bg-white/20 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-white/20 transition-colors"
                   >
                     <Plus className="w-4 h-4 text-amber-300" />
-                    <span>Añadir Slide 16:9</span>
+                    <span>Añadir Slide (1280x624)</span>
                   </button>
 
                   <button
@@ -833,8 +876,8 @@ export const CMSDashboard: React.FC = () => {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                 <div>
-                  <h2 className="text-xl font-bold text-slate-900">Gestión del Slider Carrusel (Proporción 16:9)</h2>
-                  <p className="text-xs text-slate-500">Administre las imágenes, textos y llamadas a la acción de la portada.</p>
+                  <h2 className="text-xl font-bold text-slate-900">Gestión del Slider Carrusel (1280px x 624px)</h2>
+                  <p className="text-xs text-slate-500">Administre las imágenes, textos y llamadas a la acción de la portada (Responsive en Desktop, Tablet y Móvil).</p>
                 </div>
 
                 <button
@@ -847,7 +890,7 @@ export const CMSDashboard: React.FC = () => {
                   }`}
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Nuevo Slide 16:9</span>
+                  <span>Nuevo Slide (1280x624)</span>
                 </button>
               </div>
 
@@ -859,14 +902,29 @@ export const CMSDashboard: React.FC = () => {
                     className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col justify-between"
                   >
                     <div>
-                      {/* 16:9 Image Preview Container */}
-                      <div className="relative aspect-video w-full overflow-hidden bg-slate-900">
+                      {/* 1280x624 Image Preview Container */}
+                      <div 
+                        className="relative aspect-[1280/624] w-full overflow-hidden bg-slate-950"
+                        style={{ aspectRatio: '1280 / 624' }}
+                      >
                         {slide.image ? (
-                          <img 
-                            src={slide.image} 
-                            alt={slide.title}
-                            className="w-full h-full object-cover"
-                          />
+                          <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                            {/* Fondo ambiental difuminado para cobertura suave */}
+                            <img 
+                              src={slide.image} 
+                              alt="" 
+                              className="absolute inset-0 w-full h-full object-cover blur-md opacity-30 scale-110 pointer-events-none select-none"
+                              aria-hidden="true"
+                            />
+                            {/* Imagen 100% visible completa con alejamiento */}
+                            <img 
+                              src={slide.image} 
+                              alt={slide.title}
+                              className={`relative z-10 max-w-full max-h-full w-full h-full p-2 transition-transform ${
+                                slide.imageFit === 'cover' ? 'object-cover' : 'object-contain'
+                              }`}
+                            />
+                          </div>
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-[#061836] via-[#0D3671] to-[#041126] flex flex-col items-center justify-center text-white/80 p-4 text-center">
                             <Shield className="w-8 h-8 text-amber-400 mb-1" />
@@ -1413,17 +1471,22 @@ export const CMSDashboard: React.FC = () => {
       {/* Slide Modal */}
       {isSlideModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-5 sm:p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-base text-slate-900">
-                {editingSlideId ? 'Editar Slide 16:9' : 'Nuevo Slide para Carrusel 16:9'}
-              </h3>
+              <div>
+                <h3 className="font-bold text-base text-slate-900">
+                  {editingSlideId ? 'Editar Slide (1280x624)' : 'Nuevo Slide para Carrusel (1280x624)'}
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  Cada cambio se guarda y registra en la base de datos Firestore.
+                </p>
+              </div>
               <button onClick={() => setIsSlideModalOpen(false)} aria-label="Cerrar modal" className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveSlide} className="space-y-3 text-xs">
+            <form onSubmit={handleSaveSlide} className="space-y-3.5 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Título Principal *</label>
                 <input
@@ -1468,18 +1531,115 @@ export const CMSDashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">URL de Imagen (Opcional - Proporción 16:9)</label>
-                <input
-                  type="text"
-                  value={slideFormData.image}
-                  onChange={(e) => setSlideFormData({ ...slideFormData, image: e.target.value })}
-                  placeholder="Dejar vacío para fondo institucional oficial o pegar URL de imagen..."
-                  className="w-full px-3 py-2 border rounded-lg font-mono text-[11px]"
-                />
-                <span className="text-[10px] text-slate-500 mt-1 block">
-                  Si se deja en blanco, la diapositiva se mostrará con el fondo institucional militar oficial sin imágenes externas.
-                </span>
+              {/* GESTIÓN DE IMAGEN 1280x624 Y PERSISTENCIA BD */}
+              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="block font-bold text-slate-800 text-xs">
+                    Imagen de la Diapositiva (Tamaño recomendado: 1280px x 624px)
+                  </label>
+                  {slideFormData.image && (
+                    <button
+                      type="button"
+                      onClick={() => setSlideFormData(prev => ({ ...prev, image: '' }))}
+                      className="text-[11px] text-red-600 hover:text-red-800 font-semibold cursor-pointer"
+                    >
+                      Quitar Imagen
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white hover:bg-slate-100 border-2 border-dashed border-[#0D3671]/30 hover:border-[#0D3671] rounded-lg cursor-pointer text-slate-700 font-semibold text-xs transition-colors">
+                    {isProcessingSlideImage ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-[#0D3671]" />
+                    ) : (
+                      <Upload className="w-4 h-4 text-[#0D3671]" />
+                    )}
+                    <span>{isProcessingSlideImage ? 'Optimizando imagen...' : 'Cargar Imagen (PC / Móvil)'}</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleSlideImageFileUpload}
+                      disabled={isProcessingSlideImage}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                <div>
+                  <input
+                    type="text"
+                    value={slideFormData.image}
+                    onChange={(e) => setSlideFormData({ ...slideFormData, image: e.target.value })}
+                    placeholder="O pegue aquí la URL de la imagen (https://...)"
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg font-mono text-[11px]"
+                  />
+                </div>
+
+                {/* Modo de Visualización: Ajustar a la estructura vs Contener */}
+                <div className="pt-1 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+                  <span className="font-semibold text-slate-700 text-[11px]">
+                    Ajuste de Visualización:
+                  </span>
+                  <div className="inline-flex rounded-lg p-0.5 bg-slate-200">
+                    <button
+                      type="button"
+                      onClick={() => setSlideFormData({ ...slideFormData, imageFit: 'cover' })}
+                      className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
+                        slideFormData.imageFit !== 'contain'
+                          ? 'bg-[#0D3671] text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Ajustar a la Estructura (Cover)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSlideFormData({ ...slideFormData, imageFit: 'contain' })}
+                      className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
+                        slideFormData.imageFit === 'contain'
+                          ? 'bg-[#0D3671] text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Ajuste Contenido (Contain)
+                    </button>
+                  </div>
+                </div>
+
+                {/* Previsualización 1280x624 en Vivo */}
+                {slideFormData.image ? (
+                  <div className="mt-2 space-y-1">
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                      <span>Vista Previa (1280px x 624px):</span>
+                      <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        {slideFormData.imageFit === 'contain' ? 'Modo Contener' : 'Ajustada a la Estructura'}
+                      </span>
+                    </div>
+                    <div 
+                      className="relative aspect-[1280/624] w-full rounded-lg overflow-hidden bg-slate-950 border border-slate-300 shadow-inner flex items-center justify-center"
+                      style={{ aspectRatio: '1280 / 624' }}
+                    >
+                      <img
+                        src={slideFormData.image}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover blur-md opacity-30 scale-110 pointer-events-none select-none"
+                        aria-hidden="true"
+                      />
+                      <img
+                        src={slideFormData.image}
+                        alt="Previsualización"
+                        className={`relative z-10 w-full h-full ${
+                          slideFormData.imageFit === 'contain' ? 'object-contain p-2' : 'object-cover'
+                        } transition-all`}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-[10px] text-slate-500 block">
+                    Sin imagen: La diapositiva se mostrará con el fondo militar institucional de alta fidelidad.
+                  </span>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">

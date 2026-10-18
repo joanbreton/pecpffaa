@@ -28,6 +28,7 @@ import {
   computeDatabaseStats, 
   generateDatabaseExport 
 } from '../db/database';
+import { sanitizeSnapshotForAudit } from '../utils/imageOptimizer';
 import firebaseConfig from '../../firebase-applet-config.json';
 import { 
   initAndSyncFirestore,
@@ -179,8 +180,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const saved = localStorage.getItem(DB_KEYS.SLIDES);
       if (saved) {
-        const parsed = JSON.parse(saved) as SlideItem[];
-        return parsed.map((s) => (s.image && s.image.includes('images.unsplash.com') ? { ...s, image: '' } : s));
+        return JSON.parse(saved) as SlideItem[];
       }
       return INITIAL_SLIDES;
     } catch {
@@ -415,7 +415,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   ) => {
     const userName = currentUser ? `${currentUser.name} (@${currentUser.username})` : 'Administrador del Sistema';
     const userRole = currentUser?.role || 'Administrador';
-    const newEntry = createAuditLog(userName, userRole, action, module, itemTitle, itemId, details, snapshot);
+    const cleanSnapshot = snapshot ? sanitizeSnapshotForAudit(snapshot) : undefined;
+    const newEntry = createAuditLog(userName, userRole, action, module, itemTitle, itemId, details, cleanSnapshot);
     setAuditLogs(prev => {
       const updated = [newEntry, ...prev];
       saveStoredAuditLogs(updated);
@@ -435,7 +436,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     // Persist audit log entry directly to Firebase Firestore
-    saveAuditLogToFirestore(newEntry);
+    saveAuditLogToFirestore(newEntry).catch(e => console.warn('Firestore audit log persist note:', e));
   }, [currentUser]);
 
   const checkAdminPermission = (): boolean => {
@@ -535,7 +536,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       'Slides (Carrusel)',
       newSlide.title || 'Slide sin título',
       newSlide.id,
-      `Se creó un nuevo slide 16:9 con etiqueta "${newSlide.tag}" y enlace a "${newSlide.ctaText}".`,
+      `Se creó un nuevo slide para el carrusel (1280x624) con etiqueta "${newSlide.tag}" y enlace a "${newSlide.ctaText}".`,
       { slide: newSlide }
     );
     notifyCrossTab();

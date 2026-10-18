@@ -94,7 +94,7 @@ export const HeroCarousel: React.FC = () => {
   return (
     <section 
       id="hero-slider-section"
-      className="relative w-full bg-slate-950 overflow-hidden select-none"
+      className="relative w-full bg-slate-950 select-none overflow-hidden p-0 m-0"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
@@ -103,13 +103,15 @@ export const HeroCarousel: React.FC = () => {
       aria-label="Carrusel Institucional"
     >
       {/* 
-        Responsive Container:
-        - Mobile: min-h-[520px] h-[72vh] max-h-[600px]
-        - Tablet: md:h-[640px] md:max-h-[680px]
-        - Desktop: lg:h-[720px] xl:h-[768px] 2xl:h-[820px] max-h-[880px]
-        Adapts seamlessly to any resolution, ultra-wide screens, laptops, and mobile orientations.
+        Carrusel 100% Ancho Completo (Full-Width Edge-to-Edge)
+        - Las imágenes ocupan el 100% del ancho de la pantalla en cualquier dispositivo
+        - Desktop / Pantallas grandes: 100% ancho x 624px de alto
+        - Tablet: 100% ancho x 440px-520px
+        - Móvil: 100% ancho x 280px-340px
       */}
-      <div className="relative w-full h-[540px] sm:h-[600px] md:h-[660px] lg:h-[720px] xl:h-[768px] 2xl:h-[820px] min-h-[500px] flex items-center overflow-hidden">
+      <div 
+        className="relative w-full h-[280px] xs:h-[340px] sm:h-[440px] md:h-[520px] lg:h-[624px] flex items-center overflow-hidden bg-slate-950 transition-all duration-300"
+      >
 
         {/* Slides loop */}
         {activeSlides.map((slide, idx) => {
@@ -128,24 +130,21 @@ export const HeroCarousel: React.FC = () => {
               }}
             >
               {hasCustomImage ? (
-                <div className="relative w-full h-full overflow-hidden">
-                  {/* Imagen del Slider limpia, nítida y 100% visible sin capas intermedias */}
+                <div className="relative w-full h-full overflow-hidden flex items-center justify-center bg-slate-950">
+                  {/* Imagen ocupando el 100% del ancho de la pantalla */}
                   <img
                     src={slide.image}
-                    alt={slide.title}
+                    alt={slide.title || 'Slide institucional'}
                     sizes="100vw"
-                    className="w-full h-full object-cover object-center transform transition-transform duration-1000 ease-out"
+                    className="w-full h-full object-cover object-center transition-transform duration-700 ease-out select-none"
                     loading={idx === 0 ? "eager" : "lazy"}
                     fetchPriority={idx === 0 ? "high" : "low"}
                     decoding={idx === 0 ? "sync" : "async"}
                     draggable={false}
                     style={{
-                      objectFit: 'cover',
-                      objectPosition: 'center center',
+                      imageRendering: 'high-quality',
                       WebkitBackfaceVisibility: 'hidden',
                       backfaceVisibility: 'hidden',
-                      WebkitTransform: 'translate3d(0, 0, 0)',
-                      transform: 'translate3d(0, 0, 0)',
                     }}
                   />
                 </div>
@@ -178,60 +177,56 @@ export const HeroCarousel: React.FC = () => {
           );
         })}
 
-        {/* Foreground Content: Liquid Glass Card centered vertically
-            Solo se muestra cuando la diapositiva no tiene imagen cargada (fondo institucional),
-            dejando las imágenes del slider totalmente limpias, visibles y sin informaciones sobrepuestas. */}
+        {/* Foreground Content: Liquid Glass Card centered vertically */}
         {Boolean(!currentSlide.image?.trim() ? currentSlide.showTextContainer !== false : currentSlide.showTextContainer === true) && (
-          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 w-full py-4 sm:py-6">
+          <div className="relative z-20 max-w-7xl mx-auto px-2 sm:px-6 md:px-10 w-full py-1.5 sm:py-3 md:py-4">
             <div 
-              className="relative w-full max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl p-4 sm:p-6 md:p-7 lg:p-8 rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-2xl bg-white/[0.16] border border-white/40 border-t-white/80 border-l-white/60 border-b-white/20 border-r-white/30 shadow-[0_20px_50px_rgba(0,0,0,0.35),inset_0_1px_2px_rgba(255,255,255,0.85),inset_0_-1px_1px_rgba(255,255,255,0.2)] space-y-3 sm:space-y-4 animate-fadeIn"
+              className="relative w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl p-2.5 sm:p-4 md:p-6 rounded-xl sm:rounded-3xl overflow-hidden backdrop-blur-2xl bg-white/[0.16] border border-white/40 border-t-white/80 border-l-white/60 border-b-white/20 border-r-white/30 shadow-[0_20px_50px_rgba(0,0,0,0.35),inset_0_1px_2px_rgba(255,255,255,0.85),inset_0_-1px_1px_rgba(255,255,255,0.2)] space-y-1 sm:space-y-2 md:space-y-3 animate-fadeIn"
               style={{
                 WebkitBackdropFilter: 'blur(24px) saturate(180%)',
                 backdropFilter: 'blur(24px) saturate(180%)',
               }}
             >
               
-              {/* Apple Crystal Glass Pure Specular Highlights (sin tintes azules ni oscuros) */}
+              {/* Apple Crystal Glass Pure Specular Highlights */}
               <div className="pointer-events-none absolute -top-24 -left-24 w-60 h-60 rounded-full bg-white/25 blur-2xl" />
               <div className="pointer-events-none absolute -bottom-24 -right-24 w-60 h-60 rounded-full bg-white/10 blur-3xl" />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/25 via-white/[0.05] to-transparent rounded-2xl sm:rounded-3xl" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/25 via-white/[0.05] to-transparent rounded-xl sm:rounded-3xl" />
 
-              {/* Tag / Badge en Cápsula Liquid Glass */}
-              <div className="relative z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#B91C1C] text-white text-[11px] sm:text-xs font-bold tracking-wider uppercase shadow-[0_2px_10px_rgba(185,28,28,0.4),inset_0_1px_1px_rgba(255,255,255,0.7)] border border-white/40">
-                <Sparkles className="w-3 h-3 text-amber-300 shrink-0" />
+              {/* Tag / Badge */}
+              <div className="relative z-10 inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-[#B91C1C] text-white text-[9px] sm:text-xs font-bold tracking-wider uppercase shadow-[0_2px_10px_rgba(185,28,28,0.4),inset_0_1px_1px_rgba(255,255,255,0.7)] border border-white/40">
+                <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-300 shrink-0" />
                 <span>{currentSlide.tag || 'Formación de Excelencia'}</span>
               </div>
 
-              {/* Title with Sleek Typography & Strong Contrast Shadow */}
-              <h1 className="relative z-10 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-white uppercase leading-tight sm:leading-snug tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] font-sans line-clamp-3">
+              {/* Title */}
+              <h1 className="relative z-10 text-xs sm:text-base md:text-2xl lg:text-3xl font-black text-white uppercase leading-tight tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] font-sans line-clamp-1 sm:line-clamp-2">
                 {currentSlide.title}
               </h1>
 
               {/* Subtitle */}
-              <p className="relative z-10 text-xs sm:text-sm md:text-base text-white/95 font-medium leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] line-clamp-2 sm:line-clamp-3 md:line-clamp-4">
+              <p className="relative z-10 text-[9px] sm:text-xs md:text-sm text-white/95 font-medium leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] line-clamp-1 sm:line-clamp-2">
                 {currentSlide.subtitle}
               </p>
 
-              {/* Accent Line con Brillo Líquido */}
-              <div className="relative z-10 w-12 sm:w-16 h-1 bg-gradient-to-r from-[#B91C1C] via-red-500 to-amber-400 rounded-full shadow-[0_0_12px_rgba(220,38,38,0.8)]" />
+              {/* Accent Line */}
+              <div className="relative z-10 w-8 sm:w-14 h-0.5 sm:h-1 bg-gradient-to-r from-[#B91C1C] via-red-500 to-amber-400 rounded-full shadow-[0_0_12px_rgba(220,38,38,0.8)]" />
 
               {/* CTA Buttons */}
-              <div className="relative z-10 pt-1 flex flex-wrap items-center gap-2 sm:gap-3">
-                {/* Primary CTA (#B91C1C) */}
+              <div className="relative z-10 pt-0.5 flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <button
                   id="btn-hero-primary-cta"
                   onClick={() => handleScrollTo(currentSlide.ctaLink || '#servicios')}
-                  className="bg-[#B91C1C] hover:bg-red-700 active:scale-95 text-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-full font-bold uppercase tracking-wider text-xs sm:text-sm transition shadow-lg flex items-center gap-1.5 group cursor-pointer border border-red-400/50 min-h-[40px] sm:min-h-[44px]"
+                  className="bg-[#B91C1C] hover:bg-red-700 active:scale-95 text-white px-2.5 py-1 sm:px-4 sm:py-2.5 rounded-full font-bold uppercase tracking-wider text-[9px] sm:text-xs transition shadow-lg flex items-center gap-1 group cursor-pointer border border-red-400/50"
                 >
                   <span>{currentSlide.ctaText || 'Explorar Carreras'}</span>
-                  <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 group-hover:translate-x-1 transition-transform" />
                 </button>
 
-                {/* Secondary CTA Liquid Glass Button estilo Apple */}
                 <button
                   id="btn-hero-secondary-cta"
                   onClick={() => handleScrollTo(currentSlide.secondaryLink || '#admisiones')}
-                  className="bg-white/20 hover:bg-white/35 active:scale-95 text-white border border-white/50 border-t-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.8)] px-4 sm:px-5 py-2.5 sm:py-3 rounded-full font-bold uppercase tracking-wider text-xs sm:text-sm transition flex items-center gap-1.5 cursor-pointer min-h-[40px] sm:min-h-[44px]"
+                  className="bg-white/20 hover:bg-white/35 active:scale-95 text-white border border-white/50 border-t-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.8)] px-2.5 py-1 sm:px-4 sm:py-2.5 rounded-full font-bold uppercase tracking-wider text-[9px] sm:text-xs transition flex items-center gap-1 cursor-pointer"
                   style={{
                     WebkitBackdropFilter: 'blur(16px) saturate(180%)',
                     backdropFilter: 'blur(16px) saturate(180%)',
@@ -240,11 +235,10 @@ export const HeroCarousel: React.FC = () => {
                   <span>{currentSlide.secondaryText || 'Admisiones 2026'}</span>
                 </button>
 
-                {/* Quick CMS slide edit helper for admins */}
                 {currentUser && (
                   <button
                     onClick={() => setActiveView('dashboard')}
-                    className="hidden md:inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[11px] border border-amber-400/40 backdrop-blur-md shadow-xs cursor-pointer"
+                    className="hidden lg:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[10px] border border-amber-400/40 backdrop-blur-md shadow-xs cursor-pointer"
                     title="Editar este carrusel en el CMS"
                   >
                     <Edit3 className="w-3 h-3" />
@@ -263,34 +257,34 @@ export const HeroCarousel: React.FC = () => {
               id="btn-carousel-prev"
               onClick={handlePrev}
               aria-label="Slide anterior"
-              className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 md:p-3 rounded-full bg-white/20 hover:bg-white/35 active:scale-95 text-white border border-white/40 border-t-white/80 transition-all shadow-[0_8px_24px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.8)] hover:scale-110 cursor-pointer"
+              className="absolute left-1.5 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-30 p-1.5 sm:p-2.5 md:p-3 rounded-full bg-white/20 hover:bg-white/35 active:scale-95 text-white border border-white/40 border-t-white/80 transition-all shadow-[0_8px_24px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.8)] hover:scale-110 cursor-pointer"
               style={{
                 WebkitBackdropFilter: 'blur(16px) saturate(180%)',
                 backdropFilter: 'blur(16px) saturate(180%)',
               }}
             >
-              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+              <ChevronLeft className="w-3.5 h-3.5 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </button>
             <button
               id="btn-carousel-next"
               onClick={handleNext}
               aria-label="Slide siguiente"
-              className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 md:p-3 rounded-full bg-white/20 hover:bg-white/35 active:scale-95 text-white border border-white/40 border-t-white/80 transition-all shadow-[0_8px_24px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.8)] hover:scale-110 cursor-pointer"
+              className="absolute right-1.5 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-30 p-1.5 sm:p-2.5 md:p-3 rounded-full bg-white/20 hover:bg-white/35 active:scale-95 text-white border border-white/40 border-t-white/80 transition-all shadow-[0_8px_24px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.8)] hover:scale-110 cursor-pointer"
               style={{
                 WebkitBackdropFilter: 'blur(16px) saturate(180%)',
                 backdropFilter: 'blur(16px) saturate(180%)',
               }}
             >
-              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+              <ChevronRight className="w-3.5 h-3.5 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </button>
           </>
         )}
 
         {/* Slide Indicators and Play/Pause control cleanly positioned at bottom-right in Apple Crystal Glass style */}
-        <div className="absolute bottom-3 sm:bottom-6 right-3 sm:right-8 z-30 flex items-center gap-2 sm:gap-3 pointer-events-auto">
+        <div className="absolute bottom-2 sm:bottom-4 md:bottom-6 right-2 sm:right-6 md:right-8 z-30 flex items-center gap-1.5 sm:gap-3 pointer-events-auto">
           {/* Indicators */}
           <div 
-            className="flex items-center space-x-1.5 sm:space-x-2 bg-white/20 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/35 border-t-white/70 shadow-[0_8px_24px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.7)]"
+            className="flex items-center space-x-1 sm:space-x-2 bg-white/20 px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-full border border-white/35 border-t-white/70 shadow-[0_8px_24px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.7)]"
             style={{
               WebkitBackdropFilter: 'blur(14px) saturate(180%)',
               backdropFilter: 'blur(14px) saturate(180%)',
@@ -301,8 +295,8 @@ export const HeroCarousel: React.FC = () => {
                 key={idx}
                 onClick={() => setCurrentIdx(idx)}
                 aria-label={`Ir al slide ${idx + 1}`}
-                className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                  idx === currentIdx ? 'w-6 sm:w-8 bg-[#B91C1C]' : 'w-1.5 sm:w-2 bg-white/50 hover:bg-white/90'
+                className={`h-1 sm:h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                  idx === currentIdx ? 'w-4 sm:w-8 bg-[#B91C1C]' : 'w-1 sm:w-2 bg-white/50 hover:bg-white/90'
                 }`}
               />
             ))}

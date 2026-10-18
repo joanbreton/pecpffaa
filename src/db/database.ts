@@ -138,7 +138,7 @@ export function computeDatabaseStats(
     tables: [
       {
         name: 'tbl_slides',
-        description: 'Banners y diapositivas principales de la portada (16:9)',
+        description: 'Banners y diapositivas principales de la portada (1280px x 624px)',
         count: slides.length
       },
       {
