@@ -337,7 +337,7 @@ export const DatabaseAuditTab: React.FC<DatabaseAuditTabProps> = ({ onNavigateTo
               <span className="font-mono text-xs font-bold text-red-300">tbl_slides</span>
               <span className="bg-white/15 px-2 py-0.5 rounded text-[10px] font-mono font-bold text-white">{slides.length} filas</span>
             </div>
-            <p className="text-[11px] text-slate-300">Banners principales del carrusel (1280px x 624px) de la portada institucional.</p>
+            <p className="text-[11px] text-slate-300">Banners principales del carrusel (1280px x 680px) de la portada institucional.</p>
             {onNavigateToTab && (
               <button 
                 onClick={() => onNavigateToTab('slides')}

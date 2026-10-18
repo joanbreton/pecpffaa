@@ -511,7 +511,7 @@ export const CMSDashboard: React.FC = () => {
               >
                 <div className="flex items-center gap-3">
                   <ImageIcon className="w-4 h-4 text-red-400" />
-                  <span>Slider Carrusel (1280x624)</span>
+                  <span>Slider Carrusel (1280x680)</span>
                 </div>
                 <span className="text-[10px] bg-white/15 text-white px-2 py-0.5 rounded-full font-mono">
                   {slides.length}
@@ -766,7 +766,7 @@ export const CMSDashboard: React.FC = () => {
                     className="py-3 px-4 bg-white/10 hover:bg-white/20 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-white/20 transition-colors"
                   >
                     <Plus className="w-4 h-4 text-amber-300" />
-                    <span>Añadir Slide (1280x624)</span>
+                    <span>Añadir Slide (1280x680)</span>
                   </button>
 
                   <button
@@ -876,7 +876,7 @@ export const CMSDashboard: React.FC = () => {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                 <div>
-                  <h2 className="text-xl font-bold text-slate-900">Gestión del Slider Carrusel (1280px x 624px)</h2>
+                  <h2 className="text-xl font-bold text-slate-900">Gestión del Slider Carrusel (1280px x 680px)</h2>
                   <p className="text-xs text-slate-500">Administre las imágenes, textos y llamadas a la acción de la portada (Responsive en Desktop, Tablet y Móvil).</p>
                 </div>
 
@@ -890,7 +890,7 @@ export const CMSDashboard: React.FC = () => {
                   }`}
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Nuevo Slide (1280x624)</span>
+                  <span>Nuevo Slide (1280x680)</span>
                 </button>
               </div>
 
@@ -902,10 +902,10 @@ export const CMSDashboard: React.FC = () => {
                     className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col justify-between"
                   >
                     <div>
-                      {/* 1280x624 Image Preview Container */}
+                      {/* 1280x680 Image Preview Container */}
                       <div 
-                        className="relative aspect-[1280/624] w-full overflow-hidden bg-slate-950"
-                        style={{ aspectRatio: '1280 / 624' }}
+                        className="relative aspect-[1280/680] w-full overflow-hidden bg-slate-950"
+                        style={{ aspectRatio: '1280 / 680' }}
                       >
                         {slide.image ? (
                           <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
@@ -1475,7 +1475,7 @@ export const CMSDashboard: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <h3 className="font-bold text-base text-slate-900">
-                  {editingSlideId ? 'Editar Slide (1280x624)' : 'Nuevo Slide para Carrusel (1280x624)'}
+                  {editingSlideId ? 'Editar Slide (1280x680)' : 'Nuevo Slide para Carrusel (1280x680)'}
                 </h3>
                 <p className="text-[11px] text-slate-500">
                   Cada cambio se guarda y registra en la base de datos Firestore.
@@ -1531,11 +1531,11 @@ export const CMSDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* GESTIÓN DE IMAGEN 1280x624 Y PERSISTENCIA BD */}
+              {/* GESTIÓN DE IMAGEN 1280x680 Y PERSISTENCIA BD */}
               <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className="block font-bold text-slate-800 text-xs">
-                    Imagen de la Diapositiva (Tamaño recomendado: 1280px x 624px)
+                    Imagen de la Diapositiva (Tamaño recomendado: 1280px x 680px)
                   </label>
                   {slideFormData.image && (
                     <button
@@ -1607,18 +1607,18 @@ export const CMSDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Previsualización 1280x624 en Vivo */}
+                {/* Previsualización 1280x680 en Vivo */}
                 {slideFormData.image ? (
                   <div className="mt-2 space-y-1">
                     <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                      <span>Vista Previa (1280px x 624px):</span>
+                      <span>Vista Previa (1280px x 680px):</span>
                       <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                         {slideFormData.imageFit === 'contain' ? 'Modo Contener' : 'Ajustada a la Estructura'}
                       </span>
                     </div>
                     <div 
-                      className="relative aspect-[1280/624] w-full rounded-lg overflow-hidden bg-slate-950 border border-slate-300 shadow-inner flex items-center justify-center"
-                      style={{ aspectRatio: '1280 / 624' }}
+                      className="relative aspect-[1280/680] w-full rounded-lg overflow-hidden bg-slate-950 border border-slate-300 shadow-inner flex items-center justify-center"
+                      style={{ aspectRatio: '1280 / 680' }}
                     >
                       <img
                         src={slideFormData.image}

@@ -104,13 +104,11 @@ export const HeroCarousel: React.FC = () => {
     >
       {/* 
         Carrusel 100% Ancho Completo (Full-Width Edge-to-Edge)
-        - Las imágenes ocupan el 100% del ancho de la pantalla en cualquier dispositivo
-        - Desktop / Pantallas grandes: 100% ancho x 624px de alto
-        - Tablet: 100% ancho x 440px-520px
-        - Móvil: 100% ancho x 280px-340px
+        - Altura 680px en pantallas grandes (Desktop), adaptativa en Tablet y Móvil
+        - Imagen destacada con alto contraste, nitidez y realce visual
       */}
       <div 
-        className="relative w-full h-[280px] xs:h-[340px] sm:h-[440px] md:h-[520px] lg:h-[624px] flex items-center overflow-hidden bg-slate-950 transition-all duration-300"
+        className="relative w-full h-[320px] xs:h-[380px] sm:h-[480px] md:h-[580px] lg:h-[680px] flex items-center overflow-hidden bg-slate-950 transition-all duration-300 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)]"
       >
 
         {/* Slides loop */}
@@ -131,22 +129,26 @@ export const HeroCarousel: React.FC = () => {
             >
               {hasCustomImage ? (
                 <div className="relative w-full h-full overflow-hidden flex items-center justify-center bg-slate-950">
-                  {/* Imagen ocupando el 100% del ancho de la pantalla */}
+                  {/* Imagen ocupando el 100% del ancho y 680px destacada con máxima nitidez */}
                   <img
                     src={slide.image}
                     alt={slide.title || 'Slide institucional'}
                     sizes="100vw"
-                    className="w-full h-full object-cover object-center transition-transform duration-700 ease-out select-none"
+                    className="w-full h-full object-cover object-center transition-all duration-700 ease-out select-none"
                     loading={idx === 0 ? "eager" : "lazy"}
                     fetchPriority={idx === 0 ? "high" : "low"}
                     decoding={idx === 0 ? "sync" : "async"}
                     draggable={false}
                     style={{
                       imageRendering: 'high-quality',
+                      filter: 'contrast(1.05) saturate(1.06) brightness(1.02)',
                       WebkitBackfaceVisibility: 'hidden',
                       backfaceVisibility: 'hidden',
                     }}
                   />
+
+                  {/* Sutil viñeta cinematográfica para dar profundidad y resaltar la imagen */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-slate-950/20 sm:bg-gradient-to-r sm:from-slate-950/45 sm:via-transparent sm:to-slate-950/20 pointer-events-none" />
                 </div>
               ) : (
                 /* Elegant Institutional Military Theme without external default images */

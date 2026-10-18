@@ -536,7 +536,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       'Slides (Carrusel)',
       newSlide.title || 'Slide sin título',
       newSlide.id,
-      `Se creó un nuevo slide para el carrusel (1280x624) con etiqueta "${newSlide.tag}" y enlace a "${newSlide.ctaText}".`,
+      `Se creó un nuevo slide para el carrusel (1280x680) con etiqueta "${newSlide.tag}" y enlace a "${newSlide.ctaText}".`,
       { slide: newSlide }
     );
     notifyCrossTab();
