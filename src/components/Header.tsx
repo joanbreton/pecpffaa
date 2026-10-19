@@ -45,7 +45,7 @@ export const Header: React.FC = () => {
 
   const navLinks = [
     { label: 'Inicio', href: '#inicio' },
-    { label: 'Noticias & Eventos', href: '#noticias' },
+    { label: 'Noticias y Eventos', href: '#noticias' },
     { label: 'Oferta Académica', href: '#servicios' },
     { label: 'Admisiones', href: '#admisiones' },
     { label: 'Contacto', href: '#contacto' },

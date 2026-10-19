@@ -33,7 +33,7 @@ export const NewsSection: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-slate-100 pb-4">
           <div className="space-y-1">
             <h2 className="text-2xl sm:text-3xl font-bold text-[#0D3671] border-l-4 border-[#B91C1C] pl-4">
-              Actualidad Institucional
+              Noticias y Eventos
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 pl-4">
               Actividades académicas, ceremonias de graduación y convenios de doctrina militar del PECPFFAA.
