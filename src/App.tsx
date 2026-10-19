@@ -63,10 +63,10 @@ const MainContent: React.FC = () => {
         <>
           <Header />
           <main className="flex-1">
-            <DirectorSection />
             <HeroCarousel />
-            <AcademicOffer />
+            <DirectorSection />
             <NewsSection />
+            <AcademicOffer />
             <ContactSection />
           </main>
           <Footer />
